@@ -252,7 +252,11 @@ const ScenarioView = () => {
                 <Button 
                   onClick={() => setCurrentStep(Step.Evaluation)} 
                   disabled={!aiOptionSelection}
-                  className="bg-primary-600 hover:bg-primary-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:bg-neutral-500 disabled:text-white"
+                  className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
+                    aiOptionSelection 
+                    ? "bg-primary-600 hover:bg-primary-700" 
+                    : "bg-neutral-500 opacity-70"
+                  }`}
                   size="lg"
                 >
                   <span className="mr-2">Continue to Evaluation</span>
@@ -527,7 +531,16 @@ const ScenarioView = () => {
                     !evaluationResponses.responsible.trim() ||
                     !evaluationResponses.ethicalChoice
                   }
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:bg-neutral-500 disabled:from-neutral-500 disabled:to-neutral-600"
+                  className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
+                    evaluationResponses.appropriateness.trim() &&
+                    evaluationResponses.benefits.trim() &&
+                    evaluationResponses.risks.trim() &&
+                    evaluationResponses.inclusion.trim() &&
+                    evaluationResponses.responsible.trim() &&
+                    evaluationResponses.ethicalChoice
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700" 
+                    : "bg-neutral-500 opacity-70"
+                  }`}
                   size="lg"
                 >
                   <span className="mr-2">Continue to Share Your Perspective</span>
@@ -595,7 +608,11 @@ const ScenarioView = () => {
                 <Button 
                   onClick={handlePerspectiveSubmit}
                   disabled={!perspectiveContent.trim() || perspectiveMutation.isPending}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:bg-neutral-500"
+                  className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
+                    perspectiveContent.trim() && !perspectiveMutation.isPending
+                    ? "bg-indigo-600 hover:bg-indigo-700" 
+                    : "bg-neutral-500 opacity-70"
+                  }`}
                   size="lg"
                 >
                   {perspectiveMutation.isPending ? (
