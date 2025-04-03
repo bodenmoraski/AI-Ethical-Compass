@@ -1,0 +1,33 @@
+Project Title: AI Ethical Compass Web Platform
+
+Project Goal: Develop a functional, engaging, and accessible web platform titled "AI Ethical Compass" for the ISTE+ASCD AI Innovator Challenge 2025. The platform's primary purpose is to help users (target audience: high school students and educators) develop critical thinking skills regarding the ethical, responsible, and inclusive use of Artificial Intelligence (AI).
+
+Core Requirements & User Flow:
+
+Scenario Presentation: The platform must present users with diverse, pre-defined scenarios involving AI use (e.g., AI-generated text, images, summaries, accessibility tools). Scenarios should be relevant to the target audience and directly address the challenge themes of digital inclusion and responsible digital citizenship, connecting implicitly or explicitly to UN Sustainable Development Goals 4 (Quality Education) and 10 (Reduced Inequalities).
+AI Use Identification: For each scenario, provide a mechanism for the user to identify if and potentially how AI might have been used. (This could be multiple choice, a short answer, or integrated into the next step).
+Ethical Evaluation Framework: After identification (or revealing the AI use), prompt the user with guided questions to evaluate the appropriateness and implications of AI use in that specific context. Key evaluation points must include:
+Appropriateness (Why/Why not?).
+Potential benefits.
+Potential drawbacks/risks (e.g., bias, misinformation, plagiarism).
+Connection to digital inclusion/exclusion.
+What constitutes responsible use in this scenario (e.g., disclosure, fact-checking)?
+Perspective Submission: Allow users to anonymously submit their brief perspective or reasoning regarding the ethical evaluation of the scenario.
+Perspective Viewing: Display a collection of anonymized user perspectives for each scenario, allowing users to see a range of viewpoints. Consider simple display methods (e.g., a list, potentially basic thematic grouping if feasible) that maintain anonymity and respect.
+Navigation: Users should be able to easily navigate between different scenarios and supporting information pages.
+Key Features to Implement:
+
+Scenario Library: A backend mechanism to easily store and manage scenarios (text, potentially images/links). Aim for 5-7 well-developed initial scenarios.
+Evaluation Interface: User-friendly interface for presenting scenarios and collecting user responses for identification and ethical evaluation.
+Perspective System: A simple database/backend system to store and retrieve anonymous user perspectives associated with specific scenarios. Ensure data handling is secure and maintains anonymity.
+Static Pages: Include basic informational pages like "About" (explaining the project, its purpose, and alignment with the challenge), "Instructions," and potentially links to external resources on digital citizenship or AI ethics.
+Technical & Design Considerations:
+
+Technology: (Optional: Specify preferred stack, e.g., "Use Python/Flask/SQLite for backend and standard HTML/CSS/JavaScript for frontend," or state "Choose an appropriate, modern web stack"). If using external libraries, ensure they are suitable for a student project.
+Accessibility: Crucial requirement. Design and build the platform adhering to web accessibility best practices (aiming for WCAG 2.1 AA compliance). This includes semantic HTML, keyboard navigation, sufficient color contrast, alt text for images, and compatibility with screen readers.
+UI/UX: Create a clean, intuitive, and engaging user interface suitable for the target audience. Prioritize ease of use and clarity.
+Functionality: The platform must be fully functional and demonstrably meet all core requirements.
+Deployment: The final output should be a deployable web application (provide necessary code and configuration files).
+Context & Evaluation: This project is for a competition judged by a rubric emphasizing: Advancing Safe/Responsible AI Use, Alignment with Theme, Impact/Relevance, Innovation/Creativity, Collaboration/Inclusion, Purposeful Design/Inclusivity, Presentation/Communication, and Exploration/Learning Process. The final product and its features should clearly reflect these criteria, particularly Purposeful Design, Inclusivity, and Impact.
+
+Deliverable: All source code, necessary assets, database schema (if applicable), and basic deployment instructions for the functional "AI Ethical Compass" web platform.
