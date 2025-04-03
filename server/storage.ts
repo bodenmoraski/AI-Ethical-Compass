@@ -160,13 +160,13 @@ export class MemStorage implements IStorage {
           title: "AI in Education: Guidelines for Ethical Use",
           source: "UNESCO",
           type: "article",
-          link: "#"
+          link: "https://en.unesco.org/artificial-intelligence/education"
         },
         {
           title: "Video: Digital Equity in AI-Enhanced Learning",
           source: "ISTE",
           type: "video",
-          link: "#"
+          link: "https://www.iste.org/areas-of-focus/AI-in-education"
         }
       ],
       order: 1
@@ -190,13 +190,13 @@ export class MemStorage implements IStorage {
           title: "Facial Recognition Technology in Schools: Privacy Concerns",
           source: "Electronic Frontier Foundation",
           type: "article",
-          link: "#"
+          link: "https://www.eff.org/issues/facial-recognition"
         },
         {
           title: "Algorithmic Bias in Face Recognition Technologies",
           source: "MIT Media Lab",
           type: "research",
-          link: "#"
+          link: "https://www.media.mit.edu/projects/gender-shades/overview/"
         }
       ],
       order: 2
@@ -220,13 +220,13 @@ export class MemStorage implements IStorage {
           title: "The Challenges of AI Content Moderation in Educational Contexts",
           source: "Journal of Educational Technology",
           type: "article",
-          link: "#"
+          link: "https://www.jlet.org/index.php/articles"
         },
         {
           title: "Balancing Safety and Academic Freedom Online",
           source: "Center for Digital Education",
           type: "guide",
-          link: "#"
+          link: "https://www.govtech.com/education"
         }
       ],
       order: 3
@@ -250,13 +250,13 @@ export class MemStorage implements IStorage {
           title: "AI in College Admissions: Promise and Pitfalls",
           source: "Higher Education Today",
           type: "article",
-          link: "#"
+          link: "https://www.higheredtoday.org/policy-research/diversity-equity-inclusion/"
         },
         {
           title: "Equity Considerations in Automated Admissions Systems",
           source: "Education Policy Institute",
           type: "research",
-          link: "#"
+          link: "https://epi.org.uk/publications-and-research/"
         }
       ],
       order: 4
@@ -280,13 +280,13 @@ export class MemStorage implements IStorage {
           title: "AI for Education Accessibility: Best Practices",
           source: "Center for Applied Special Technology",
           type: "guide",
-          link: "#"
+          link: "https://www.cast.org/products-services/resources"
         },
         {
           title: "Balancing Accommodation and Assessment Integrity",
           source: "Association of Test Publishers",
           type: "whitepaper",
-          link: "#"
+          link: "https://www.testpublishers.org/resources"
         }
       ],
       order: 5

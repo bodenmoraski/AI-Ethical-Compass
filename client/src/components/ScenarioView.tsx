@@ -252,7 +252,7 @@ const ScenarioView = () => {
                 <Button 
                   onClick={() => setCurrentStep(Step.Evaluation)} 
                   disabled={!aiOptionSelection}
-                  className="bg-primary-600 hover:bg-primary-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:bg-neutral-400 disabled:text-white"
+                  className="bg-primary-600 hover:bg-primary-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 disabled:bg-neutral-500 disabled:text-white"
                   size="lg"
                 >
                   <span className="mr-2">Continue to Evaluation</span>
