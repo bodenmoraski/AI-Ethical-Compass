@@ -38,6 +38,9 @@ const ScenarioView = () => {
     risks: "",
     inclusion: "",
     responsible: "",
+    impactRating: 3, // Default to middle value (1-5 scale)
+    concernLevel: 3, // Default to middle value (1-5 scale)
+    ethicalChoice: "", // Multiple choice selection
   });
   
   // Form state for perspective submission
@@ -76,6 +79,9 @@ const ScenarioView = () => {
       risks: "",
       inclusion: "",
       responsible: "",
+      impactRating: 3,
+      concernLevel: 3,
+      ethicalChoice: "",
     });
     setPerspectiveContent("");
   }, [scenarioId]);
@@ -132,7 +138,7 @@ const ScenarioView = () => {
   };
 
   // Handle changes to evaluation form fields
-  const handleEvaluationChange = (field: keyof typeof evaluationResponses, value: string) => {
+  const handleEvaluationChange = (field: keyof typeof evaluationResponses, value: string | number) => {
     setEvaluationResponses(prev => ({
       ...prev,
       [field]: value
@@ -199,32 +205,58 @@ const ScenarioView = () => {
           {/* Step 1: AI Use Identification */}
           {currentStep === Step.Identification && (
             <div className="mt-8" id="step-ai-identification">
-              <h3 className="text-lg font-medium text-neutral-900 mb-3">Step 1: Identify the AI Use</h3>
-              <p className="mb-4 text-neutral-700">Do you think AI was used in this scenario? If so, how might it have been used?</p>
+              <div className="flex items-center mb-5 bg-gradient-to-r from-primary-50 to-blue-50 p-4 rounded-lg border-l-4 border-primary-500">
+                <div className="bg-primary-100 w-10 h-10 flex items-center justify-center rounded-full mr-4">
+                  <span className="material-icons text-primary-600">psychology</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-primary-800">Step 1: Identify the AI Use</h3>
+                  <p className="text-neutral-600">Do you think AI was used in this scenario? If so, how might it have been used?</p>
+                </div>
+              </div>
               
-              <RadioGroup 
-                value={aiOptionSelection || ""} 
-                onValueChange={setAiOptionSelection}
-              >
-                {currentScenario.options.map((option, index) => (
-                  <div key={index} className="flex items-start space-x-2 py-2">
-                    <RadioGroupItem value={option} id={`ai-option-${index}`} />
-                    <Label 
-                      htmlFor={`ai-option-${index}`} 
-                      className="font-medium text-neutral-700"
+              <div className="bg-white p-5 rounded-lg shadow-sm border border-neutral-200">
+                <RadioGroup 
+                  value={aiOptionSelection || ""} 
+                  onValueChange={setAiOptionSelection}
+                  className="space-y-3"
+                >
+                  {currentScenario.options.map((option, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex items-start space-x-3 p-3 rounded-md transition-all ${
+                        aiOptionSelection === option 
+                          ? 'bg-primary-50 border border-primary-200' 
+                          : 'border border-transparent hover:bg-neutral-50'
+                      }`}
                     >
-                      {option}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
+                      <RadioGroupItem 
+                        value={option} 
+                        id={`ai-option-${index}`} 
+                        className="mt-1"
+                      />
+                      <Label 
+                        htmlFor={`ai-option-${index}`} 
+                        className={`font-medium cursor-pointer ${
+                          aiOptionSelection === option ? 'text-primary-900' : 'text-neutral-700'
+                        }`}
+                      >
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
               
-              <div className="mt-5">
+              <div className="mt-6 text-center">
                 <Button 
                   onClick={() => setCurrentStep(Step.Evaluation)} 
                   disabled={!aiOptionSelection}
+                  className="bg-primary-600 hover:bg-primary-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                  size="lg"
                 >
-                  Continue
+                  <span className="mr-2">Continue to Evaluation</span>
+                  <span className="material-icons text-sm">arrow_forward</span>
                 </Button>
               </div>
             </div>
@@ -233,18 +265,44 @@ const ScenarioView = () => {
           {/* Step 2: Ethical Evaluation */}
           {currentStep === Step.Evaluation && (
             <div className="mt-8" id="step-ethical-evaluation">
-              <h3 className="text-lg font-medium text-neutral-900 mb-3">Step 2: Evaluate the Ethics</h3>
-              <Alert className="mb-5 bg-green-50 text-green-800 border-green-200">
-                <span className="material-icons text-green-500 mr-2">info</span>
-                <AlertTitle>AI Use in This Scenario</AlertTitle>
-                <AlertDescription>
-                  {currentScenario.aiUseAnswer}
-                </AlertDescription>
-              </Alert>
-              
-              <div className="space-y-6">
+              <div className="flex items-center mb-5 bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <div className="bg-blue-100 w-10 h-10 flex items-center justify-center rounded-full mr-4">
+                  <span className="material-icons text-blue-600">balance</span>
+                </div>
                 <div>
-                  <Label htmlFor="appropriateness" className="block text-sm font-medium text-neutral-900">
+                  <h3 className="text-lg font-medium text-blue-800">Step 2: Evaluate the Ethics</h3>
+                  <p className="text-neutral-600">
+                    Consider the ethical implications of AI use in this scenario from multiple perspectives.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mb-5 bg-gradient-to-br from-green-50 to-teal-50 p-5 rounded-lg border border-green-200 shadow-sm">
+                <div className="flex">
+                  <div className="flex-shrink-0 mr-4">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="material-icons text-green-600">lightbulb</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-green-800">AI Use in This Scenario</h4>
+                    <p className="mt-2 text-green-800">
+                      {currentScenario.aiUseAnswer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-6 bg-white p-6 rounded-lg border border-neutral-200 shadow-sm mb-6">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-100 mb-6">
+                  <p className="text-blue-700 text-sm">
+                    Taking time to thoughtfully consider different perspectives will help you develop a deeper understanding of AI ethics.
+                  </p>
+                </div>
+                
+                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50 transition-colors">
+                  <Label htmlFor="appropriateness" className="flex items-center text-neutral-900 font-medium mb-2">
+                    <span className="material-icons text-blue-500 mr-2">help_outline</span>
                     Was the use of AI in this scenario appropriate? Why or why not?
                   </Label>
                   <Textarea
@@ -252,12 +310,13 @@ const ScenarioView = () => {
                     value={evaluationResponses.appropriateness}
                     onChange={(e) => handleEvaluationChange('appropriateness', e.target.value)}
                     placeholder="Share your thoughts..."
-                    className="mt-1"
+                    className="border-neutral-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="benefits" className="block text-sm font-medium text-neutral-900">
+                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-green-100 hover:bg-green-50 transition-colors">
+                  <Label htmlFor="benefits" className="flex items-center text-neutral-900 font-medium mb-2">
+                    <span className="material-icons text-green-500 mr-2">add_circle_outline</span>
                     What are the potential benefits of using AI in this way?
                   </Label>
                   <Textarea
@@ -265,12 +324,13 @@ const ScenarioView = () => {
                     value={evaluationResponses.benefits}
                     onChange={(e) => handleEvaluationChange('benefits', e.target.value)}
                     placeholder="Consider benefits for different stakeholders..."
-                    className="mt-1"
+                    className="border-neutral-300 focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="risks" className="block text-sm font-medium text-neutral-900">
+                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-red-100 hover:bg-red-50 transition-colors">
+                  <Label htmlFor="risks" className="flex items-center text-neutral-900 font-medium mb-2">
+                    <span className="material-icons text-red-500 mr-2">error_outline</span>
                     What are the potential risks or drawbacks?
                   </Label>
                   <Textarea
@@ -278,12 +338,13 @@ const ScenarioView = () => {
                     value={evaluationResponses.risks}
                     onChange={(e) => handleEvaluationChange('risks', e.target.value)}
                     placeholder="Consider issues like bias, plagiarism, learning impact..."
-                    className="mt-1"
+                    className="border-neutral-300 focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50"
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="inclusion" className="block text-sm font-medium text-neutral-900">
+                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-purple-100 hover:bg-purple-50 transition-colors">
+                  <Label htmlFor="inclusion" className="flex items-center text-neutral-900 font-medium mb-2">
+                    <span className="material-icons text-purple-500 mr-2">diversity_3</span>
                     How does this relate to digital inclusion or exclusion?
                   </Label>
                   <Textarea
@@ -291,12 +352,13 @@ const ScenarioView = () => {
                     value={evaluationResponses.inclusion}
                     onChange={(e) => handleEvaluationChange('inclusion', e.target.value)}
                     placeholder="Consider access, equity, language barriers..."
-                    className="mt-1"
+                    className="border-neutral-300 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="responsible" className="block text-sm font-medium text-neutral-900">
+                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-amber-100 hover:bg-amber-50 transition-colors">
+                  <Label htmlFor="responsible" className="flex items-center text-neutral-900 font-medium mb-2">
+                    <span className="material-icons text-amber-500 mr-2">policy</span>
                     What would constitute responsible use in this scenario?
                   </Label>
                   <Textarea
@@ -304,17 +366,172 @@ const ScenarioView = () => {
                     value={evaluationResponses.responsible}
                     onChange={(e) => handleEvaluationChange('responsible', e.target.value)}
                     placeholder="Consider disclosure, guidelines, policies..."
-                    className="mt-1"
+                    className="border-neutral-300 focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
                   />
                 </div>
               </div>
               
-              <div className="mt-6">
+              {/* Add rating scales and multiple choice */}
+              <div className="mt-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border border-blue-100 p-6 shadow-sm">
+                <div className="flex items-center mb-5">
+                  <div className="bg-blue-100 w-10 h-10 flex items-center justify-center rounded-full mr-3">
+                    <span className="material-icons text-blue-600">speed</span>
+                  </div>
+                  <h4 className="text-lg font-medium text-blue-800">Quick Assessments</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Impact rating scale */}
+                  <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-sm">
+                    <Label htmlFor="impactRating" className="flex items-center text-neutral-900 font-medium mb-3">
+                      <span className="material-icons text-indigo-500 mr-2">trending_up</span>
+                      Potential Educational Impact
+                    </Label>
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs text-neutral-600 px-2 mb-1">
+                        <span>Low Impact</span>
+                        <span>High Impact</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-neutral-500">1</span>
+                        <input
+                          type="range"
+                          min={1}
+                          max={5}
+                          step={1}
+                          value={evaluationResponses.impactRating}
+                          onChange={(e) => handleEvaluationChange('impactRating', parseInt(e.target.value))}
+                          className="w-full h-3 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        />
+                        <span className="text-sm font-medium text-neutral-500">5</span>
+                      </div>
+                      <div className="text-center mt-2">
+                        <span className="inline-block px-3 py-1 bg-indigo-500 text-white font-medium rounded-full text-sm">
+                          {evaluationResponses.impactRating}/5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Concern level scale */}
+                  <div className="bg-white rounded-lg p-4 border border-neutral-200 shadow-sm">
+                    <Label htmlFor="concernLevel" className="flex items-center text-neutral-900 font-medium mb-3">
+                      <span className="material-icons text-amber-500 mr-2">warning</span>
+                      Ethical Concern Level
+                    </Label>
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs text-neutral-600 px-2 mb-1">
+                        <span>No Concerns</span>
+                        <span>Serious Concerns</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-neutral-500">1</span>
+                        <input
+                          type="range"
+                          min={1}
+                          max={5}
+                          step={1}
+                          value={evaluationResponses.concernLevel}
+                          onChange={(e) => handleEvaluationChange('concernLevel', parseInt(e.target.value))}
+                          className="w-full h-3 bg-amber-100 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                        />
+                        <span className="text-sm font-medium text-neutral-500">5</span>
+                      </div>
+                      <div className="text-center mt-2">
+                        <span className="inline-block px-3 py-1 bg-amber-500 text-white font-medium rounded-full text-sm">
+                          {evaluationResponses.concernLevel}/5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Multiple choice */}
+                <div className="mt-6 bg-white rounded-lg p-4 border border-neutral-200 shadow-sm">
+                  <Label className="flex items-center text-neutral-900 font-medium mb-3">
+                    <span className="material-icons text-purple-500 mr-2">category</span>
+                    Most Relevant Ethical Principle
+                  </Label>
+                  <RadioGroup 
+                    value={evaluationResponses.ethicalChoice} 
+                    onValueChange={(value) => handleEvaluationChange('ethicalChoice', value)}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2"
+                  >
+                    <div className={`flex items-center p-3 border rounded-md transition-all ${
+                      evaluationResponses.ethicalChoice === 'fairness' 
+                        ? 'bg-blue-50 border-blue-300 shadow-sm' 
+                        : 'border-neutral-200 hover:border-blue-200 hover:bg-blue-50'
+                    }`}>
+                      <RadioGroupItem value="fairness" id="ethicalChoice-fairness" 
+                        className="mr-2" />
+                      <Label htmlFor="ethicalChoice-fairness" className="cursor-pointer font-medium">
+                        Fairness & Equity
+                      </Label>
+                    </div>
+                    <div className={`flex items-center p-3 border rounded-md transition-all ${
+                      evaluationResponses.ethicalChoice === 'privacy' 
+                        ? 'bg-green-50 border-green-300 shadow-sm' 
+                        : 'border-neutral-200 hover:border-green-200 hover:bg-green-50'
+                    }`}>
+                      <RadioGroupItem value="privacy" id="ethicalChoice-privacy" 
+                        className="mr-2" />
+                      <Label htmlFor="ethicalChoice-privacy" className="cursor-pointer font-medium">
+                        Privacy & Data Protection
+                      </Label>
+                    </div>
+                    <div className={`flex items-center p-3 border rounded-md transition-all ${
+                      evaluationResponses.ethicalChoice === 'transparency' 
+                        ? 'bg-purple-50 border-purple-300 shadow-sm' 
+                        : 'border-neutral-200 hover:border-purple-200 hover:bg-purple-50'
+                    }`}>
+                      <RadioGroupItem value="transparency" id="ethicalChoice-transparency" 
+                        className="mr-2" />
+                      <Label htmlFor="ethicalChoice-transparency" className="cursor-pointer font-medium">
+                        Transparency & Explainability
+                      </Label>
+                    </div>
+                    <div className={`flex items-center p-3 border rounded-md transition-all ${
+                      evaluationResponses.ethicalChoice === 'safety' 
+                        ? 'bg-red-50 border-red-300 shadow-sm' 
+                        : 'border-neutral-200 hover:border-red-200 hover:bg-red-50'
+                    }`}>
+                      <RadioGroupItem value="safety" id="ethicalChoice-safety" 
+                        className="mr-2" />
+                      <Label htmlFor="ethicalChoice-safety" className="cursor-pointer font-medium">
+                        Safety & Security
+                      </Label>
+                    </div>
+                    <div className={`flex items-center p-3 border rounded-md transition-all ${
+                      evaluationResponses.ethicalChoice === 'autonomy' 
+                        ? 'bg-amber-50 border-amber-300 shadow-sm' 
+                        : 'border-neutral-200 hover:border-amber-200 hover:bg-amber-50'
+                    }`}>
+                      <RadioGroupItem value="autonomy" id="ethicalChoice-autonomy" 
+                        className="mr-2" />
+                      <Label htmlFor="ethicalChoice-autonomy" className="cursor-pointer font-medium">
+                        Human Autonomy & Agency
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+
+              <div className="mt-8 flex justify-center">
                 <Button 
                   onClick={() => setCurrentStep(Step.Submission)}
-                  disabled={Object.values(evaluationResponses).some(val => !val.trim())}
+                  disabled={
+                    !evaluationResponses.appropriateness.trim() ||
+                    !evaluationResponses.benefits.trim() ||
+                    !evaluationResponses.risks.trim() ||
+                    !evaluationResponses.inclusion.trim() ||
+                    !evaluationResponses.responsible.trim() ||
+                    !evaluationResponses.ethicalChoice
+                  }
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  size="lg"
                 >
-                  Continue
+                  <span className="mr-2">Continue to Share Your Perspective</span>
+                  <span className="material-icons text-sm">arrow_forward</span>
                 </Button>
               </div>
             </div>
@@ -323,27 +540,43 @@ const ScenarioView = () => {
           {/* Step 3: Perspective Submission */}
           {currentStep === Step.Submission && (
             <div className="mt-8" id="step-perspective-submission">
-              <h3 className="text-lg font-medium text-neutral-900 mb-3">Step 3: Share Your Perspective</h3>
-              <p className="mb-4 text-neutral-700">
-                Submit your overall perspective on this ethical dilemma. Your response will be shared anonymously with other users.
-              </p>
-              
-              <div>
-                <Label htmlFor="perspective" className="block text-sm font-medium text-neutral-900">
-                  Your Perspective
-                </Label>
-                <Textarea
-                  id="perspective"
-                  value={perspectiveContent}
-                  onChange={(e) => setPerspectiveContent(e.target.value)}
-                  placeholder="Share your thoughts on the ethical implications of this scenario..."
-                  className="mt-1"
-                  rows={4}
-                />
+              <div className="flex items-center mb-5 bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                <div className="bg-indigo-100 w-10 h-10 flex items-center justify-center rounded-full mr-4">
+                  <span className="material-icons text-indigo-600">comment</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-indigo-800">Step 3: Share Your Perspective</h3>
+                  <p className="text-neutral-600">
+                    Submit your overall perspective on this ethical dilemma. Your response will be shared anonymously with other users.
+                  </p>
+                </div>
               </div>
               
-              <div className="mt-4">
-                <div className="flex items-start space-x-2">
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                <div className="mb-5">
+                  <Label htmlFor="perspective" className="block text-md font-medium text-neutral-900 mb-2">
+                    Your Perspective
+                  </Label>
+                  <Textarea
+                    id="perspective"
+                    value={perspectiveContent}
+                    onChange={(e) => setPerspectiveContent(e.target.value)}
+                    placeholder="Share your thoughts on the ethical implications of this scenario..."
+                    className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
+                    rows={4}
+                  />
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-4">
+                  <div className="flex items-start">
+                    <span className="material-icons text-blue-600 mr-2">tips_and_updates</span>
+                    <p className="text-sm text-blue-800">
+                      Consider including your thoughts on the balance between innovation and ethics, how different stakeholders might be affected, and what guidelines or policies could help ensure responsible AI use.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex items-start space-x-2 bg-neutral-50 p-3 rounded-md">
                   <Checkbox 
                     id="anonymous" 
                     checked={isAnonymous} 
@@ -358,12 +591,24 @@ const ScenarioView = () => {
                 </div>
               </div>
               
-              <div className="mt-5">
+              <div className="mt-6 flex justify-center">
                 <Button 
                   onClick={handlePerspectiveSubmit}
                   disabled={!perspectiveContent.trim() || perspectiveMutation.isPending}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                  size="lg"
                 >
-                  {perspectiveMutation.isPending ? "Submitting..." : "Submit Perspective"}
+                  {perspectiveMutation.isPending ? (
+                    <>
+                      <span className="mr-2">Submitting...</span>
+                      <span className="material-icons animate-spin text-sm">refresh</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">Submit Perspective</span>
+                      <span className="material-icons text-sm">send</span>
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -372,30 +617,52 @@ const ScenarioView = () => {
           {/* Step 4: Perspective Viewing */}
           {currentStep === Step.Viewing && (
             <div className="mt-8" id="step-perspective-viewing">
-              <h3 className="text-lg font-medium text-neutral-900 mb-3">Step 4: Community Perspectives</h3>
-              <p className="mb-4 text-neutral-700">
-                Explore diverse viewpoints from others who have analyzed this scenario. 
-                Remember that there often isn't a single "right" answer to ethical questions.
-              </p>
+              <div className="flex items-center mb-5 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border-l-4 border-green-500">
+                <div className="bg-green-100 w-10 h-10 flex items-center justify-center rounded-full mr-4">
+                  <span className="material-icons text-green-600">groups</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-green-800">Step 4: Community Perspectives</h3>
+                  <p className="text-neutral-600">
+                    Explore diverse viewpoints from others who have analyzed this scenario. 
+                    Remember that there often isn't a single "right" answer to ethical questions.
+                  </p>
+                </div>
+              </div>
               
-              <Alert className="mb-6 bg-primary-50 border-primary-100">
-                <span className="material-icons text-primary-400 mr-2">volunteer_activism</span>
-                <AlertTitle>Your contribution matters!</AlertTitle>
-                <AlertDescription>
-                  Thank you for sharing your perspective. By engaging in these ethical discussions, 
-                  you're helping to shape responsible AI use in education.
-                </AlertDescription>
-              </Alert>
+              <div className="mb-6 bg-gradient-to-br from-primary-50 to-blue-50 border border-primary-100 rounded-lg p-5 shadow-sm">
+                <div className="flex items-start">
+                  <span className="material-icons text-primary-500 mr-3 text-2xl">volunteer_activism</span>
+                  <div>
+                    <h4 className="text-lg font-medium text-primary-800">Your contribution matters!</h4>
+                    <p className="text-primary-700 mt-1">
+                      Thank you for sharing your perspective. By engaging in these ethical discussions, 
+                      you're helping to shape responsible AI use in education.
+                    </p>
+                  </div>
+                </div>
+              </div>
               
               <div className="space-y-4">
                 {perspectives.length > 0 ? (
                   perspectives.map((perspective) => (
-                    <div key={perspective.id} className="bg-white border border-neutral-200 rounded-md shadow-sm p-4">
-                      <div className="text-sm text-neutral-700">
-                        <p>"{perspective.content}"</p>
-                      </div>
-                      <div className="mt-2 text-xs text-neutral-500">
-                        Anonymous • {getRelativeTimeString(new Date(perspective.createdAt))}
+                    <div key={perspective.id} className="bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-md shadow-md p-5 transition-all hover:shadow-lg">
+                      <div className="flex">
+                        <div className="flex-shrink-0 mr-3">
+                          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
+                            <span className="material-icons">person</span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm text-neutral-700 italic">
+                            <p>"{perspective.content}"</p>
+                          </div>
+                          <div className="mt-3 flex items-center text-xs text-neutral-500">
+                            <span className="font-medium text-primary-700">Anonymous</span>
+                            <span className="mx-2">•</span>
+                            <span>{getRelativeTimeString(new Date(perspective.createdAt))}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -406,19 +673,23 @@ const ScenarioView = () => {
                 )}
               </div>
               
-              <div className="mt-6 flex flex-wrap gap-4">
+              <div className="mt-8 flex flex-wrap gap-4 justify-center">
                 <Button 
                   variant="outline" 
                   onClick={() => setCurrentStep(Step.Submission)}
+                  className="border-indigo-300 text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 flex items-center px-5 py-2"
+                  size="lg"
                 >
+                  <span className="material-icons mr-2">add_comment</span>
                   Add Another Perspective
                 </Button>
                 <Button 
-                  variant="default"
-                  className="bg-green-600 hover:bg-green-700" 
                   onClick={() => navigateToScenario('next')}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all px-5 py-2 flex items-center"
+                  size="lg"
                 >
-                  Next Scenario
+                  <span className="mr-2">Next Scenario</span>
+                  <span className="material-icons">arrow_forward</span>
                 </Button>
               </div>
             </div>
