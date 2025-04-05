@@ -294,10 +294,11 @@ const ScenarioView = () => {
                   disabled={!aiOptionSelection}
                   className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all ${
                     aiOptionSelection
-                      ? "bg-primary-600 hover:bg-primary-700 text-white"
-                      : "bg-neutral-500 opacity-70 text-neutral-900"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white font-bold border-2 border-blue-800"
+                      : "bg-neutral-300 text-neutral-600 border-2 border-neutral-400"
                   }`}
                   size="lg"
+                  style={aiOptionSelection ? { backgroundColor: "#1d4ed8" } : {}}
                 >
                   <span className="mr-2">Continue to Evaluation</span>
                   <span className="material-icons text-sm">arrow_forward</span>

@@ -20,8 +20,8 @@ const Home = () => {
           <Button 
             size="lg" 
             onClick={() => navigate("/scenarios")}
-            className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg"
-            style={{ backgroundColor: "#1d4ed8", padding: "10px 20px" }}
+            className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg w-40 h-12"
+            style={{ backgroundColor: "#1d4ed8" }}
           >
             Explore Scenarios
           </Button>
@@ -29,6 +29,7 @@ const Home = () => {
             size="lg" 
             variant="outline" 
             onClick={() => navigate("/about")}
+            className="border-2 border-blue-300 w-40 h-12"
           >
             Learn More
           </Button>
@@ -125,8 +126,8 @@ const Home = () => {
         <Button 
           size="lg" 
           onClick={() => navigate("/scenarios")}
-          className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg"
-          style={{ backgroundColor: "#1d4ed8", padding: "10px 20px" }}
+          className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg w-60 h-12"
+          style={{ backgroundColor: "#1d4ed8" }}
         >
           Start Exploring Scenarios
         </Button>
