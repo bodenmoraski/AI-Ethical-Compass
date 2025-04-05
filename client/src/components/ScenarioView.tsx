@@ -50,6 +50,12 @@ const ScenarioView = () => {
     concernLevel: 3, // Default to middle value (1-5 scale)
     ethicalChoice: "", // Multiple choice selection
   });
+  
+  // State for number of free response questions to show
+  const [questionCount, setQuestionCount] = useState(3);
+  
+  // State to track which free response questions to display
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
 
   // Form state for perspective submission
   const [perspectiveContent, setPerspectiveContent] = useState("");
@@ -77,6 +83,20 @@ const ScenarioView = () => {
     }
   }, [scenarioId, scenarios, navigate]);
 
+  // Function to randomly select questions
+  const selectRandomQuestions = (count: number) => {
+    const freeResponseQuestions = ["appropriateness", "benefits", "risks", "inclusion", "responsible"];
+    // Shuffle array
+    const shuffled = [...freeResponseQuestions].sort(() => 0.5 - Math.random());
+    // Get first n elements
+    return shuffled.slice(0, Math.min(count, freeResponseQuestions.length));
+  };
+
+  // Update selected questions when question count changes
+  useEffect(() => {
+    setSelectedQuestions(selectRandomQuestions(questionCount));
+  }, [questionCount]);
+
   // Reset form state when scenario changes
   useEffect(() => {
     setCurrentStep(Step.Identification);
@@ -92,6 +112,9 @@ const ScenarioView = () => {
       ethicalChoice: "",
     });
     setPerspectiveContent("");
+    
+    // Select new random questions for this scenario
+    setSelectedQuestions(selectRandomQuestions(questionCount));
   }, [scenarioId]);
 
   // Mutate perspective submission
@@ -354,119 +377,170 @@ const ScenarioView = () => {
                 </div>
               </div>
 
+              {/* Question count selector */}
+              <div className="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-yellow-100 w-8 h-8 flex items-center justify-center rounded-full mr-3">
+                      <span className="material-icons text-yellow-700 text-sm">tune</span>
+                    </div>
+                    <h4 className="text-sm font-medium text-yellow-800">
+                      Number of free response questions:
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setQuestionCount(Math.max(1, questionCount - 1))}
+                      className="h-8 px-2 bg-white"
+                    >
+                      <span className="material-icons text-sm">remove</span>
+                    </Button>
+                    <span className="font-semibold text-yellow-900 min-w-[1.5rem] text-center">
+                      {questionCount}
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setQuestionCount(Math.min(5, questionCount + 1))}
+                      className="h-8 px-2 bg-white"
+                    >
+                      <span className="material-icons text-sm">add</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
               <div className="space-y-6 bg-white p-6 rounded-lg border border-neutral-200 shadow-sm mb-6">
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-100 mb-6">
                   <p className="text-blue-700 text-sm">
                     Taking time to thoughtfully consider different perspectives
                     will help you develop a deeper understanding of AI ethics.
+                    {questionCount < 5 && ` Showing ${questionCount} of 5 possible questions.`}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50 transition-colors">
-                  <Label
-                    htmlFor="appropriateness"
-                    className="flex items-center text-neutral-900 font-medium mb-2"
-                  >
-                    <span className="material-icons text-blue-500 mr-2">
-                      help_outline
-                    </span>
-                    Was the use of AI in this scenario appropriate? Why or why
-                    not?
-                  </Label>
-                  <Textarea
-                    id="appropriateness"
-                    value={evaluationResponses.appropriateness}
-                    onChange={(e) =>
-                      handleEvaluationChange("appropriateness", e.target.value)
-                    }
-                    placeholder="Share your thoughts..."
-                    className="border-neutral-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                  />
-                </div>
+                {/* Question 1: Appropriateness */}
+                {selectedQuestions.includes("appropriateness") && (
+                  <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-blue-100 hover:bg-blue-50 transition-colors">
+                    <Label
+                      htmlFor="appropriateness"
+                      className="flex items-center text-neutral-900 font-medium mb-2"
+                    >
+                      <span className="material-icons text-blue-500 mr-2">
+                        help_outline
+                      </span>
+                      Was the use of AI in this scenario appropriate? Why or why
+                      not?
+                    </Label>
+                    <Textarea
+                      id="appropriateness"
+                      value={evaluationResponses.appropriateness}
+                      onChange={(e) =>
+                        handleEvaluationChange("appropriateness", e.target.value)
+                      }
+                      placeholder="Share your thoughts..."
+                      className="border-neutral-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    />
+                  </div>
+                )}
 
-                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-green-100 hover:bg-green-50 transition-colors">
-                  <Label
-                    htmlFor="benefits"
-                    className="flex items-center text-neutral-900 font-medium mb-2"
-                  >
-                    <span className="material-icons text-green-500 mr-2">
-                      add_circle_outline
-                    </span>
-                    What are the potential benefits of using AI in this way?
-                  </Label>
-                  <Textarea
-                    id="benefits"
-                    value={evaluationResponses.benefits}
-                    onChange={(e) =>
-                      handleEvaluationChange("benefits", e.target.value)
-                    }
-                    placeholder="Consider benefits for different stakeholders..."
-                    className="border-neutral-300 focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
-                  />
-                </div>
+                {/* Question 2: Benefits */}
+                {selectedQuestions.includes("benefits") && (
+                  <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-green-100 hover:bg-green-50 transition-colors">
+                    <Label
+                      htmlFor="benefits"
+                      className="flex items-center text-neutral-900 font-medium mb-2"
+                    >
+                      <span className="material-icons text-green-500 mr-2">
+                        add_circle_outline
+                      </span>
+                      What are the potential benefits of using AI in this way?
+                    </Label>
+                    <Textarea
+                      id="benefits"
+                      value={evaluationResponses.benefits}
+                      onChange={(e) =>
+                        handleEvaluationChange("benefits", e.target.value)
+                      }
+                      placeholder="Consider benefits for different stakeholders..."
+                      className="border-neutral-300 focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+                    />
+                  </div>
+                )}
 
-                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-red-100 hover:bg-red-50 transition-colors">
-                  <Label
-                    htmlFor="risks"
-                    className="flex items-center text-neutral-900 font-medium mb-2"
-                  >
-                    <span className="material-icons text-red-500 mr-2">
-                      error_outline
-                    </span>
-                    What are the potential risks or drawbacks?
-                  </Label>
-                  <Textarea
-                    id="risks"
-                    value={evaluationResponses.risks}
-                    onChange={(e) =>
-                      handleEvaluationChange("risks", e.target.value)
-                    }
-                    placeholder="Consider issues like bias, plagiarism, learning impact..."
-                    className="border-neutral-300 focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50"
-                  />
-                </div>
+                {/* Question 3: Risks */}
+                {selectedQuestions.includes("risks") && (
+                  <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-red-100 hover:bg-red-50 transition-colors">
+                    <Label
+                      htmlFor="risks"
+                      className="flex items-center text-neutral-900 font-medium mb-2"
+                    >
+                      <span className="material-icons text-red-500 mr-2">
+                        error_outline
+                      </span>
+                      What are the potential risks or drawbacks?
+                    </Label>
+                    <Textarea
+                      id="risks"
+                      value={evaluationResponses.risks}
+                      onChange={(e) =>
+                        handleEvaluationChange("risks", e.target.value)
+                      }
+                      placeholder="Consider issues like bias, plagiarism, learning impact..."
+                      className="border-neutral-300 focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50"
+                    />
+                  </div>
+                )}
 
-                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-purple-100 hover:bg-purple-50 transition-colors">
-                  <Label
-                    htmlFor="inclusion"
-                    className="flex items-center text-neutral-900 font-medium mb-2"
-                  >
-                    <span className="material-icons text-purple-500 mr-2">
-                      diversity_3
-                    </span>
-                    How does this relate to digital inclusion or exclusion?
-                  </Label>
-                  <Textarea
-                    id="inclusion"
-                    value={evaluationResponses.inclusion}
-                    onChange={(e) =>
-                      handleEvaluationChange("inclusion", e.target.value)
-                    }
-                    placeholder="Consider access, equity, language barriers..."
-                    className="border-neutral-300 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
-                  />
-                </div>
+                {/* Question 4: Inclusion */}
+                {selectedQuestions.includes("inclusion") && (
+                  <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-purple-100 hover:bg-purple-50 transition-colors">
+                    <Label
+                      htmlFor="inclusion"
+                      className="flex items-center text-neutral-900 font-medium mb-2"
+                    >
+                      <span className="material-icons text-purple-500 mr-2">
+                        diversity_3
+                      </span>
+                      How does this relate to digital inclusion or exclusion?
+                    </Label>
+                    <Textarea
+                      id="inclusion"
+                      value={evaluationResponses.inclusion}
+                      onChange={(e) =>
+                        handleEvaluationChange("inclusion", e.target.value)
+                      }
+                      placeholder="Consider access, equity, language barriers..."
+                      className="border-neutral-300 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                    />
+                  </div>
+                )}
 
-                <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-amber-100 hover:bg-amber-50 transition-colors">
-                  <Label
-                    htmlFor="responsible"
-                    className="flex items-center text-neutral-900 font-medium mb-2"
-                  >
-                    <span className="material-icons text-amber-500 mr-2">
-                      policy
-                    </span>
-                    What would constitute responsible use in this scenario?
-                  </Label>
-                  <Textarea
-                    id="responsible"
-                    value={evaluationResponses.responsible}
-                    onChange={(e) =>
-                      handleEvaluationChange("responsible", e.target.value)
-                    }
-                    placeholder="Consider disclosure, guidelines, policies..."
-                    className="border-neutral-300 focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
-                  />
-                </div>
+                {/* Question 5: Responsible Use */}
+                {selectedQuestions.includes("responsible") && (
+                  <div className="p-4 rounded-lg border border-neutral-100 bg-neutral-50 hover:border-amber-100 hover:bg-amber-50 transition-colors">
+                    <Label
+                      htmlFor="responsible"
+                      className="flex items-center text-neutral-900 font-medium mb-2"
+                    >
+                      <span className="material-icons text-amber-500 mr-2">
+                        policy
+                      </span>
+                      What would constitute responsible use in this scenario?
+                    </Label>
+                    <Textarea
+                      id="responsible"
+                      value={evaluationResponses.responsible}
+                      onChange={(e) =>
+                        handleEvaluationChange("responsible", e.target.value)
+                      }
+                      placeholder="Consider disclosure, guidelines, policies..."
+                      className="border-neutral-300 focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Add rating scales and multiple choice */}
