@@ -766,22 +766,24 @@ const ScenarioView = () => {
                 <Button
                   onClick={() => setCurrentStep(Step.Submission)}
                   disabled={
-                    !evaluationResponses.appropriateness.trim() ||
-                    !evaluationResponses.benefits.trim() ||
-                    !evaluationResponses.risks.trim() ||
-                    !evaluationResponses.inclusion.trim() ||
-                    !evaluationResponses.responsible.trim() ||
+                    // Only check questions that are selected
+                    (selectedQuestions.includes("appropriateness") && !evaluationResponses.appropriateness.trim()) ||
+                    (selectedQuestions.includes("benefits") && !evaluationResponses.benefits.trim()) ||
+                    (selectedQuestions.includes("risks") && !evaluationResponses.risks.trim()) ||
+                    (selectedQuestions.includes("inclusion") && !evaluationResponses.inclusion.trim()) ||
+                    (selectedQuestions.includes("responsible") && !evaluationResponses.responsible.trim()) ||
                     !evaluationResponses.ethicalChoice
                   }
                   className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
-                    evaluationResponses.appropriateness.trim() &&
-                    evaluationResponses.benefits.trim() &&
-                    evaluationResponses.risks.trim() &&
-                    evaluationResponses.inclusion.trim() &&
-                    evaluationResponses.responsible.trim() &&
+                    // Style based on whether all selected questions are answered
+                    (!selectedQuestions.includes("appropriateness") || evaluationResponses.appropriateness.trim()) &&
+                    (!selectedQuestions.includes("benefits") || evaluationResponses.benefits.trim()) &&
+                    (!selectedQuestions.includes("risks") || evaluationResponses.risks.trim()) &&
+                    (!selectedQuestions.includes("inclusion") || evaluationResponses.inclusion.trim()) &&
+                    (!selectedQuestions.includes("responsible") || evaluationResponses.responsible.trim()) &&
                     evaluationResponses.ethicalChoice
-                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                      : "bg-neutral-500 opacity-70"
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-2 border-blue-800"
+                      : "bg-neutral-500 opacity-70 border-2 border-neutral-600"
                   }`}
                   size="lg"
                 >
