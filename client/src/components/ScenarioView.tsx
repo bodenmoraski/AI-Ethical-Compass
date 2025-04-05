@@ -939,22 +939,42 @@ const ScenarioView = () => {
               </div>
 
               <div className="space-y-4">
-                {perspectives.length > 0 ? (
-                  perspectives
-                    .filter(p => !p.parentId) // Only show top-level perspectives, not replies
-                    .map((perspective) => (
+                {(() => {
+                  // First filter to get only top-level perspectives
+                  const topLevelPerspectives = perspectives.filter(p => !p.parentId);
+                  
+                  // Check if we have any top-level perspectives after filtering
+                  if (topLevelPerspectives.length > 0) {
+                    return topLevelPerspectives.map((perspective) => (
                       <PerspectiveCard
                         key={perspective.id}
                         perspective={perspective}
                         scenarioId={scenarioId!}
                       />
-                    ))
-                ) : (
-                  <p className="text-neutral-500 italic">
-                    No perspectives have been shared yet. Be the first to
-                    contribute!
-                  </p>
-                )}
+                    ));
+                  } else {
+                    // No perspectives or only replies found
+                    return (
+                      <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-6 text-center">
+                        <div className="flex justify-center mb-4">
+                          <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center">
+                            <span className="material-icons text-neutral-500 text-2xl">comment</span>
+                          </div>
+                        </div>
+                        <p className="text-neutral-700 font-medium mb-2">No perspectives shared yet</p>
+                        <p className="text-neutral-500 text-sm mb-4">
+                          Be the first to contribute your thoughts on this ethical dilemma.
+                        </p>
+                        <Button
+                          onClick={() => setCurrentStep(Step.Submission)}
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        >
+                          Share Your Perspective
+                        </Button>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
 
               <div className="mt-8 flex flex-wrap gap-4 justify-center">
