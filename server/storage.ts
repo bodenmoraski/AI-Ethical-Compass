@@ -291,6 +291,156 @@ export class MemStorage implements IStorage {
       ],
       order: 5
     });
+    
+    // Scenario 6: AI-Powered Tutoring Systems
+    this.createScenario({
+      title: "AI-Powered Tutoring Systems",
+      description: "A school district has implemented an AI-powered tutoring system that provides personalized learning assistance to students outside of regular class hours. The system adapts to each student's learning pace, identifies knowledge gaps based on their responses, and customizes explanations and practice problems accordingly.\n\nSome students have shown significant improvement in their understanding and test scores after using the system, while others find the experience impersonal or struggle to engage with the digital interface. Parents and educators are debating whether AI tutoring should complement or replace traditional tutoring programs.",
+      options: [
+        "Yes - The system uses AI to personalize learning experiences for each student",
+        "Yes - Adaptive learning algorithms are being used to identify knowledge gaps",
+        "Partially - There are some AI elements but likely with significant human oversight",
+        "No - This is mainly an automated practice system with pre-programmed responses",
+        "Not sure - Need more technical details to determine the level of AI involvement"
+      ],
+      aiUseAnswer: "This scenario describes an AI-powered adaptive tutoring system. Modern educational technology of this type typically uses sophisticated AI algorithms that analyze student performance patterns, adapt content difficulty, and personalize learning pathways based on individual student data.",
+      sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      relatedResources: [
+        {
+          title: "The Effectiveness of AI Tutors vs. Human Tutors",
+          source: "Journal of Educational Psychology",
+          type: "research",
+          link: "https://www.apa.org/pubs/journals/edu"
+        },
+        {
+          title: "Designing Equitable AI Tutoring Systems",
+          source: "Stanford HAI",
+          type: "guide",
+          link: "https://hai.stanford.edu/research/ai-education"
+        }
+      ],
+      order: 6
+    });
+    
+    // Scenario 7: Predictive Analytics for Dropout Prevention
+    this.createScenario({
+      title: "Predictive Analytics for Dropout Prevention",
+      description: "A large public school system has implemented an AI-based predictive analytics program that identifies students at risk of dropping out. The system analyzes various data points including attendance records, grades, disciplinary incidents, and socioeconomic factors to flag students who might need additional support.\n\nThe school's intervention team uses these predictions to allocate resources and create personalized support plans. While graduation rates have improved since implementation, some parents and civil rights advocates have raised concerns about privacy, data security, and potential bias in how students are identified and assisted.",
+      options: [
+        "Yes - AI algorithms are analyzing student data to predict dropout risk",
+        "Yes - Machine learning models are identifying patterns in student behavior",
+        "Partially - The system uses some AI but relies heavily on traditional statistical methods",
+        "No - This is standard data analysis without advanced AI capabilities",
+        "Not sure - The distinction between complex analytics and AI is unclear here"
+      ],
+      aiUseAnswer: "This scenario describes an AI-based predictive analytics system. Modern dropout prevention tools typically use machine learning algorithms to identify complex patterns across multiple variables that might not be apparent through traditional statistical approaches.",
+      sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      relatedResources: [
+        {
+          title: "Ethical Considerations in Educational Data Mining",
+          source: "International Educational Data Mining Society",
+          type: "article",
+          link: "https://educationaldatamining.org/resources/"
+        },
+        {
+          title: "Privacy-Preserving Approaches to Predictive Analytics in Education",
+          source: "Future of Privacy Forum",
+          type: "whitepaper",
+          link: "https://fpf.org/blog/category/k-12-education/"
+        }
+      ],
+      order: 7
+    });
+    
+    // Scenario 8: AI Writing Feedback Tools
+    this.createScenario({
+      title: "AI Writing Feedback Tools",
+      description: "An English department has adopted an AI-powered writing feedback tool that analyzes student essays and provides immediate suggestions on grammar, style, organization, and content. Students submit drafts to the system and receive automated feedback before submitting their final work to teachers.\n\nSome students find the instant feedback helpful for improving their writing, while others feel the AI doesn't fully understand nuanced or creative approaches. Teachers have noticed improvements in technical aspects of writing but wonder if students are becoming overly dependent on the tool rather than developing their own editing skills.",
+      options: [
+        "Yes - Natural language processing AI is analyzing and providing feedback on writing",
+        "Yes - The system uses machine learning to evaluate various aspects of written work",
+        "Partially - The tool likely combines predefined rules with some AI capabilities",
+        "No - This is primarily automated grammar checking without true AI understanding",
+        "Not sure - The sophistication of the writing analysis is unclear"
+      ],
+      aiUseAnswer: "This scenario describes an AI-powered writing feedback system. Modern writing assessment tools typically use natural language processing and machine learning to analyze multiple dimensions of writing beyond simple grammar checking, including structure, style, and content relevance.",
+      sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      relatedResources: [
+        {
+          title: "AI Feedback and Writing Skill Development",
+          source: "International Literacy Association",
+          type: "research",
+          link: "https://www.literacyworldwide.org/resources"
+        },
+        {
+          title: "Balancing Automated and Human Feedback in Writing Instruction",
+          source: "National Council of Teachers of English",
+          type: "guide",
+          link: "https://ncte.org/resources/"
+        }
+      ],
+      order: 8
+    });
+    
+    // Scenario 9: AI-Enhanced Science Labs
+    this.createScenario({
+      title: "AI-Enhanced Science Labs",
+      description: "A science department has implemented AI-enhanced virtual laboratory experiences that allow students to conduct sophisticated experiments that would be too dangerous, expensive, or time-consuming in a traditional school lab. The simulations use AI to model realistic outcomes based on student inputs and can adapt the complexity based on student performance.\n\nMost students are excited about the opportunity to explore advanced concepts, but some teachers worry that students are missing out on developing hands-on laboratory skills. There are also questions about whether the simulations might oversimplify certain scientific phenomena or embed unintended biases in how scientific concepts are presented.",
+      options: [
+        "Yes - AI is powering the simulation and adapting to student interactions",
+        "Yes - Machine learning models are generating realistic experimental outcomes",
+        "Partially - There's some AI involvement but primarily pre-programmed simulations",
+        "No - These are advanced graphics and physics engines but not true AI",
+        "Not sure - It's difficult to determine the level of AI without technical details"
+      ],
+      aiUseAnswer: "This scenario describes AI-enhanced virtual laboratory simulations. Modern science simulations often use AI to create realistic, responsive environments that adapt to student actions and generate outcomes that follow scientific principles rather than simply playing back pre-recorded scenarios.",
+      sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      relatedResources: [
+        {
+          title: "Virtual vs. Physical Labs in Science Education",
+          source: "National Science Teaching Association",
+          type: "research",
+          link: "https://www.nsta.org/resources"
+        },
+        {
+          title: "Designing Inclusive AI-Based Science Learning Experiences",
+          source: "Association for Science Education",
+          type: "guide",
+          link: "https://www.ase.org.uk/resources"
+        }
+      ],
+      order: 9
+    });
+    
+    // Scenario 10: AI Teacher Assistants
+    this.createScenario({
+      title: "AI Teacher Assistants",
+      description: "A middle school is piloting AI-powered digital teaching assistants in several classrooms. These assistants help manage routine tasks like answering common student questions, providing additional explanations of concepts, tracking participation, and even helping with initial grading of objective assignments.\n\nTeachers report having more time for individualized instruction and creative activities, but some parents worry about the reduced human interaction and oversight. Questions have also been raised about data privacy, as the system collects detailed information about student interactions and performance to improve its responses.",
+      options: [
+        "Yes - The digital assistants use AI to respond to student questions and grade work",
+        "Yes - Machine learning allows the system to improve over time based on interactions",
+        "Partially - The assistants combine scripted responses with some AI capabilities",
+        "No - These are primarily automated tools without sophisticated AI understanding",
+        "Not sure - More information is needed about the technology behind the assistants"
+      ],
+      aiUseAnswer: "This scenario describes AI-powered digital teaching assistants. Modern educational AI assistants typically use natural language processing to understand and respond to student questions, machine learning to improve over time, and automated assessment capabilities—all of which are AI applications.",
+      sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      relatedResources: [
+        {
+          title: "The Role of AI Assistants in K-12 Classrooms",
+          source: "International Society for Technology in Education",
+          type: "article",
+          link: "https://www.iste.org/areas-of-focus/AI-in-education"
+        },
+        {
+          title: "Student Data Privacy Considerations for AI in Schools",
+          source: "Student Data Privacy Consortium",
+          type: "guide",
+          link: "https://privacy.a4l.org/resources/"
+        }
+      ],
+      order: 10
+    });
   }
 }
 
