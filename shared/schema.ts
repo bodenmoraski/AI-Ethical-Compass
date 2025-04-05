@@ -23,7 +23,18 @@ export const scenarios = pgTable("scenarios", {
   options: json("options").$type<string[]>().notNull(),
   aiUseAnswer: text("ai_use_answer").notNull(),
   sdgTags: json("sdg_tags").$type<string[]>().notNull(),
-  relatedResources: json("related_resources").$type<{title: string, source: string, type: string, link: string}[]>().notNull(),
+  sdgDetails: json("sdg_details").$type<{
+    goal: string,
+    description: string,
+    relevance: string,
+    icon: string
+  }[]>().default([]).notNull(),
+  relatedResources: json("related_resources").$type<{
+    title: string, 
+    source: string, 
+    type: string, 
+    link: string
+  }[]>().notNull(),
   order: integer("order").notNull(),
 });
 
@@ -38,6 +49,9 @@ export const perspectives = pgTable("perspectives", {
   id: serial("id").primaryKey(),
   scenarioId: integer("scenario_id").notNull(),
   content: text("content").notNull(),
+  authorName: text("author_name").default("Anonymous").notNull(),
+  likes: integer("likes").default(0).notNull(),
+  parentId: integer("parent_id"), // For replies - null means it's a top-level perspective
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -19,6 +19,8 @@ export interface IStorage {
   // Perspective management
   getPerspectivesByScenarioId(scenarioId: number): Promise<Perspective[]>;
   createPerspective(perspective: InsertPerspective): Promise<Perspective>;
+  likePerspective(id: number): Promise<Perspective>;
+  getRepliesByPerspectiveId(perspectiveId: number): Promise<Perspective[]>;
   
   // User Progress
   getUserProgress(userId: number | null): Promise<UserProgress[]>;
@@ -79,7 +81,44 @@ export class MemStorage implements IStorage {
   
   async createScenario(insertScenario: InsertScenario): Promise<Scenario> {
     const id = this.scenarioCurrentId++;
-    const scenario: Scenario = { ...insertScenario, id };
+    // Ensure options is an array of strings
+    const options: string[] = Array.isArray(insertScenario.options) 
+      ? [...insertScenario.options].map(opt => String(opt)) 
+      : [];
+      
+    // Ensure sdgTags is properly typed  
+    const sdgTags: string[] = Array.isArray(insertScenario.sdgTags)
+      ? [...insertScenario.sdgTags].map(tag => String(tag))
+      : [];
+      
+    // Ensure sdgDetails is properly typed
+    const sdgDetails: {
+      goal: string;
+      description: string;
+      relevance: string;
+      icon: string;
+    }[] = Array.isArray(insertScenario.sdgDetails) 
+      ? [...insertScenario.sdgDetails] 
+      : [];
+      
+    // Ensure relatedResources is properly typed
+    const relatedResources: {
+      title: string; 
+      source: string; 
+      type: string; 
+      link: string;
+    }[] = Array.isArray(insertScenario.relatedResources)
+      ? [...insertScenario.relatedResources]
+      : [];
+    
+    const scenario: Scenario = { 
+      ...insertScenario, 
+      options,
+      sdgTags,
+      sdgDetails,
+      relatedResources,
+      id 
+    };
     this.scenarios.set(id, scenario);
     return scenario;
   }
@@ -94,11 +133,34 @@ export class MemStorage implements IStorage {
     const id = this.perspectiveCurrentId++;
     const perspective: Perspective = { 
       ...insertPerspective, 
+      authorName: insertPerspective.authorName || "Anonymous",
+      likes: insertPerspective.likes || 0,
+      parentId: insertPerspective.parentId || null,
       id, 
       createdAt: new Date() 
     };
     this.perspectives.set(id, perspective);
     return perspective;
+  }
+  
+  async likePerspective(id: number): Promise<Perspective> {
+    const perspective = this.perspectives.get(id);
+    if (!perspective) {
+      throw new Error(`Perspective with id ${id} not found`);
+    }
+    
+    const updated = { 
+      ...perspective, 
+      likes: (perspective.likes || 0) + 1 
+    };
+    this.perspectives.set(id, updated);
+    return updated;
+  }
+  
+  async getRepliesByPerspectiveId(perspectiveId: number): Promise<Perspective[]> {
+    return Array.from(this.perspectives.values())
+      .filter(perspective => perspective.parentId === perspectiveId)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
   
   async getUserProgress(userId: number | null): Promise<UserProgress[]> {
@@ -123,7 +185,9 @@ export class MemStorage implements IStorage {
       // Update existing progress
       const updatedProgress: UserProgress = {
         ...existingProgress,
-        ...insertProgress,
+        userId: insertProgress.userId !== undefined ? insertProgress.userId : existingProgress.userId,
+        scenarioId: insertProgress.scenarioId,
+        completed: insertProgress.completed !== undefined ? insertProgress.completed : existingProgress.completed,
         completedAt: insertProgress.completed ? new Date() : existingProgress.completedAt
       };
       this.progresses.set(existingProgress.id, updatedProgress);
@@ -132,7 +196,9 @@ export class MemStorage implements IStorage {
       // Create new progress
       const id = this.progressCurrentId++;
       const progress: UserProgress = {
-        ...insertProgress,
+        scenarioId: insertProgress.scenarioId,
+        userId: insertProgress.userId || null,
+        completed: insertProgress.completed !== undefined ? insertProgress.completed : false,
         id,
         completedAt: insertProgress.completed ? new Date() : null
       };
@@ -155,6 +221,20 @@ export class MemStorage implements IStorage {
       ],
       aiUseAnswer: "The scenario suggests that AI might have been used to generate or significantly enhance the essay. This is a common ethical dilemma in education today.",
       sdgTags: ["Quality Education (SDG 4)", "Reduced Inequalities (SDG 10)"],
+      sdgDetails: [
+        {
+          goal: "Quality Education (SDG 4)",
+          description: "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all.",
+          relevance: "This scenario explores how AI is changing academic assessment, integrity standards, and what constitutes original student work - all core aspects of quality education.",
+          icon: "school"
+        },
+        {
+          goal: "Reduced Inequalities (SDG 10)",
+          description: "Reduce inequality within and among countries.",
+          relevance: "Access to AI tools may differ between students from different socioeconomic backgrounds, potentially creating new forms of educational inequality.",
+          icon: "balance"
+        }
+      ],
       relatedResources: [
         {
           title: "AI in Education: Guidelines for Ethical Use",

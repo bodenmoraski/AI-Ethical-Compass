@@ -1,11 +1,11 @@
 import { type Scenario, type Perspective } from "@shared/schema";
 import { apiRequest } from "./queryClient";
 
-export async function submitPerspective(scenarioId: number, content: string): Promise<Perspective> {
+export async function submitPerspective(scenarioId: number, content: string, parentId?: number): Promise<Perspective> {
   const response = await apiRequest(
     "POST",
     "/api/perspectives",
-    { scenarioId, content }
+    { scenarioId, content, parentId }
   );
   return await response.json();
 }

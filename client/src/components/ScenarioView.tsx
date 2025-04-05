@@ -18,6 +18,8 @@ import {
   getRelativeTimeString,
 } from "@/lib/scenarios";
 import RelatedResources from "./RelatedResources";
+import SdgDetails from "./SdgDetails";
+import PerspectiveCard from "./PerspectiveCard";
 
 enum Step {
   Identification = 1,
@@ -232,6 +234,13 @@ const ScenarioView = () => {
               <p key={idx}>{paragraph}</p>
             ))}
           </div>
+          
+          {/* SDG Details */}
+          {currentScenario.sdgDetails && currentScenario.sdgDetails.length > 0 && (
+            <div className="mt-8">
+              <SdgDetails sdgDetails={currentScenario.sdgDetails} />
+            </div>
+          )}
 
           {/* Step 1: AI Use Identification */}
           {currentStep === Step.Identification && (
@@ -855,36 +864,15 @@ const ScenarioView = () => {
 
               <div className="space-y-4">
                 {perspectives.length > 0 ? (
-                  perspectives.map((perspective) => (
-                    <div
-                      key={perspective.id}
-                      className="bg-gradient-to-br from-white to-blue-50 border border-blue-100 rounded-md shadow-md p-5 transition-all hover:shadow-lg"
-                    >
-                      <div className="flex">
-                        <div className="flex-shrink-0 mr-3">
-                          <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
-                            <span className="material-icons">person</span>
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm text-neutral-700 italic">
-                            <p>"{perspective.content}"</p>
-                          </div>
-                          <div className="mt-3 flex items-center text-xs text-neutral-500">
-                            <span className="font-medium text-primary-700">
-                              Anonymous
-                            </span>
-                            <span className="mx-2">•</span>
-                            <span>
-                              {getRelativeTimeString(
-                                new Date(perspective.createdAt),
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                  perspectives
+                    .filter(p => !p.parentId) // Only show top-level perspectives, not replies
+                    .map((perspective) => (
+                      <PerspectiveCard
+                        key={perspective.id}
+                        perspective={perspective}
+                        scenarioId={scenarioId!}
+                      />
+                    ))
                 ) : (
                   <p className="text-neutral-500 italic">
                     No perspectives have been shared yet. Be the first to

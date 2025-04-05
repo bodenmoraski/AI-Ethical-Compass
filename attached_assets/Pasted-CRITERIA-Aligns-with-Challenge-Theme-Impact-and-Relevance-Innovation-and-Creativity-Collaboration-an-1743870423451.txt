@@ -1,0 +1,65 @@
+CRITERIA
+Aligns with Challenge Theme
+Impact and Relevance
+Innovation and Creativity
+Collaboration and Inclusion
+Purposeful Design and Inclusivity
+Presentation and Communication
+Presentation and Communication
+Description
+Projects must directly address the challenge's theme of promoting digital inclusion and responsible digital citizenship through AI, reflecting considerations for reduced inequalities and quality education as outlined by the UN Sustainable Development Goals.
+Evaluates the potential impact of the project on its intended audience, including its relevance to the goals of digital inclusion and the promotion of responsible digital citizenship in the use of AI.
+This criteria assesses the originality and creativity of the project, including how AI and resources such as SFI are used to offer novel solutions or insights into digital inclusion and citizenship.
+Focuses on the team's ability to work effectively together, incorporate diverse perspectives, and ensure the project is inclusive, reflecting the importance of teamwork and the consideration of varied user needs.
+The purpose of the product, in alignment to the challenge, should be at the core of its design.
+ 
+Projects should have a design that is focused on the user, ensuring accessibility, functionality, and ease of use for a diverse range of users.
+Assesses the clarity, coherence, and creativity of the project's presentation, including how well the team communicates their ideas, processes, and the project's impact to a wider audience.
+Projects should demonstrate a process of exploration and experimentation, showcasing how teams have researched both the theme and the technology used, making full use of resources such as SFI, engaged with challenges, learned from failures, and applied their learnings to improve their solutions.
+As evidenced by
+Advancing Safe and Responsible Use of AI
+; The video clearly explains how the project addresses digital inclusion and responsible digital citizenship, with specific references to the UN Sustainable Development Goals9
+; Visuals or the product itself highlight the project's relevance and application to promoting digital citizenship and inclusive access to AI technologies.
+; The video presentation includes potential impact testimonials, explaining how the project positively affects its target audience. v
+; Clear articulation of the project's goals and how it meets the needs of the community it serves, with potential data or scenarios illustrating its impact.
+
+Demonstration of ISTE Student Standards
+; The product is a new type or a new approach to an existing type of resource for addressing the theme9
+; The video presentation includes a thoughtful discussion or visual representation of the creative process behind the project.
+; The video presentation demonstrates how team collaboration contributed to the project, possibly through shared insights or a summary of the collaborative process.v
+; The team intentionally includes outside and diverse voices in their process.v
+; Discussion or demonstration of how the project aims to be inclusive, with examples of features or design choices that cater to diverse needs.
+Meaningful Project and Process
+; The product is fully realized and functional, going beyond a conceptual pitch.v
+; The stated purpose is clear in the product itself, not requiring additional documentation9
+; Explanation of design considerations in the video is made to ensure the product is accessible to a wide audience, including any specific features or adaptations.
+; The clarity, organization, and engagement level of the video presentation. The video should include the project's features, benefits, and connection to the challenge theme. v
+; Effective use of visuals, narration, and demonstrations in the video make the project's concepts and impact accessible and understandable to a broad audience9
+; Communication in the product, such as the script, the content, or instructions, is clear and appropriate to a wide audience.
+
+; Narratives or visuals in the video that recount the project's development journey, highlighting key learning moments, challenges, and how they were addressed. v
+; The video may include brief mentions or visuals of earlier prototypes or versions to illustrate the process of iteration9
+; Key resources used in research, such as Intel’s Skills for Innovation, are highlighted.
+ISTE Standards & Digital Citizenship Competencies
+Empowered Learner: Students leverage technology to take an active role in choosing, achieving, and demonstrating competency in their learning goals.
+Digital Citizen: Students recognize the rights, responsibilities, and opportunities of living, learning, and working in an interconnected digital world, and they act and model in ways that are safe, legal, and ethical.
+
+Global Collaborator: Students use digital tools to broaden their perspectives and enrich their learning by collaborating with others and working effectively in teams locally and globally.
+
+Creative Communicator: Students communicate clearly and express themselves creatively for a variety of purposes using the platforms, tools, styles, formats, and digital media appropriate to their goals.
+
+
+Global Collaborator: Emphasizes the ability to work with others from different backgrounds and cultures.
+
+
+Digital Citizen: Advocates for respectful and empathetic interactions in a digital environment.
+
+
+Innovative Designer: Students use a variety of technologies within a design process to identify and solve problems by creating new, useful, or imaginative solutions.
+Digital Citizen: Emphasizes the importance of using technology in a way that is respectful to others and ensures privacy and data protection.
+
+
+
+Creative Communicator: Students express themselves creatively and communicate their processes and results effectively using digital tools and media.
+
+Knowledge Constructor: Students critically curate a variety of resources using digital tools to construct knowledge, produce creative artifacts, and make meaningful learning experiences for themselves and others.

@@ -65,6 +65,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Like a perspective
+  app.post("/api/perspectives/:id/like", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid perspective ID" });
+      }
+      
+      const perspective = await storage.likePerspective(id);
+      res.json(perspective);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to like perspective" });
+    }
+  });
+  
+  // Get replies to a perspective
+  app.get("/api/perspectives/:id/replies", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid perspective ID" });
+      }
+      
+      const replies = await storage.getRepliesByPerspectiveId(id);
+      res.json(replies);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to retrieve replies" });
+    }
+  });
+  
   // Update user progress
   app.post("/api/progress", async (req: Request, res: Response) => {
     try {
