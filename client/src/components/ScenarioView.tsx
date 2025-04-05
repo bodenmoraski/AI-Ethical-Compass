@@ -71,9 +71,9 @@ const ScenarioView = () => {
     : scenarios[0];
 
   // Fetch perspectives for the current scenario
-  const { data: perspectives = [] } = useQuery<Perspective[]>({
+  const { data: perspectives = [], isLoading: perspectivesLoading, error: perspectivesError } = useQuery<Perspective[]>({
     queryKey: ["/api/scenarios", scenarioId, "perspectives"],
-    enabled: !!scenarioId && currentStep === Step.Viewing,
+    enabled: !!scenarioId && currentStep === Step.Viewing
   });
 
   // Navigate to first scenario if none selected and scenarios are loaded
@@ -326,14 +326,22 @@ const ScenarioView = () => {
                   disabled={!aiOptionSelection}
                   className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all ${
                     aiOptionSelection
-                      ? "bg-blue-600 hover:bg-blue-700 text-white font-bold border-2 border-blue-800"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white font-bold border-2 border-blue-800 transform scale-105 animate-pulse"
                       : "bg-neutral-300 text-neutral-600 border-2 border-neutral-400"
                   }`}
                   size="lg"
                   style={aiOptionSelection ? { backgroundColor: "#1d4ed8" } : {}}
                 >
-                  <span className="mr-2">Continue to Evaluation</span>
-                  <span className="material-icons text-sm">arrow_forward</span>
+                  {aiOptionSelection ? (
+                    <>
+                      <span className="mr-2">Continue to Evaluation</span>
+                      <span className="material-icons text-sm">arrow_forward</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">Select an option above to continue</span>
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -939,42 +947,49 @@ const ScenarioView = () => {
               </div>
 
               <div className="space-y-4">
-                {(() => {
-                  // First filter to get only top-level perspectives
-                  const topLevelPerspectives = perspectives.filter(p => !p.parentId);
-                  
-                  // Check if we have any top-level perspectives after filtering
-                  if (topLevelPerspectives.length > 0) {
-                    return topLevelPerspectives.map((perspective) => (
-                      <PerspectiveCard
-                        key={perspective.id}
-                        perspective={perspective}
-                        scenarioId={scenarioId!}
-                      />
-                    ));
-                  } else {
-                    // No perspectives or only replies found
-                    return (
-                      <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-6 text-center">
-                        <div className="flex justify-center mb-4">
-                          <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center">
-                            <span className="material-icons text-neutral-500 text-2xl">comment</span>
-                          </div>
-                        </div>
-                        <p className="text-neutral-700 font-medium mb-2">No perspectives shared yet</p>
-                        <p className="text-neutral-500 text-sm mb-4">
-                          Be the first to contribute your thoughts on this ethical dilemma.
-                        </p>
-                        <Button
-                          onClick={() => setCurrentStep(Step.Submission)}
-                          className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                        >
-                          Share Your Perspective
-                        </Button>
+                {console.log("Rendering perspectives:", perspectives)}
+                
+                {/* Check if perspectives array exists and has items with top-level perspectives */}
+                {Array.isArray(perspectives) && perspectives.length > 0 && 
+                  (() => {
+                    // Filter to get only top-level perspectives
+                    const topLevelPerspectives = perspectives.filter((p: Perspective) => !p.parentId);
+                    console.log("Top-level perspectives:", topLevelPerspectives);
+                    
+                    if (topLevelPerspectives.length > 0) {
+                      return topLevelPerspectives.map((perspective: Perspective) => (
+                        <PerspectiveCard
+                          key={perspective.id}
+                          perspective={perspective}
+                          scenarioId={scenarioId!}
+                        />
+                      ));
+                    }
+                    return null;
+                  })()
+                }
+                
+                {/* Show no perspectives message if none found or empty array */}
+                {(!Array.isArray(perspectives) || perspectives.length === 0 || 
+                  !perspectives.filter((p: Perspective) => !p.parentId).length) && (
+                  <div className="bg-neutral-50 border-2 border-blue-200 rounded-lg p-6 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="material-icons text-blue-600 text-3xl">forum</span>
                       </div>
-                    );
-                  }
-                })()}
+                    </div>
+                    <p className="text-neutral-800 font-medium text-lg mb-2">No perspectives shared yet</p>
+                    <p className="text-neutral-600 mb-4">
+                      This is your opportunity to be the first to contribute your thoughts on this ethical dilemma.
+                    </p>
+                    <Button
+                      onClick={() => setCurrentStep(Step.Submission)}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      Share Your Perspective
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 flex flex-wrap gap-4 justify-center">

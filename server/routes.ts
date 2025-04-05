@@ -54,13 +54,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add a new perspective
   app.post("/api/perspectives", async (req: Request, res: Response) => {
     try {
+      // Validate the data structure with Zod schema
       const perspectiveData = insertPerspectiveSchema.parse(req.body);
+      
+      // Additional validation for content
+      if (!perspectiveData.content || perspectiveData.content.trim().length === 0) {
+        return res.status(400).json({ message: "Perspective content cannot be empty" });
+      }
+      
+      if (perspectiveData.content.trim().length < 5) {
+        return res.status(400).json({ message: "Perspective content is too short" });
+      }
+      
+      if (perspectiveData.content.trim().length > 2000) {
+        return res.status(400).json({ message: "Perspective content exceeds maximum length of 2000 characters" });
+      }
+      
+      // Basic content moderation (check for obvious inappropriate content)
+      const inappropriateWords = ['profanity1', 'profanity2']; // Add actual inappropriate words
+      const contentLowerCase = perspectiveData.content.toLowerCase();
+      const containsInappropriate = inappropriateWords.some(word => 
+        contentLowerCase.includes(word.toLowerCase())
+      );
+      
+      if (containsInappropriate) {
+        return res.status(400).json({ 
+          message: "Perspective contains inappropriate content. Please revise your submission." 
+        });
+      }
+      
+      // Validated, create the perspective
       const perspective = await storage.createPerspective(perspectiveData);
+      
+      // Log successful storage for debugging
+      console.log(`Perspective created successfully with ID: ${perspective.id}`);
+      
       res.status(201).json(perspective);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid perspective data", errors: error.errors });
       }
+      console.error("Error creating perspective:", error);
       res.status(500).json({ message: "Failed to create perspective" });
     }
   });

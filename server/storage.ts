@@ -51,6 +51,32 @@ export class MemStorage implements IStorage {
     
     // Initialize with default scenarios
     this.initializeScenarios();
+    
+    // Add some test perspectives for each scenario
+    this.initializeTestPerspectives();
+  }
+  
+  // Method to add test perspectives for each scenario
+  private initializeTestPerspectives() {
+    // Add a few perspectives for the first scenario
+    this.createPerspective({
+      scenarioId: 1,
+      content: "I believe AI was definitely used in this scenario. The sudden improvement in writing quality, especially from a student who speaks English as a second language, is a telltale sign. Educators need to establish clear guidelines on acceptable AI use for editing vs. generating content.",
+      authorName: "Teacher23"
+    });
+    
+    this.createPerspective({
+      scenarioId: 1,
+      content: "As someone who struggled with English growing up, I think we should consider that the student might have worked extra hard on this assignment. Before assuming AI was used, the teacher should have a conversation with the student about their process.",
+      authorName: "ESL_Advocate"
+    });
+    
+    // Add a perspective for the second scenario
+    this.createPerspective({
+      scenarioId: 2,
+      content: "Facial recognition in schools raises serious privacy concerns. While security is important, students shouldn't have to sacrifice their biometric data just to attend class. There are less invasive security measures that could be implemented instead.",
+      authorName: "PrivacyFirst"
+    });
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -130,17 +156,36 @@ export class MemStorage implements IStorage {
   }
   
   async createPerspective(insertPerspective: InsertPerspective): Promise<Perspective> {
-    const id = this.perspectiveCurrentId++;
-    const perspective: Perspective = { 
-      ...insertPerspective, 
-      authorName: insertPerspective.authorName || "Anonymous",
-      likes: insertPerspective.likes || 0,
-      parentId: insertPerspective.parentId || null,
-      id, 
-      createdAt: new Date() 
-    };
-    this.perspectives.set(id, perspective);
-    return perspective;
+    try {
+      // Sanitize the input content
+      const sanitizedContent = insertPerspective.content.trim();
+      
+      // Generate a unique ID for this perspective
+      const id = this.perspectiveCurrentId++;
+      
+      // Create the perspective object with defaults for optional fields
+      const perspective: Perspective = { 
+        ...insertPerspective, 
+        content: sanitizedContent,
+        authorName: insertPerspective.authorName || "Anonymous",
+        likes: insertPerspective.likes || 0,
+        parentId: insertPerspective.parentId || null,
+        id, 
+        createdAt: new Date() 
+      };
+      
+      // Store the perspective in our memory map
+      this.perspectives.set(id, perspective);
+      
+      // Log storage confirmation (helpful for debugging)
+      console.log(`Stored perspective with ID ${id} for scenario ${perspective.scenarioId}`);
+      console.log(`Total perspectives in storage: ${this.perspectives.size}`);
+      
+      return perspective;
+    } catch (error) {
+      console.error("Error in createPerspective:", error);
+      throw error; // Re-throw to handle in the route
+    }
   }
   
   async likePerspective(id: number): Promise<Perspective> {
