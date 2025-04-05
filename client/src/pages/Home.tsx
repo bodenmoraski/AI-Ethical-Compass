@@ -20,7 +20,8 @@ const Home = () => {
           <Button 
             size="lg" 
             onClick={() => navigate("/scenarios")}
-            className="text-white bg-primary-600 hover:bg-primary-700"
+            className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg"
+            style={{ backgroundColor: "#1d4ed8", padding: "10px 20px" }}
           >
             Explore Scenarios
           </Button>
@@ -124,7 +125,8 @@ const Home = () => {
         <Button 
           size="lg" 
           onClick={() => navigate("/scenarios")}
-          className="text-white bg-primary-600 hover:bg-primary-700"
+          className="text-white bg-blue-600 hover:bg-blue-700 font-bold border-2 border-blue-800 shadow-lg"
+          style={{ backgroundColor: "#1d4ed8", padding: "10px 20px" }}
         >
           Start Exploring Scenarios
         </Button>
