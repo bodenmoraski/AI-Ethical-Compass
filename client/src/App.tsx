@@ -8,6 +8,9 @@ import Scenarios from "@/pages/Scenarios";
 import About from "@/pages/About";
 import Instructions from "@/pages/Instructions";
 import Resources from "@/pages/Resources";
+import TermsOfService from "@/pages/TermsOfService";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Contact from "@/pages/Contact";
 import Layout from "@/components/Layout";
 
 function Router() {
@@ -20,6 +23,9 @@ function Router() {
         <Route path="about" element={<About />} />
         <Route path="instructions" element={<Instructions />} />
         <Route path="resources" element={<Resources />} />
+        <Route path="terms" element={<TermsOfService />} />
+        <Route path="privacy" element={<PrivacyPolicy />} />
+        <Route path="contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

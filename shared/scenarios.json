@@ -1,0 +1,462 @@
+[
+  {
+    "id": 1,
+    "title": "AI-Generated Essay",
+    "description": "A high school teacher receives an essay from a student that seems unusually sophisticated. The writing style is polished, references are extensive and accurate, and the arguments are well-structured. The teacher suspects that the student may have used an AI tool to generate part or all of the essay, but has no definitive proof.\n\nThe student in question has previously submitted work of varying quality, and comes from a household where English is not the primary language. The assignment was a crucial part of the semester grade.",
+    "options": [
+      {
+        "text": "Yes - The student likely used an AI text generator to write the entire essay",
+        "consequence": "Raises questions about academic integrity and learning outcomes"
+      },
+      {
+        "text": "Yes - The student may have used AI to help edit or enhance their own writing",
+        "consequence": "Blurs the line between assistance and authorship"
+      },
+      {
+        "text": "Yes - The student possibly used AI for research or finding references",
+        "consequence": "Questions the value of AI-assisted research"
+      },
+      {
+        "text": "No - The improvement is likely due to the student getting outside help or making extra effort",
+        "consequence": "Highlights the importance of not jumping to conclusions"
+      },
+      {
+        "text": "Not sure - There's insufficient information to determine AI use",
+        "consequence": "Emphasizes the need for clear policies and evidence"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Academic integrity",
+      "Fairness in assessment",
+      "Supporting ESL students",
+      "Technology in education"
+    ],
+    "sdgTags": ["4", "10", "16"],
+    "resources": [
+      {
+        "title": "AI in Education: Guidelines for Ethical Use",
+        "url": "https://en.unesco.org/artificial-intelligence/education",
+        "type": "article"
+      },
+      {
+        "title": "Digital Equity in AI-Enhanced Learning",
+        "url": "https://www.iste.org/areas-of-focus/AI-in-education",
+        "type": "video"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Facial Recognition in Schools",
+    "description": "A high school is considering implementing facial recognition technology at school entrances to enhance security. The system would scan students' faces upon entry to verify their identity against a database and alert security staff of any unrecognized individuals.\n\nSome students and parents have expressed privacy concerns, while others believe the safety benefits outweigh these concerns. Additionally, there are questions about the accuracy of facial recognition with diverse student populations.",
+    "options": [
+      {
+        "text": "Yes - Facial recognition is a form of AI used for identity verification",
+        "consequence": "Raises privacy and surveillance concerns"
+      },
+      {
+        "text": "Yes - The system uses AI algorithms to match faces to a database",
+        "consequence": "Highlights potential bias in facial recognition"
+      },
+      {
+        "text": "Partially - There's AI involved but it's primarily a security camera system",
+        "consequence": "Blurs the line between security and surveillance"
+      },
+      {
+        "text": "No - This is standard security technology without advanced AI",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - Need more technical details to determine AI involvement",
+        "consequence": "Emphasizes the need for transparency"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Privacy rights",
+      "Security vs. freedom",
+      "Algorithmic bias",
+      "Data protection"
+    ],
+    "sdgTags": ["4", "10", "16", "11"],
+    "resources": [
+      {
+        "title": "Facial Recognition Technology in Schools: Privacy Concerns",
+        "url": "https://www.eff.org/issues/facial-recognition",
+        "type": "article"
+      },
+      {
+        "title": "Algorithmic Bias in Face Recognition Technologies",
+        "url": "https://www.media.mit.edu/projects/gender-shades/overview/",
+        "type": "research"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "AI Content Moderation",
+    "description": "A popular educational discussion platform used by students and teachers has implemented an AI content moderation system to automatically detect and filter inappropriate content. The system reviews posts in real-time and can automatically remove content it flags as harmful, offensive, or inappropriate for an educational setting.\n\nSome users have noticed that discussions about certain historical events, literature containing sensitive topics, or even scientific discussions are sometimes incorrectly flagged and removed.",
+    "options": [
+      {
+        "text": "Yes - The platform is using AI to automatically moderate content",
+        "consequence": "Raises concerns about censorship and academic freedom"
+      },
+      {
+        "text": "Yes - The system uses natural language processing to analyze posts",
+        "consequence": "Highlights limitations of AI in understanding context"
+      },
+      {
+        "text": "Partially - There's likely some human oversight combined with AI tools",
+        "consequence": "Suggests a hybrid approach might be more effective"
+      },
+      {
+        "text": "No - This appears to be basic keyword filtering, not AI",
+        "consequence": "Underestimates the sophistication of modern content moderation"
+      },
+      {
+        "text": "Not sure - Can't determine without knowing the specific technology used",
+        "consequence": "Emphasizes the need for transparency in moderation systems"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Academic freedom",
+      "Content moderation",
+      "Algorithmic censorship",
+      "Educational discourse"
+    ],
+    "sdgTags": ["4", "10", "16", "5"],
+    "resources": [
+      {
+        "title": "The Challenges of AI Content Moderation in Educational Contexts",
+        "url": "https://www.jlet.org/index.php/articles",
+        "type": "article"
+      },
+      {
+        "title": "Balancing Safety and Academic Freedom Online",
+        "url": "https://www.govtech.com/education",
+        "type": "guide"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "AI in College Admissions",
+    "description": "A group of universities has begun using an AI system to help screen initial college applications. The system analyzes various factors including grades, standardized test scores, extracurricular activities, and recommendation letters to generate an \"applicant score\" that admissions officers use to prioritize applications for further review.\n\nThe universities claim this makes the process more efficient and helps identify promising candidates who might otherwise be overlooked. However, some students and education advocates have raised concerns about transparency and potential bias in the system.",
+    "options": [
+      {
+        "text": "Yes - The universities are using AI to evaluate and score applications",
+        "consequence": "Raises concerns about algorithmic bias and fairness"
+      },
+      {
+        "text": "Yes - The system uses machine learning to predict student success potential",
+        "consequence": "Questions the validity of AI predictions"
+      },
+      {
+        "text": "Partially - The AI is only providing initial screening, with humans making final decisions",
+        "consequence": "Suggests a balanced approach to AI use"
+      },
+      {
+        "text": "No - This is just an automated scoring system without true AI capabilities",
+        "consequence": "Underestimates the AI's role in decision-making"
+      },
+      {
+        "text": "Not sure - More information about the algorithm is needed",
+        "consequence": "Highlights the need for transparency in AI systems"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Algorithmic fairness",
+      "Access to education",
+      "Transparency",
+      "Bias in admissions"
+    ],
+    "sdgTags": ["4", "10", "16"],
+    "resources": [
+      {
+        "title": "AI in College Admissions: Promise and Pitfalls",
+        "url": "https://www.higheredtoday.org/policy-research/diversity-equity-inclusion/",
+        "type": "article"
+      },
+      {
+        "title": "Equity Considerations in Automated Admissions Systems",
+        "url": "https://epi.org.uk/publications-and-research/",
+        "type": "research"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Accessibility AI Tools",
+    "description": "A high school has introduced AI-powered accessibility tools to support students with different learning needs. These include speech-to-text tools for students with writing difficulties, text-to-speech for reading challenges, real-time captioning for deaf or hard-of-hearing students, and language translation for English language learners.\n\nWhile many students benefit from these tools, there have been instances where the technology misunderstood specialized terminology in science classes or struggled with accented speech. Some teachers also wonder if certain accommodations might give some students an unfair advantage in assessments.",
+    "options": [
+      {
+        "text": "Yes - Multiple AI technologies are being used for accessibility purposes",
+        "consequence": "Highlights the potential of AI for inclusion"
+      },
+      {
+        "text": "Yes - Speech recognition and language processing are AI applications",
+        "consequence": "Shows the complexity of AI language processing"
+      },
+      {
+        "text": "Partially - Some of these tools use AI while others use simpler technologies",
+        "consequence": "Suggests a mixed approach to accessibility"
+      },
+      {
+        "text": "No - These are basic assistive technologies without advanced AI",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - The level of AI sophistication in these tools is unclear",
+        "consequence": "Emphasizes the need for better understanding of AI tools"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Educational equity",
+      "Accessibility",
+      "Fair assessment",
+      "Technology support"
+    ],
+    "sdgTags": ["4", "10", "3"],
+    "resources": [
+      {
+        "title": "AI for Education Accessibility: Best Practices",
+        "url": "https://www.cast.org/products-services/resources",
+        "type": "guide"
+      },
+      {
+        "title": "Balancing Accommodation and Assessment Integrity",
+        "url": "https://www.testpublishers.org/resources",
+        "type": "whitepaper"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "AI-Powered Tutoring Systems",
+    "description": "A school district has implemented an AI-powered tutoring system that provides personalized learning assistance to students outside of regular class hours. The system adapts to each student's learning pace, identifies knowledge gaps based on their responses, and customizes explanations and practice problems accordingly.\n\nSome students have shown significant improvement in their understanding and test scores after using the system, while others find the experience impersonal or struggle to engage with the digital interface. Parents and educators are debating whether AI tutoring should complement or replace traditional tutoring programs.",
+    "options": [
+      {
+        "text": "Yes - The system uses AI to personalize learning experiences for each student",
+        "consequence": "Highlights the potential of personalized learning"
+      },
+      {
+        "text": "Yes - Adaptive learning algorithms are being used to identify knowledge gaps",
+        "consequence": "Shows how AI can enhance learning assessment"
+      },
+      {
+        "text": "Partially - There are some AI elements but likely with significant human oversight",
+        "consequence": "Suggests a balanced approach to AI tutoring"
+      },
+      {
+        "text": "No - This is mainly an automated practice system with pre-programmed responses",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - Need more technical details to determine the level of AI involvement",
+        "consequence": "Emphasizes the need for transparency in educational AI"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Personalized learning",
+      "Human interaction",
+      "Educational effectiveness",
+      "Digital engagement"
+    ],
+    "sdgTags": ["4", "10", "9"],
+    "resources": [
+      {
+        "title": "The Effectiveness of AI Tutors vs. Human Tutors",
+        "url": "https://www.apa.org/pubs/journals/edu",
+        "type": "research"
+      },
+      {
+        "title": "Designing Equitable AI Tutoring Systems",
+        "url": "https://hai.stanford.edu/research/ai-education",
+        "type": "guide"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Predictive Analytics for Dropout Prevention",
+    "description": "A large public school system has implemented an AI-based predictive analytics program that identifies students at risk of dropping out. The system analyzes various data points including attendance records, grades, disciplinary incidents, and socioeconomic factors to flag students who might need additional support.\n\nThe school's intervention team uses these predictions to allocate resources and create personalized support plans. While graduation rates have improved since implementation, some parents and civil rights advocates have raised concerns about privacy, data security, and potential bias in how students are identified and assisted.",
+    "options": [
+      {
+        "text": "Yes - AI algorithms are analyzing student data to predict dropout risk",
+        "consequence": "Raises concerns about data privacy and algorithmic bias"
+      },
+      {
+        "text": "Yes - Machine learning models are identifying patterns in student behavior",
+        "consequence": "Highlights the complexity of student success prediction"
+      },
+      {
+        "text": "Partially - The system uses some AI but relies heavily on traditional statistical methods",
+        "consequence": "Suggests a balanced approach to data analysis"
+      },
+      {
+        "text": "No - This is standard data analysis without advanced AI capabilities",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - The distinction between complex analytics and AI is unclear here",
+        "consequence": "Emphasizes the need for better understanding of AI systems"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Student privacy",
+      "Data security",
+      "Algorithmic bias",
+      "Resource allocation"
+    ],
+    "sdgTags": ["4", "10", "1", "3"],
+    "resources": [
+      {
+        "title": "Ethical Considerations in Educational Data Mining",
+        "url": "https://educationaldatamining.org/resources/",
+        "type": "article"
+      },
+      {
+        "title": "Privacy-Preserving Approaches to Predictive Analytics in Education",
+        "url": "https://fpf.org/blog/category/k-12-education/",
+        "type": "whitepaper"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "AI Writing Feedback Tools",
+    "description": "An English department has adopted an AI-powered writing feedback tool that analyzes student essays and provides immediate suggestions on grammar, style, organization, and content. Students submit drafts to the system and receive automated feedback before submitting their final work to teachers.\n\nSome students find the instant feedback helpful for improving their writing, while others feel the AI doesn't fully understand nuanced or creative approaches. Teachers have noticed improvements in technical aspects of writing but wonder if students are becoming overly dependent on the tool rather than developing their own editing skills.",
+    "options": [
+      {
+        "text": "Yes - Natural language processing AI is analyzing and providing feedback on writing",
+        "consequence": "Raises questions about the role of AI in developing writing skills"
+      },
+      {
+        "text": "Yes - The system uses machine learning to evaluate various aspects of written work",
+        "consequence": "Highlights the complexity of writing assessment"
+      },
+      {
+        "text": "Partially - The tool likely combines predefined rules with some AI capabilities",
+        "consequence": "Suggests a balanced approach to writing feedback"
+      },
+      {
+        "text": "No - This is primarily automated grammar checking without true AI understanding",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - The sophistication of the writing analysis is unclear",
+        "consequence": "Emphasizes the need for transparency in AI tools"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Writing skill development",
+      "Tool dependency",
+      "Creative expression",
+      "Feedback quality"
+    ],
+    "sdgTags": ["4", "10", "9"],
+    "resources": [
+      {
+        "title": "AI Feedback and Writing Skill Development",
+        "url": "https://www.literacyworldwide.org/resources",
+        "type": "research"
+      },
+      {
+        "title": "Balancing Automated and Human Feedback in Writing Instruction",
+        "url": "https://ncte.org/resources/",
+        "type": "guide"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "AI-Enhanced Science Labs",
+    "description": "A science department has implemented AI-enhanced virtual laboratory experiences that allow students to conduct sophisticated experiments that would be too dangerous, expensive, or time-consuming in a traditional school lab. The simulations use AI to model realistic outcomes based on student inputs and can adapt the complexity based on student performance.\n\nMost students are excited about the opportunity to explore advanced concepts, but some teachers worry that students are missing out on developing hands-on laboratory skills. There are also questions about whether the simulations might oversimplify certain scientific phenomena or embed unintended biases in how scientific concepts are presented.",
+    "options": [
+      {
+        "text": "Yes - AI is powering the simulation and adapting to student interactions",
+        "consequence": "Raises questions about the role of virtual labs in science education"
+      },
+      {
+        "text": "Yes - Machine learning models are generating realistic experimental outcomes",
+        "consequence": "Highlights the complexity of scientific simulation"
+      },
+      {
+        "text": "Partially - There's some AI involvement but primarily pre-programmed simulations",
+        "consequence": "Suggests a balanced approach to virtual labs"
+      },
+      {
+        "text": "No - These are advanced graphics and physics engines but not true AI",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - It's difficult to determine the level of AI without technical details",
+        "consequence": "Emphasizes the need for transparency in educational technology"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Hands-on learning",
+      "Scientific accuracy",
+      "Simulation bias",
+      "Lab accessibility"
+    ],
+    "sdgTags": ["4", "10", "9", "13"],
+    "resources": [
+      {
+        "title": "Virtual vs. Physical Labs in Science Education",
+        "url": "https://www.nsta.org/resources",
+        "type": "research"
+      },
+      {
+        "title": "Designing Inclusive AI-Based Science Learning Experiences",
+        "url": "https://www.ase.org.uk/resources",
+        "type": "guide"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "AI Teacher Assistants",
+    "description": "A middle school is piloting AI-powered digital teaching assistants in several classrooms. These assistants help manage routine tasks like answering common student questions, providing additional explanations of concepts, tracking participation, and even helping with initial grading of objective assignments.\n\nTeachers report having more time for individualized instruction and creative activities, but some parents worry about the reduced human interaction and oversight. Questions have also been raised about data privacy, as the system collects detailed information about student interactions and performance to improve its responses.",
+    "options": [
+      {
+        "text": "Yes - The digital assistants use AI to respond to student questions and grade work",
+        "consequence": "Raises questions about the role of AI in teaching"
+      },
+      {
+        "text": "Yes - Machine learning allows the system to improve over time based on interactions",
+        "consequence": "Highlights the adaptive nature of AI assistants"
+      },
+      {
+        "text": "Partially - The assistants combine scripted responses with some AI capabilities",
+        "consequence": "Suggests a balanced approach to AI assistance"
+      },
+      {
+        "text": "No - These are primarily automated tools without sophisticated AI understanding",
+        "consequence": "Underestimates the AI capabilities involved"
+      },
+      {
+        "text": "Not sure - More information is needed about the technology behind the assistants",
+        "consequence": "Emphasizes the need for transparency in educational AI"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Teacher-student interaction",
+      "Data privacy",
+      "Educational quality",
+      "AI role in education"
+    ],
+    "sdgTags": ["4", "10", "8", "16"],
+    "resources": [
+      {
+        "title": "The Role of AI Assistants in K-12 Classrooms",
+        "url": "https://www.iste.org/areas-of-focus/AI-in-education",
+        "type": "article"
+      },
+      {
+        "title": "Student Data Privacy Considerations for AI in Schools",
+        "url": "https://privacy.a4l.org/resources/",
+        "type": "guide"
+      }
+    ]
+  }
+] 
