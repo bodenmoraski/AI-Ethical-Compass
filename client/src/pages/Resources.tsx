@@ -1,187 +1,203 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
 
 const Resources = () => {
-  const resourceCategories = [
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+
+  const resources = [
     {
-      title: "AI Ethics Frameworks",
-      resources: [
-        {
-          title: "UNESCO Recommendation on the Ethics of AI",
-          source: "UNESCO",
-          description: "The first global standard-setting instrument on the ethics of artificial intelligence.",
-          link: "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics",
-          icon: "public"
-        },
-        {
-          title: "AI Ethics Guidelines Global Inventory",
-          source: "AlgorithmWatch",
-          description: "A comprehensive database of AI ethics guidelines from around the world.",
-          link: "https://algorithmwatch.org/en/ai-ethics-guidelines-global-inventory/",
-          icon: "inventory_2"
-        },
-        {
-          title: "Ethics Guidelines for Trustworthy AI",
-          source: "European Commission",
-          description: "Guidelines for developing and using AI systems in a way that is legal, ethical, and robust.",
-          link: "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai",
-          icon: "gavel"
-        }
-      ]
+      title: "UNESCO AI Ethics Guidelines",
+      description: "The first global standard-setting instrument on the ethics of artificial intelligence, providing comprehensive frameworks for educational implementation.",
+      icon: "policy",
+      category: "Guidelines",
+      link: "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics"
     },
     {
-      title: "AI in Education Resources",
-      resources: [
-        {
-          title: "Artificial Intelligence in Education: Challenges and Opportunities",
-          source: "ISTE",
-          description: "Research and guidelines for educators on implementing AI in educational settings.",
-          link: "https://www.iste.org/areas-of-focus/AI-in-education",
-          icon: "school"
-        },
-        {
-          title: "AI4K12",
-          source: "CSTA & AAAI",
-          description: "Resources for teaching AI concepts in K-12 education.",
-          link: "https://ai4k12.org/",
-          icon: "smart_toy"
-        },
-        {
-          title: "Elements of AI",
-          source: "University of Helsinki",
-          description: "Free online course covering the basics of AI for everyone.",
-          link: "https://www.elementsofai.com/",
-          icon: "menu_book"
-        }
-      ]
+      title: "AI4K12 Guidelines",
+      description: "Comprehensive guidelines for teaching AI concepts in K-12 education, developed by CSTA & AAAI.",
+      icon: "school",
+      category: "Guidelines",
+      link: "https://ai4k12.org/"
     },
     {
-      title: "Digital Inclusion & Equity",
-      resources: [
-        {
-          title: "AI and Inclusion",
-          source: "Berkman Klein Center",
-          description: "Research network examining the impact of AI on marginalized populations.",
-          link: "https://cyber.harvard.edu/projects/ai-inclusion",
-          icon: "diversity_3"
-        },
-        {
-          title: "Algorithmic Justice League",
-          source: "AJL",
-          description: "Organization working to highlight and address bias in AI systems.",
-          link: "https://www.ajl.org/",
-          icon: "balance"
-        },
-        {
-          title: "Digital Equity in Education",
-          source: "ISTE",
-          description: "Resources for addressing digital equity challenges in educational settings.",
-          link: "https://www.iste.org/areas-of-focus/digital-equity",
-          icon: "laptop_chromebook"
-        }
-      ]
+      title: "ISTE AI in Education Research",
+      description: "Latest research and guidelines for educators on implementing AI in educational settings responsibly.",
+      icon: "science",
+      category: "Research",
+      link: "https://www.iste.org/areas-of-focus/AI-in-education"
     },
     {
-      title: "Sustainable Development Goals",
-      resources: [
-        {
-          title: "SDG 4: Quality Education",
-          source: "United Nations",
-          description: "Overview, targets, and progress on ensuring inclusive and equitable quality education.",
-          link: "https://sdgs.un.org/goals/goal4",
-          icon: "school"
-        },
-        {
-          title: "SDG 10: Reduced Inequalities",
-          source: "United Nations",
-          description: "Overview, targets, and progress on reducing inequality within and among countries.",
-          link: "https://sdgs.un.org/goals/goal10",
-          icon: "diversity_3"
-        },
-        {
-          title: "AI for Good",
-          source: "UN ITU",
-          description: "Platform for dialogue on beneficial AI to advance the SDGs.",
-          link: "https://aiforgood.itu.int/",
-          icon: "public"
-        }
-      ]
+      title: "Elements of AI Course",
+      description: "Free online course covering AI basics and ethics, perfect for educators and students.",
+      icon: "school",
+      category: "Courses",
+      link: "https://www.elementsofai.com/"
+    },
+    {
+      title: "AI Fairness 360 Toolkit",
+      description: "Open-source toolkit to help detect and mitigate discriminatory biases in AI systems.",
+      icon: "balance",
+      category: "Tools",
+      link: "https://github.com/Trusted-AI/AIF360"
+    },
+    {
+      title: "Algorithmic Justice League",
+      description: "Tools and resources for identifying and addressing algorithmic bias in AI systems.",
+      icon: "gavel",
+      category: "Tools",
+      link: "https://www.ajl.org/"
+    },
+    {
+      title: "Digital Equity in Education",
+      description: "Resources for addressing digital equity challenges in AI-enhanced educational settings.",
+      icon: "laptop",
+      category: "Guidelines",
+      link: "https://www.iste.org/areas-of-focus/digital-equity"
+    },
+    {
+      title: "EU Ethics Guidelines for Trustworthy AI",
+      description: "European Union's guidelines for achieving trustworthy artificial intelligence.",
+      icon: "policy",
+      category: "Guidelines",
+      link: "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
     }
   ];
 
+  const categories = ["All", "Guidelines", "Research", "Tools", "Examples"];
+
+  const filteredResources = selectedCategory === "All" 
+    ? resources 
+    : resources.filter(resource => resource.category === selectedCategory);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-neutral-900 mb-6">Learning Resources</h1>
-      <p className="text-lg text-neutral-700 mb-10 max-w-4xl">
-        Explore these resources to deepen your understanding of AI ethics, digital inclusion, 
-        and responsible use of technology in educational contexts. These materials complement 
-        the scenarios in AI Ethical Compass and provide further background on important concepts.
-      </p>
-      
-      <div className="space-y-12">
-        {resourceCategories.map((category, idx) => (
-          <div key={idx}>
-            <h2 className="text-2xl font-semibold text-neutral-900 mb-6 border-b pb-2">
-              {category.title}
-            </h2>
-            
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {category.resources.map((resource, resourceIdx) => (
-                <Card key={resourceIdx} className="h-full">
-                  <CardContent className="p-6 h-full flex flex-col">
-                    <div className="flex items-start mb-4">
-                      <div className="bg-primary-100 p-2 rounded-full mr-4">
-                        <span className="material-icons text-primary-600">{resource.icon}</span>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="relative bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
+              Educational{" "}
+              <span className="relative inline-block">
+                <span className="relative z-10 text-primary-800">
+                  AI Resources
+                </span>
+                <span className="absolute inset-x-0 bottom-0 h-3 bg-primary-100"></span>
+              </span>
+            </h1>
+            <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
+              Explore our curated collection of resources on ethical AI implementation in education, 
+              from comprehensive guidelines to practical tools and real-world case studies.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Filter */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex flex-wrap gap-3">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant="outline"
+                onClick={() => setSelectedCategory(category)}
+                className={
+                  selectedCategory === category
+                    ? "border-2 border-primary-300 bg-primary-50 text-slate-800 font-medium"
+                    : "border-2 border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-primary-300 font-medium"
+                }
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Resources Grid */}
+      <div className="relative bg-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            {filteredResources.map((resource, index) => (
+              <a
+                key={index}
+                href={resource.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <div className="bg-slate-50 rounded-xl p-8 border border-slate-200 hover:border-primary-200 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+                  <div className="flex items-start mb-6">
+                    <div className="h-12 w-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center mr-4 group-hover:border-primary-200 transition-colors">
+                      <span className="material-icons text-2xl text-primary-800">
+                        {resource.icon}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-sm text-primary-800 uppercase tracking-wider mb-1 font-medium">
+                        {resource.category}
                       </div>
-                      <h3 className="text-lg font-medium text-neutral-900">{resource.title}</h3>
+                      <h3 className="text-xl font-semibold text-slate-900 group-hover:text-primary-800 transition-colors">
+                        {resource.title}
+                      </h3>
                     </div>
-                    
-                    <p className="text-neutral-700 mb-2 text-sm flex-grow">
-                      {resource.description}
+                  </div>
+                  <p className="text-slate-600 leading-relaxed">
+                    {resource.description}
+                  </p>
+                  <div className="mt-6 flex items-center text-primary-800 font-medium">
+                    <span className="text-base">Learn More</span>
+                    <span className="material-icons ml-2 text-xl group-hover:translate-x-1 transition-transform">
+                      arrow_forward
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Educator Resources CTA */}
+      <div className="relative bg-slate-50 border-t border-slate-200 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
+            <div className="flex items-start space-x-6">
+              <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center">
+                <span className="material-icons text-2xl text-primary-800">school</span>
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">For Educators</h2>
+                <p className="text-slate-600 mb-6">
+                  Looking to incorporate AI ethics into your curriculum? These resources can help you create 
+                  engaging lessons and foster meaningful discussions about AI's role in education.
+                </p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <h3 className="font-medium text-slate-900 mb-2 flex items-center">
+                      <span className="material-icons text-xl text-primary-800 mr-2">format_quote</span>
+                      Discussion Prompts
+                    </h3>
+                    <p className="text-slate-600">
+                      Use our scenarios as starting points for classroom discussions about AI ethics.
                     </p>
-                    
-                    <div className="flex justify-between items-center mt-4">
-                      <span className="text-xs text-neutral-500">{resource.source}</span>
-                      <a 
-                        href={resource.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-sm font-medium text-primary-600 hover:text-primary-800 flex items-center"
-                      >
-                        Visit resource
-                        <span className="material-icons ml-1 text-sm">open_in_new</span>
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <h3 className="font-medium text-slate-900 mb-2 flex items-center">
+                      <span className="material-icons text-xl text-primary-800 mr-2">assignment</span>
+                      Activity Ideas
+                    </h3>
+                    <p className="text-slate-600">
+                      Engage students with hands-on activities exploring AI's impact on education.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <div className="mt-12 bg-primary-50 border border-primary-100 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-primary-900 mb-4 flex items-center">
-          <span className="material-icons mr-2 text-primary-600">tips_and_updates</span>
-          Educator Resources
-        </h2>
-        <p className="text-primary-800 mb-4">
-          Are you an educator looking to incorporate AI ethics into your curriculum? 
-          These scenarios can be used as classroom discussion starters or as individual assignments.
-        </p>
-        <ul className="list-disc pl-5 text-primary-700 space-y-2">
-          <li>
-            Have students complete scenarios independently, then compare and discuss their ethical evaluations in small groups.
-          </li>
-          <li>
-            Use the scenarios as case studies for debates on AI policy in educational settings.
-          </li>
-          <li>
-            Ask students to create their own AI ethics scenarios based on their experiences or research.
-          </li>
-          <li>
-            Connect scenario discussions to broader conversations about digital citizenship and responsible technology use.
-          </li>
-        </ul>
+        </div>
       </div>
     </div>
   );
