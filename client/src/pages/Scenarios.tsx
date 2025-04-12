@@ -10,16 +10,36 @@ const Scenarios = () => {
   const navigate = useNavigate();
   const scenarioId = params.id ? parseInt(params.id) : null;
   
-  const { data: scenarios = [], isLoading } = useQuery<Scenario[]>({
+  const { data: scenarios = [], isLoading, error } = useQuery<Scenario[]>({
     queryKey: ["/api/scenarios"],
+    queryFn: async () => {
+      const response = await fetch("/api/scenarios", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch scenarios");
+      }
+      return response.json();
+    },
   });
 
-  // If no scenario ID is specified but scenarios are loaded, navigate to the first one
   useEffect(() => {
+    console.log("Current scenarios:", scenarios);
+    console.log("Is loading:", isLoading);
+    if (error) console.error("Error:", error);
+    
     if (!scenarioId && scenarios.length > 0) {
       navigate(`/scenarios/${scenarios[0].id}`);
     }
-  }, [scenarioId, scenarios, navigate]);
+  }, [scenarioId, scenarios, navigate, isLoading, error]);
+
+  if (error instanceof Error) {
+    return (
+      <div className="flex-1 flex justify-center items-center h-64">
+        <p className="text-red-500">Error loading scenarios: {error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -43,7 +63,7 @@ const Scenarios = () => {
           <ScenarioView />
         ) : (
           <div className="flex-1 flex justify-center items-center h-64">
-            <p>No scenarios available.</p>
+            <p>No scenarios available. Please check the server connection.</p>
           </div>
         )}
       </div>

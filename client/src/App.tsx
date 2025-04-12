@@ -1,42 +1,50 @@
 import { Routes, Route } from "react-router-dom";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import NotFound from "@/pages/not-found";
-import Home from "@/pages/Home";
-import Scenarios from "@/pages/Scenarios";
-import About from "@/pages/About";
-import Instructions from "@/pages/Instructions";
-import Resources from "@/pages/Resources";
-import TermsOfService from "@/pages/TermsOfService";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import Contact from "@/pages/Contact";
+import { ThemeProvider } from "@/components/theme-provider";
 import Layout from "@/components/Layout";
+import Home from "@/pages/Home";
+import About from "@/pages/About";
+import Resources from "@/pages/Resources";
+import ScenarioView from "@/components/ScenarioView";
+import Scenarios from "@/pages/Scenarios";
+import AccessibilityControls from "@/components/AccessibilityControls";
+import "@/styles/accessibility.css";
 
-function Router() {
-  return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="scenarios" element={<Scenarios />} />
-        <Route path="scenarios/:id" element={<Scenarios />} />
-        <Route path="about" element={<About />} />
-        <Route path="instructions" element={<Instructions />} />
-        <Route path="resources" element={<Resources />} />
-        <Route path="terms" element={<TermsOfService />} />
-        <Route path="privacy" element={<PrivacyPolicy />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
-  );
-}
+const queryClient = new QueryClient();
 
 function App() {
+  const handleFontSizeChange = (size: number) => {
+    document.documentElement.style.setProperty('--font-size', `${size}px`);
+  };
+
+  const handleHighContrastToggle = (enabled: boolean) => {
+    document.documentElement.classList.toggle('high-contrast', enabled);
+  };
+
+  const handleScreenReaderToggle = (enabled: boolean) => {
+    document.documentElement.setAttribute('aria-live', enabled ? 'polite' : 'off');
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/scenarios" element={<Scenarios />} />
+            <Route path="/scenarios/:id" element={<ScenarioView />} />
+          </Routes>
+          <Toaster />
+          <AccessibilityControls
+            onFontSizeChange={handleFontSizeChange}
+            onHighContrastToggle={handleHighContrastToggle}
+            onScreenReaderToggle={handleScreenReaderToggle}
+          />
+        </Layout>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

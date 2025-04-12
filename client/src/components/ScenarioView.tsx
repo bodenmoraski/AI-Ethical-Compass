@@ -20,6 +20,7 @@ import {
 import RelatedResources from "./RelatedResources";
 import SdgDetails from "./SdgDetails";
 import PerspectiveCard from "./PerspectiveCard";
+import SdgImpactTracker from "./SdgImpactTracker";
 
 enum Step {
   Identification = 1,
@@ -64,6 +65,15 @@ const ScenarioView = () => {
   // Fetch scenario data
   const { data: scenarios = [] } = useQuery<Scenario[]>({
     queryKey: ["/api/scenarios"],
+    queryFn: async () => {
+      const response = await fetch("/api/scenarios", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch scenarios");
+      }
+      return response.json();
+    },
   });
 
   const currentScenario = scenarioId
@@ -204,6 +214,11 @@ const ScenarioView = () => {
       {/* Current Scenario */}
       <Card>
         <CardContent className="p-5 sm:p-6">
+          <SdgImpactTracker 
+            scenarios={scenarios} 
+            totalPerspectives={perspectives?.length || 0} 
+          />
+          
           <div className="flex justify-between items-start">
             <div>
               <h2
@@ -294,7 +309,7 @@ const ScenarioView = () => {
                   {currentScenario.options.map((option, index) => (
                     <div
                       key={index}
-                      className={`flex items-start space-x-3 p-3 rounded-md transition-all ${
+                      className={`flex items-center space-x-3 p-3 rounded-md transition-all ${
                         aiOptionSelection === option
                           ? "bg-primary-50 border border-primary-200"
                           : "border border-transparent hover:bg-neutral-50"
@@ -303,7 +318,6 @@ const ScenarioView = () => {
                       <RadioGroupItem
                         value={option}
                         id={`ai-option-${index}`}
-                        className="mt-1"
                       />
                       <Label
                         htmlFor={`ai-option-${index}`}
@@ -947,14 +961,11 @@ const ScenarioView = () => {
               </div>
 
               <div className="space-y-4">
-                {console.log("Rendering perspectives:", perspectives)}
-                
                 {/* Check if perspectives array exists and has items with top-level perspectives */}
                 {Array.isArray(perspectives) && perspectives.length > 0 && 
                   (() => {
                     // Filter to get only top-level perspectives
                     const topLevelPerspectives = perspectives.filter((p: Perspective) => !p.parentId);
-                    console.log("Top-level perspectives:", topLevelPerspectives);
                     
                     if (topLevelPerspectives.length > 0) {
                       return topLevelPerspectives.map((perspective: Perspective) => (

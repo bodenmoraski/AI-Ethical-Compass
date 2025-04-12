@@ -10,9 +10,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all scenarios
   app.get("/api/scenarios", async (_req: Request, res: Response) => {
     try {
+      console.log("GET /api/scenarios - Fetching all scenarios");
       const scenarios = await storage.getAllScenarios();
+      console.log(`Found ${scenarios.length} scenarios`);
+      scenarios.forEach(s => {
+        console.log(`- Scenario ${s.id}: ${s.title}`);
+      });
       res.json(scenarios);
     } catch (error) {
+      console.error("Error retrieving scenarios:", error);
       res.status(500).json({ message: "Failed to retrieve scenarios" });
     }
   });
@@ -25,13 +31,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid scenario ID" });
       }
       
+      console.log(`GET /api/scenarios/${id} - Fetching scenario`);
       const scenario = await storage.getScenarioById(id);
       if (!scenario) {
+        console.log(`Scenario ${id} not found`);
         return res.status(404).json({ message: "Scenario not found" });
       }
       
+      console.log(`Found scenario: ${scenario.title}`);
       res.json(scenario);
     } catch (error) {
+      console.error("Error retrieving scenario:", error);
       res.status(500).json({ message: "Failed to retrieve scenario" });
     }
   });

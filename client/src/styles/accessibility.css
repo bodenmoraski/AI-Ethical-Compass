@@ -1,0 +1,105 @@
+/* High Contrast Mode */
+.high-contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+  --primary: #ffff00;
+  --accent: #00ffff;
+  --neutral-50: #000000;
+  --neutral-100: #111111;
+  --neutral-200: #222222;
+  --neutral-300: #333333;
+  --neutral-400: #444444;
+  --neutral-500: #555555;
+  --neutral-600: #666666;
+  --neutral-700: #777777;
+  --neutral-800: #888888;
+  --neutral-900: #ffffff;
+}
+
+.high-contrast * {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--foreground) !important;
+}
+
+.high-contrast .text-primary-600,
+.high-contrast .text-accent-600 {
+  color: var(--primary) !important;
+}
+
+.high-contrast .bg-primary-100,
+.high-contrast .bg-accent-100 {
+  background-color: var(--background) !important;
+  border: 2px solid var(--primary) !important;
+}
+
+.high-contrast button,
+.high-contrast [role="button"],
+.high-contrast a {
+  border: 2px solid var(--foreground) !important;
+  outline: 2px solid var(--primary) !important;
+}
+
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select {
+  border: 2px solid var(--foreground) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Focus Styles */
+*:focus {
+  outline: 3px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+.high-contrast *:focus {
+  outline: 3px solid var(--primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Font Size */
+:root {
+  --font-size: 16px;
+}
+
+body {
+  font-size: var(--font-size);
+}
+
+/* Keyboard Navigation */
+[role="button"],
+button,
+a {
+  cursor: pointer;
+}
+
+[role="button"]:focus,
+button:focus,
+a:focus {
+  box-shadow: 0 0 0 3px var(--primary);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+} 
