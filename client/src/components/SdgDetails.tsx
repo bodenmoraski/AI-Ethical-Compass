@@ -14,7 +14,7 @@ interface SdgDetailsProps {
   className?: string;
 }
 
-const SdgDetails = ({ sdgDetails, className = "" }: SdgDetailsProps) => {
+const SdgDetails = ({ sdgDetails = [], className = "" }: SdgDetailsProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const handleItemToggle = (itemId: string) => {
@@ -25,9 +25,7 @@ const SdgDetails = ({ sdgDetails, className = "" }: SdgDetailsProps) => {
     );
   };
 
-  if (!sdgDetails || sdgDetails.length === 0) {
-    return null;
-  }
+  const details = Array.isArray(sdgDetails) ? sdgDetails : [];
 
   return (
     <div className={cn("bg-white rounded-lg border border-green-200 overflow-hidden", className)}>
@@ -47,7 +45,7 @@ const SdgDetails = ({ sdgDetails, className = "" }: SdgDetailsProps) => {
         onValueChange={setExpandedItems}
         className="divide-y divide-neutral-100"
       >
-        {sdgDetails.map((detail, index) => (
+        {details.map((detail, index) => (
           <AccordionItem 
             key={index} 
             value={`sdg-${index}`}
