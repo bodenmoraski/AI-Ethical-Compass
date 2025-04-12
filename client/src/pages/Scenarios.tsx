@@ -5,6 +5,29 @@ import { type Scenario } from "@shared/schema";
 import ScenarioNav from "@/components/ScenarioNav";
 import ScenarioView from "@/components/ScenarioView";
 import { Card } from "@/components/ui/card";
+import scenariosData from "@shared/scenarios.json";
+
+// Transform the raw data to match the Scenario type
+const transformScenarios = (data: any[]): Scenario[] => {
+  return data.map(scenario => ({
+    ...scenario,
+    options: scenario.options.map((opt: any) => opt.text),
+    aiUseAnswer: scenario.description, // Using description as aiUseAnswer for now
+    sdgDetails: scenario.sdgTags.map((tag: string) => ({
+      goal: tag,
+      description: `Description for ${tag}`,
+      relevance: `Relevance for ${tag}`,
+      icon: `Icon for ${tag}`
+    })),
+    relatedResources: scenario.resources.map((res: any) => ({
+      title: res.title,
+      source: res.type,
+      type: res.type,
+      link: res.url
+    })),
+    order: scenario.id // Using id as order for now
+  }));
+};
 
 const Scenarios = () => {
   const params = useParams();
@@ -12,15 +35,9 @@ const Scenarios = () => {
   const scenarioId = params.id ? parseInt(params.id) : null;
   
   const { data: scenarios = [], isLoading, error } = useQuery<Scenario[]>({
-    queryKey: ["/api/scenarios"],
+    queryKey: ["scenarios"],
     queryFn: async () => {
-      const response = await fetch("/api/scenarios", {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch scenarios");
-      }
-      return response.json();
+      return transformScenarios(scenariosData);
     },
   });
 
