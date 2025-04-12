@@ -8,6 +8,9 @@ import About from "@/pages/About";
 import Resources from "@/pages/Resources";
 import ScenarioView from "@/components/ScenarioView";
 import Scenarios from "@/pages/Scenarios";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Terms from "@/pages/Terms";
+import Contact from "@/pages/Contact";
 import AccessibilityControls from "@/components/AccessibilityControls";
 import "@/styles/accessibility.css";
 
@@ -36,6 +39,9 @@ function App() {
             <Route path="/resources" element={<Resources />} />
             <Route path="/scenarios" element={<Scenarios />} />
             <Route path="/scenarios/:id" element={<ScenarioView />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
           <Toaster />
           <AccessibilityControls

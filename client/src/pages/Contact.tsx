@@ -1,161 +1,136 @@
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("submitting");
-
-    try {
-      // Here you would typically send the form data to your backend
-      // For now, we'll just simulate a successful submission
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error) {
-      setStatus("error");
-    }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Badge variant="outline" className="bg-primary-100 text-primary-800">
-              Contact
-            </Badge>
-            <h1 className="text-3xl font-bold text-neutral-900">Get in Touch</h1>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="relative bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
+              Meet Our{" "}
+              <span className="relative inline-block">
+                <span className="relative z-10 text-primary-800">
+                  Team
+                </span>
+                <span className="absolute inset-x-0 bottom-0 h-3 bg-primary-100"></span>
+              </span>
+            </h1>
+            <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
+              Get to know the people behind AI Ethical Compass and reach out with any questions.
+            </p>
           </div>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-semibold text-neutral-800 mb-4">
-                Contact Information
-              </h2>
-              <div className="space-y-4 text-neutral-700">
-                <div>
-                  <h3 className="font-medium text-neutral-800">Email</h3>
-                  <p>support@ethicalai.com</p>
+      {/* Team Members */}
+      <div className="relative bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Founder */}
+            <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+              <div className="flex items-start space-x-6">
+                <div className="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-3xl text-primary-800">person</span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-neutral-800">Address</h3>
-                  <p>
-                    123 AI Ethics Street<br />
-                    Tech City, TC 12345<br />
-                    United States
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-neutral-800">Office Hours</h3>
-                  <p>
-                    Monday - Friday: 9:00 AM - 5:00 PM<br />
-                    Saturday - Sunday: Closed
-                  </p>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Boden Moraski</h2>
+                  <p className="text-primary-800 font-medium mb-4">Founder & Lead Developer</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">mail</span>
+                      <a href="mailto:bodenmoraski@gmail.com" className="hover:text-primary-800">
+                        bodenmoraski@gmail.com
+                      </a>
+                    </div>
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">school</span>
+                      <a href="mailto:27moraskib@shadysideacademy.org" className="hover:text-primary-800">
+                        27moraskib@shadysideacademy.org
+                      </a>
+                    </div>
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">work</span>
+                      <a href="https://linkedin.com/in/boden-moraski" target="_blank" rel="noopener noreferrer" className="hover:text-primary-800">
+                        linkedin.com/in/boden-moraski
+                      </a>
+                    </div>
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">code</span>
+                      <a href="https://github.com/bodenmoraski" target="_blank" rel="noopener noreferrer" className="hover:text-primary-800">
+                        github.com/bodenmoraski
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {status === "success" && (
-                  <Alert>
-                    <AlertDescription>
-                      Thank you for your message! We'll get back to you soon.
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {status === "error" && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      There was an error sending your message. Please try again.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    disabled={status === "submitting"}
-                  />
+            {/* Co-founder */}
+            <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+              <div className="flex items-start space-x-6">
+                <div className="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-3xl text-primary-800">person</span>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    disabled={status === "submitting"}
-                  />
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-2">Roshan Kshirsagar</h2>
+                  <p className="text-primary-800 font-medium mb-4">Co-founder</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">mail</span>
+                      <span className="italic">Email coming soon</span>
+                    </div>
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">work</span>
+                      <span className="italic">LinkedIn coming soon</span>
+                    </div>
+                    <div className="flex items-center text-slate-600">
+                      <span className="material-icons text-xl mr-3">code</span>
+                      <span className="italic">GitHub coming soon</span>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    disabled={status === "submitting"}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    disabled={status === "submitting"}
-                    className="min-h-[150px]"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={status === "submitting"}
-                  className="w-full"
-                >
-                  {status === "submitting" ? "Sending..." : "Send Message"}
-                </Button>
-              </form>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* General Contact */}
+          <div className="mt-16">
+            <div className="bg-white rounded-xl p-8 border border-slate-200">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Get in Touch</h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="font-medium text-slate-900 mb-4">General Inquiries</h3>
+                  <p className="text-slate-600 mb-4">
+                    Have questions about AI Ethical Compass? We'd love to hear from you.
+                  </p>
+                  <a 
+                    href="mailto:bodenmoraski@gmail.com"
+                    className="inline-flex items-center text-primary-800 hover:text-primary-900 font-medium"
+                  >
+                    Send us an email
+                    <span className="material-icons ml-2">arrow_forward</span>
+                  </a>
+                </div>
+                <div>
+                  <h3 className="font-medium text-slate-900 mb-4">Educational Partnerships</h3>
+                  <p className="text-slate-600 mb-4">
+                    Interested in implementing AI Ethical Compass at your institution?
+                  </p>
+                  <a 
+                    href="mailto:27moraskib@shadysideacademy.org"
+                    className="inline-flex items-center text-primary-800 hover:text-primary-900 font-medium"
+                  >
+                    Contact our education team
+                    <span className="material-icons ml-2">arrow_forward</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
