@@ -6,7 +6,7 @@
     }
   ],
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "dist/public",
   "framework": "vite",
   "regions": ["all"]
 } 
