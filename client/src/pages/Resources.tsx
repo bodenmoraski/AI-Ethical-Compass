@@ -32,7 +32,7 @@ const Resources = () => {
       title: "Elements of AI Course",
       description: "Free online course covering AI basics and ethics, perfect for educators and students.",
       icon: "school",
-      category: "Courses",
+      category: "Courses & Tutorials",
       link: "https://www.elementsofai.com/"
     },
     {
