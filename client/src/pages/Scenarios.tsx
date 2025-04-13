@@ -5,11 +5,12 @@ import { type Scenario } from "@shared/schema";
 import ScenarioNav from "@/components/ScenarioNav";
 import ScenarioView from "@/components/ScenarioView";
 import { Card } from "@/components/ui/card";
-import scenariosData from "@shared/scenarios.json";
+import scenariosData from "../../../shared/scenarios.json";
 
 // Transform the raw data to match the Scenario type
 const transformScenarios = (data: any[]): Scenario[] => {
-  return data.map(scenario => ({
+  console.log("Raw scenarios data:", data);
+  const transformed = data.map(scenario => ({
     ...scenario,
     options: scenario.options.map((opt: any) => opt.text),
     aiUseAnswer: scenario.description, // Using description as aiUseAnswer for now
@@ -27,6 +28,8 @@ const transformScenarios = (data: any[]): Scenario[] => {
     })),
     order: scenario.id // Using id as order for now
   }));
+  console.log("Transformed scenarios:", transformed);
+  return transformed;
 };
 
 const Scenarios = () => {
@@ -34,10 +37,15 @@ const Scenarios = () => {
   const navigate = useNavigate();
   const scenarioId = params.id ? parseInt(params.id) : null;
   
+  console.log("Initial scenariosData:", scenariosData);
+  
   const { data: scenarios = [], isLoading, error } = useQuery<Scenario[]>({
     queryKey: ["scenarios"],
     queryFn: async () => {
-      return transformScenarios(scenariosData);
+      console.log("Starting to transform scenarios");
+      const result = transformScenarios(scenariosData);
+      console.log("Transformation complete:", result);
+      return result;
     },
   });
 
