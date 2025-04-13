@@ -21,6 +21,7 @@ import RelatedResources from "./RelatedResources";
 import SdgDetails from "./SdgDetails";
 import PerspectiveCard from "./PerspectiveCard";
 import ScenarioNav from "./ScenarioNav";
+import scenariosData from "../../../shared/scenarios.json";
 
 enum Step {
   Identification = 1,
@@ -147,6 +148,28 @@ const getDefaultSdgDetails = (sdgTags: string[], scenario: Scenario) => {
   return details;
 };
 
+// Transform the raw data to match the Scenario type
+const transformScenarios = (data: any[]): Scenario[] => {
+  return data.map(scenario => ({
+    ...scenario,
+    options: scenario.options.map((opt: any) => opt.text),
+    aiUseAnswer: scenario.description,
+    sdgDetails: scenario.sdgTags.map((tag: string) => ({
+      goal: tag,
+      description: `Description for ${tag}`,
+      relevance: `Relevance for ${tag}`,
+      icon: `Icon for ${tag}`
+    })),
+    relatedResources: scenario.resources.map((res: any) => ({
+      title: res.title,
+      source: res.type,
+      type: res.type,
+      link: res.url
+    })),
+    order: scenario.id
+  }));
+};
+
 const ScenarioView = () => {
   const params = useParams();
   const navigate = useNavigate();
@@ -182,15 +205,9 @@ const ScenarioView = () => {
 
   // Fetch scenario data
   const { data: scenarios = [] } = useQuery<Scenario[]>({
-    queryKey: ["/api/scenarios"],
+    queryKey: ["scenarios"],
     queryFn: async () => {
-      const response = await fetch("/api/scenarios", {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch scenarios");
-      }
-      return response.json();
+      return transformScenarios(scenariosData);
     },
   });
 
