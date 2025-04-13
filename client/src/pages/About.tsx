@@ -48,7 +48,7 @@ const About = () => {
               <div className="text-sm text-slate-600 uppercase tracking-wider font-medium">Ethical Scenarios</div>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-              <div className="text-4xl font-bold text-primary-800 mb-2">2</div>
+              <div className="text-4xl font-bold text-primary-800 mb-2">10</div>
               <div className="text-sm text-slate-600 uppercase tracking-wider font-medium">UN SDG Goals</div>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
@@ -128,6 +128,11 @@ const About = () => {
               </div>
               <h2 className="text-3xl font-bold text-slate-900">UN Sustainable Development Goals</h2>
             </div>
+            <p className="text-lg text-slate-700 mb-8 leading-relaxed">
+              Our platform aligns with multiple UN Sustainable Development Goals, with a particular emphasis on 
+              transforming education and reducing inequalities through ethical AI implementation. We believe that 
+              by addressing these core challenges, we can create a more equitable and inclusive future for all learners.
+            </p>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
                 <div className="flex items-center mb-4">
@@ -137,9 +142,10 @@ const About = () => {
                   <h3 className="text-xl font-semibold text-slate-900">SDG 4: Quality Education</h3>
                 </div>
                 <p className="text-slate-700 leading-relaxed">
-                  Our platform supports SDG 4 by promoting critical analysis of how AI can enhance or detract from 
-                  quality education. We examine ethical considerations that educators and students must navigate as 
-                  AI becomes more prevalent in learning environments.
+                  At the heart of our mission, we support SDG 4 by promoting critical analysis of how AI can enhance 
+                  or detract from quality education. Our comprehensive scenarios examine ethical considerations that 
+                  educators and students must navigate as AI becomes more prevalent in learning environments, ensuring 
+                  that technological advancement serves educational excellence.
                 </p>
               </div>
               <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
@@ -150,9 +156,58 @@ const About = () => {
                   <h3 className="text-xl font-semibold text-slate-900">SDG 10: Reduced Inequalities</h3>
                 </div>
                 <p className="text-slate-700 leading-relaxed">
-                  We address SDG 10 by exploring how AI can either amplify or reduce inequalities. Our scenarios 
-                  prompt users to consider algorithmic bias, accessibility considerations, and how AI design choices 
-                  impact different populations.
+                  A fundamental pillar of our work, we address SDG 10 by deeply exploring how AI can either amplify 
+                  or reduce inequalities. Our scenarios prompt users to consider algorithmic bias, accessibility 
+                  considerations, and how AI design choices impact different populations, with a focus on creating 
+                  more equitable educational opportunities.
+                </p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center mr-4">
+                    <span className="material-icons text-2xl text-primary-800">precision_manufacturing</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">SDG 9: Industry, Innovation and Infrastructure</h3>
+                </div>
+                <p className="text-slate-700 leading-relaxed">
+                  Our scenarios examine how AI innovation in education can be balanced with responsible development 
+                  and inclusive access, ensuring that technological progress benefits all learners.
+                </p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center mr-4">
+                    <span className="material-icons text-2xl text-primary-800">gavel</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">SDG 16: Peace, Justice and Strong Institutions</h3>
+                </div>
+                <p className="text-slate-700 leading-relaxed">
+                  We explore how AI implementation affects institutional integrity, transparency, and justice in 
+                  educational settings, promoting ethical frameworks and responsible governance.
+                </p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center mr-4">
+                    <span className="material-icons text-2xl text-primary-800">work</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">SDG 8: Decent Work and Economic Growth</h3>
+                </div>
+                <p className="text-slate-700 leading-relaxed">
+                  Our scenarios consider how AI affects employment opportunities and skills development in education, 
+                  preparing students for the evolving job market while ensuring fair and inclusive growth.
+                </p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
+                <div className="flex items-center mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center mr-4">
+                    <span className="material-icons text-2xl text-primary-800">favorite</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900">SDG 3: Good Health and Well-being</h3>
+                </div>
+                <p className="text-slate-700 leading-relaxed">
+                  We examine how AI can support student well-being and mental health in educational settings, 
+                  while addressing potential risks and ensuring a balanced approach to technology use.
                 </p>
               </div>
             </div>
