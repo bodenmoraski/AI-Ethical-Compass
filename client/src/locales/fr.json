@@ -134,6 +134,48 @@
       }
     }
   },
+  "home": {
+    "title": "Boussole Éthique de l'IA",
+    "subtitle": "Naviguer dans l'Avenir de l'IA dans l'Éducation",
+    "description": "Développez des compétences de pensée critique sur l'utilisation éthique, responsable et inclusive de l'Intelligence Artificielle dans les contextes éducatifs.",
+    "buttons": {
+      "exploreScenarios": "Explorer les Scénarios",
+      "learnMore": "En Savoir Plus",
+      "startExploring": "Commencer à Explorer les Scénarios"
+    },
+    "sdg": {
+      "title": "Connexion aux Objectifs de Développement Durable des Nations Unies",
+      "qualityEducation": {
+        "title": "Éducation de Qualité (ODD 4)",
+        "description": "Nos scénarios explorent comment l'IA peut améliorer ou remettre en question l'éducation de qualité, en se concentrant sur l'équité, l'accessibilité et l'évolution de l'apprentissage à l'ère numérique."
+      },
+      "reducedInequalities": {
+        "title": "Réduction des Inégalités (ODD 10)",
+        "description": "Nous examinons comment l'IA peut soit exacerber soit réduire les inégalités dans les contextes éducatifs, en abordant les questions d'inclusion numérique, de biais algorithmiques et d'accès à la technologie."
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça Marche",
+      "steps": {
+        "identify": {
+          "title": "Identifier",
+          "description": "Examinez les scénarios et identifiez si et comment l'IA est utilisée"
+        },
+        "evaluate": {
+          "title": "Évaluer",
+          "description": "Considérez les implications éthiques, les avantages et les risques"
+        },
+        "share": {
+          "title": "Partager",
+          "description": "Contribuez votre perspective sur le dilemme éthique"
+        },
+        "explore": {
+          "title": "Explorer",
+          "description": "Découvrez les perspectives diverses de la communauté"
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page Introuvable",
     "description": "La page que vous recherchez n'existe pas ou a été déplacée.",

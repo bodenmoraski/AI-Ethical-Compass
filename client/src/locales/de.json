@@ -134,6 +134,48 @@
       }
     }
   },
+  "home": {
+    "title": "KI-Ethik-Kompass",
+    "subtitle": "Die Zukunft der KI in der Bildung Navigieren",
+    "description": "Entwickeln Sie kritische Denkfähigkeiten über den ethischen, verantwortungsvollen und inklusiven Einsatz von Künstlicher Intelligenz in Bildungskontexten.",
+    "buttons": {
+      "exploreScenarios": "Szenarien Erkunden",
+      "learnMore": "Mehr Erfahren",
+      "startExploring": "Mit Szenarien Beginnen"
+    },
+    "sdg": {
+      "title": "Verbindung zu den UN-Nachhaltigkeitszielen",
+      "qualityEducation": {
+        "title": "Hochwertige Bildung (SDG 4)",
+        "description": "Unsere Szenarien untersuchen, wie KI die Qualität der Bildung verbessern oder herausfordern kann, mit Fokus auf Gerechtigkeit, Zugänglichkeit und den sich wandelnden Charakter des Lernens im digitalen Zeitalter."
+      },
+      "reducedInequalities": {
+        "title": "Weniger Ungleichheiten (SDG 10)",
+        "description": "Wir untersuchen, wie KI Ungleichheiten in Bildungsumgebungen verstärken oder verringern kann, indem wir Fragen der digitalen Inklusion, algorithmischer Verzerrungen und des Technologiezugangs angehen."
+      }
+    },
+    "howItWorks": {
+      "title": "So Funktioniert's",
+      "steps": {
+        "identify": {
+          "title": "Identifizieren",
+          "description": "Untersuchen Sie Szenarien und identifizieren Sie, ob und wie KI eingesetzt wird"
+        },
+        "evaluate": {
+          "title": "Bewerten",
+          "description": "Berücksichtigen Sie die ethischen Implikationen, Vorteile und Risiken"
+        },
+        "share": {
+          "title": "Teilen",
+          "description": "Tragen Sie Ihre Perspektive zum ethischen Dilemma bei"
+        },
+        "explore": {
+          "title": "Erkunden",
+          "description": "Entdecken Sie vielfältige Perspektiven aus der Community"
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Seite Nicht Gefunden",
     "description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",

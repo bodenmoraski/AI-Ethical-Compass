@@ -134,6 +134,48 @@
       }
     }
   },
+  "home": {
+    "title": "人工智能伦理指南针",
+    "subtitle": "引领教育中人工智能的未来",
+    "description": "培养关于在教育环境中伦理、负责任和包容性使用人工智能的批判性思维能力。",
+    "buttons": {
+      "exploreScenarios": "探索场景",
+      "learnMore": "了解更多",
+      "startExploring": "开始探索场景"
+    },
+    "sdg": {
+      "title": "连接联合国可持续发展目标",
+      "qualityEducation": {
+        "title": "优质教育（可持续发展目标4）",
+        "description": "我们的场景探讨人工智能如何增强或挑战优质教育，重点关注公平性、可及性以及数字时代学习性质的变化。"
+      },
+      "reducedInequalities": {
+        "title": "减少不平等（可持续发展目标10）",
+        "description": "我们研究人工智能如何加剧或减少教育环境中的不平等，解决数字包容、算法偏见和技术获取等问题。"
+      }
+    },
+    "howItWorks": {
+      "title": "运作方式",
+      "steps": {
+        "identify": {
+          "title": "识别",
+          "description": "检查场景并确定是否以及如何使用人工智能"
+        },
+        "evaluate": {
+          "title": "评估",
+          "description": "考虑伦理影响、益处和风险"
+        },
+        "share": {
+          "title": "分享",
+          "description": "贡献您对伦理困境的观点"
+        },
+        "explore": {
+          "title": "探索",
+          "description": "查看社区的多样化观点"
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "页面未找到",
     "description": "您要查找的页面不存在或已被移动。",

@@ -134,6 +134,48 @@
       }
     }
   },
+  "home": {
+    "title": "AI Ethical Compass",
+    "subtitle": "Navigating the Future of AI in Education",
+    "description": "Develop critical thinking skills about the ethical, responsible, and inclusive use of Artificial Intelligence in educational contexts.",
+    "buttons": {
+      "exploreScenarios": "Explore Scenarios",
+      "learnMore": "Learn More",
+      "startExploring": "Start Exploring Scenarios"
+    },
+    "sdg": {
+      "title": "Connecting to United Nations Sustainable Development Goals",
+      "qualityEducation": {
+        "title": "Quality Education (SDG 4)",
+        "description": "Our scenarios explore how AI can enhance or challenge quality education, focusing on equity, accessibility, and the changing nature of learning in the digital age."
+      },
+      "reducedInequalities": {
+        "title": "Reduced Inequalities (SDG 10)",
+        "description": "We examine how AI can either exacerbate or reduce inequalities in educational settings, addressing issues of digital inclusion, algorithmic bias, and access to technology."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "steps": {
+        "identify": {
+          "title": "Identify",
+          "description": "Examine scenarios and identify if and how AI is being used"
+        },
+        "evaluate": {
+          "title": "Evaluate",
+          "description": "Consider the ethical implications, benefits, and risks"
+        },
+        "share": {
+          "title": "Share",
+          "description": "Contribute your perspective on the ethical dilemma"
+        },
+        "explore": {
+          "title": "Explore",
+          "description": "View diverse perspectives from the community"
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Page Not Found",
     "description": "The page you're looking for doesn't exist or has been moved.",

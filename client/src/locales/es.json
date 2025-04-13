@@ -134,6 +134,48 @@
       }
     }
   },
+  "home": {
+    "title": "Brújula Ética de IA",
+    "subtitle": "Navegando el Futuro de la IA en la Educación",
+    "description": "Desarrolla habilidades de pensamiento crítico sobre el uso ético, responsable e inclusivo de la Inteligencia Artificial en contextos educativos.",
+    "buttons": {
+      "exploreScenarios": "Explorar Escenarios",
+      "learnMore": "Saber Más",
+      "startExploring": "Comenzar a Explorar Escenarios"
+    },
+    "sdg": {
+      "title": "Conectando con los Objetivos de Desarrollo Sostenible de las Naciones Unidas",
+      "qualityEducation": {
+        "title": "Educación de Calidad (ODS 4)",
+        "description": "Nuestros escenarios exploran cómo la IA puede mejorar o desafiar la educación de calidad, centrándose en la equidad, accesibilidad y la naturaleza cambiante del aprendizaje en la era digital."
+      },
+      "reducedInequalities": {
+        "title": "Reducción de las Desigualdades (ODS 10)",
+        "description": "Examinamos cómo la IA puede exacerbar o reducir las desigualdades en entornos educativos, abordando cuestiones de inclusión digital, sesgos algorítmicos y acceso a la tecnología."
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "steps": {
+        "identify": {
+          "title": "Identificar",
+          "description": "Examina los escenarios e identifica si y cómo se está utilizando la IA"
+        },
+        "evaluate": {
+          "title": "Evaluar",
+          "description": "Considera las implicaciones éticas, beneficios y riesgos"
+        },
+        "share": {
+          "title": "Compartir",
+          "description": "Contribuye tu perspectiva sobre el dilema ético"
+        },
+        "explore": {
+          "title": "Explorar",
+          "description": "Visualiza diversas perspectivas de la comunidad"
+        }
+      }
+    }
+  },
   "notFound": {
     "title": "Página No Encontrada",
     "description": "La página que buscas no existe o ha sido movida.",
