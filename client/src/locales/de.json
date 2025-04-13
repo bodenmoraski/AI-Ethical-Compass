@@ -1,0 +1,142 @@
+{
+  "about": {
+    "title": "Die Zukunft der KI in der Bildung Gestalten",
+    "subtitle": "AI Ethical Compass befähigt Schüler und Pädagogen, sich im komplexen ethischen Umfeld der künstlichen Intelligenz in der Bildung zurechtzufinden.",
+    "buttons": {
+      "startExploring": "Erkunden",
+      "viewResources": "Ressourcen Anzeigen",
+      "startScenario": "Mit Szenario 1 Beginnen",
+      "browseResources": "Ressourcen Durchsuchen"
+    },
+    "stats": {
+      "scenarios": "Ethische Szenarien",
+      "sdgGoals": "UN-Nachhaltigkeitsziele",
+      "learningOpportunities": "Lernmöglichkeiten"
+    },
+    "mission": {
+      "title": "Unsere Mission",
+      "content": "AI Ethical Compass wurde für die ISTE+ASCD KI-Innovationsherausforderung 2025 mit einer klaren Mission entwickelt: Schüler der Sekundarstufe und Pädagogen dabei zu helfen, kritische Denkfähigkeiten im Hinblick auf den ethischen, verantwortungsvollen und inklusiven Einsatz von Künstlicher Intelligenz zu entwickeln.",
+      "additional": "In einer Welt, in der KI zunehmend Einfluss auf Bildung und Alltag nimmt, ist es unerlässlich, dass junge Menschen und Pädagogen lernen, sich mit komplexen ethischen Fragen zur Nutzung dieser Technologien auseinanderzusetzen."
+    },
+    "themes": {
+      "title": "Herausforderungsthemen",
+      "digitalInclusion": {
+        "title": "Digitale Inklusion",
+        "content": "Unsere Plattform untersucht, wie KI-Tools die digitale Inklusion in Bildungskontexten fördern oder behindern können. Wir erforschen Fragen des Zugangs, der Gerechtigkeit, sprachlicher Barrieren und wie KI bestehende digitale Spaltungen verringern oder vergrößern kann."
+      },
+      "responsibleCitizenship": {
+        "title": "Verantwortungsvolle Digitale Bürgerschaft",
+        "content": "Durch unsere Szenarien setzen sich Nutzer mit Fragen zum verantwortungsvollen Einsatz von KI auseinander, einschließlich Transparenz, Offenlegung, Plagiatsbedenken, Datenschutzauswirkungen und der Entwicklung ethischer Rahmenbedingungen für aufkommende Technologien."
+      }
+    },
+    "sdg": {
+      "title": "UN-Nachhaltigkeitsziele",
+      "intro": "Unsere Plattform richtet sich an mehrere UN-Nachhaltigkeitsziele, mit besonderem Fokus auf die Transformation der Bildung und die Verringerung von Ungleichheiten durch ethische KI-Implementierung. Wir glauben, dass wir durch die Bewältigung dieser grundlegenden Herausforderungen eine gerechtere und inklusivere Zukunft für alle Lernenden schaffen können.",
+      "goals": {
+        "sdg4": {
+          "title": "SDG 4: Hochwertige Bildung",
+          "content": "Im Mittelpunkt unserer Mission unterstützen wir SDG 4, indem wir die kritische Analyse fördern, wie KI hochwertige Bildung verbessern oder beeinträchtigen kann. Unsere umfassenden Szenarien untersuchen ethische Überlegungen, die Pädagogen und Schüler berücksichtigen müssen, wenn KI in Lernumgebungen zunehmend präsent wird, um sicherzustellen, dass technologischer Fortschritt der Bildungsqualität dient."
+        },
+        "sdg10": {
+          "title": "SDG 10: Weniger Ungleichheiten",
+          "content": "Als grundlegender Pfeiler unserer Arbeit adressieren wir SDG 10, indem wir tiefgehend untersuchen, wie KI Ungleichheiten verstärken oder verringern kann. Unsere Szenarien regen Nutzer dazu an, algorithmische Verzerrungen, Zugänglichkeitsaspekte und die Auswirkungen von KI-Designentscheidungen auf verschiedene Bevölkerungsgruppen zu berücksichtigen, mit Fokus auf die Schaffung gerechterer Bildungschancen."
+        },
+        "sdg9": {
+          "title": "SDG 9: Industrie, Innovation und Infrastruktur",
+          "content": "Unsere Szenarien untersuchen, wie KI-Innovation in der Bildung mit verantwortungsvoller Entwicklung und inklusivem Zugang in Einklang gebracht werden kann, um sicherzustellen, dass technologischer Fortschritt allen Lernenden zugutekommt."
+        },
+        "sdg16": {
+          "title": "SDG 16: Frieden, Gerechtigkeit und Starke Institutionen",
+          "content": "Wir erforschen, wie KI-Implementierung institutionelle Integrität, Transparenz und Gerechtigkeit in Bildungseinrichtungen beeinflusst, indem wir ethische Rahmenbedingungen und verantwortungsvolle Governance fördern."
+        },
+        "sdg8": {
+          "title": "SDG 8: Menschenwürdige Arbeit und Wirtschaftswachstum",
+          "content": "Unsere Szenarien berücksichtigen, wie KI Beschäftigungsmöglichkeiten und Kompetenzentwicklung in der Bildung beeinflusst, indem sie Schüler auf den sich wandelnden Arbeitsmarkt vorbereitet und gleichzeitig gerechtes und inklusives Wachstum sicherstellt."
+        },
+        "sdg3": {
+          "title": "SDG 3: Gesundheit und Wohlergehen",
+          "content": "Wir untersuchen, wie KI das Wohlergehen und die psychische Gesundheit von Schülern in Bildungseinrichtungen unterstützen kann, während wir potenzielle Risiken angehen und einen ausgewogenen Ansatz zur Technologienutzung sicherstellen."
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "Mitmachen",
+      "content": "Schließen Sie sich Pädagogen und Schülern weltweit an, um die ethischen Dimensionen von KI in der Bildung zu erforschen. Ihre Perspektive ist wichtig für die Gestaltung der Zukunft des verantwortungsvollen KI-Einsatzes."
+    }
+  },
+  "resources": {
+    "hero": {
+      "titlePart1": "Bildungsressourcen",
+      "titlePart2": "zu KI",
+      "description": "Entdecken Sie unsere Sammlung von Ressourcen zur ethischen Implementierung von KI in der Bildung, von umfassenden Richtlinien bis hin zu praktischen Tools und Fallstudien."
+    },
+    "categories": {
+      "all": "Alle",
+      "guidelines": "Richtlinien",
+      "research": "Forschung",
+      "tools": "Tools",
+      "examples": "Beispiele",
+      "coursesTutorials": "Kurse & Tutorials"
+    },
+    "learnMore": "Mehr Erfahren",
+    "items": {
+      "unescoGuidelines": {
+        "title": "UNESCO-Richtlinien zur KI-Ethik",
+        "description": "Das erste globale Standardisierungsinstrument zur Ethik der künstlichen Intelligenz, das umfassende Rahmenbedingungen für die Bildungsimplementierung bietet.",
+        "link": "https://www.unesco.org/de/artificial-intelligence/recommendation-ethics"
+      },
+      "ai4k12Guidelines": {
+        "title": "AI4K12-Richtlinien",
+        "description": "Umfassende Richtlinien für den Unterricht von KI-Konzepten in der K-12-Bildung, entwickelt von CSTA & AAAI.",
+        "link": "https://ai4k12.org/"
+      },
+      "isteResearch": {
+        "title": "ISTE-Forschung zu KI in der Bildung",
+        "description": "Aktuelle Forschung und Richtlinien für Pädagogen zur verantwortungsvollen Implementierung von KI in Bildungseinrichtungen.",
+        "link": "https://www.iste.org/areas-of-focus/AI-in-education"
+      },
+      "elementsOfAiCourse": {
+        "title": "Elements of AI-Kurs",
+        "description": "Kostenloser Online-Kurs zu KI-Grundlagen und Ethik, perfekt für Pädagogen und Schüler.",
+        "link": "https://www.elementsofai.com/de/"
+      },
+      "aif360Toolkit": {
+        "title": "AI Fairness 360 Toolkit",
+        "description": "Open-Source-Toolkit zur Erkennung und Minderung diskriminierender Verzerrungen in KI-Systemen.",
+        "link": "https://github.com/Trusted-AI/AIF360"
+      },
+      "algorithmicJusticeLeague": {
+        "title": "Algorithmic Justice League",
+        "description": "Tools und Ressourcen zur Identifizierung und Behandlung algorithmischer Verzerrungen in KI-Systemen.",
+        "link": "https://www.ajl.org/"
+      },
+      "digitalEquity": {
+        "title": "Digitale Gerechtigkeit in der Bildung",
+        "description": "Ressourcen zur Bewältigung der Herausforderungen digitaler Gerechtigkeit in KI-gestützten Bildungsumgebungen.",
+        "link": "https://www.iste.org/areas-of-focus/digital-equity"
+      },
+      "euGuidelines": {
+        "title": "EU-Ethikrichtlinien für Vertrauenswürdige KI",
+        "description": "Richtlinien der Europäischen Union für vertrauenswürdige künstliche Intelligenz.",
+        "link": "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
+      }
+    },
+    "cta": {
+      "title": "Für Pädagogen",
+      "description": "Möchten Sie KI-Ethik in Ihren Lehrplan integrieren? Diese Ressourcen können Ihnen helfen, ansprechende Lektionen zu erstellen und sinnvolle Diskussionen über die Rolle von KI in der Bildung zu fördern.",
+      "prompts": {
+        "title": "Diskussionsanregungen",
+        "description": "Nutzen Sie unsere Szenarien als Ausgangspunkt für Klassendiskussionen über KI-Ethik."
+      },
+      "activities": {
+        "title": "Aktivitätsideen",
+        "description": "Beziehen Sie Schüler mit praktischen Aktivitäten ein, die den Einfluss von KI auf die Bildung untersuchen."
+      }
+    }
+  },
+  "notFound": {
+    "title": "Seite Nicht Gefunden",
+    "description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "backToHome": "Zurück zur Startseite"
+  }
+} 

@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
+import { LanguageSelector } from "./LanguageSelector";
 
 export const Navbar = () => {
   const location = useLocation();
@@ -48,9 +49,10 @@ export const Navbar = () => {
             </nav>
           </div>
           <div className="flex items-center">
+            <LanguageSelector />
             <button 
               type="button" 
-              className="bg-primary-600 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors hover:bg-primary-700" 
+              className="bg-primary-600 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors hover:bg-primary-700 ml-2" 
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             >

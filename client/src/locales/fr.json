@@ -1,0 +1,142 @@
+{
+  "about": {
+    "title": "Façonner l'Avenir de l'IA dans l'Éducation",
+    "subtitle": "AI Ethical Compass permet aux étudiants et aux éducateurs de naviguer dans le paysage éthique complexe de l'intelligence artificielle dans l'éducation.",
+    "buttons": {
+      "startExploring": "Commencer à Explorer",
+      "viewResources": "Voir les Ressources",
+      "startScenario": "Commencer avec le Scénario 1",
+      "browseResources": "Parcourir les Ressources"
+    },
+    "stats": {
+      "scenarios": "Scénarios Éthiques",
+      "sdgGoals": "Objectifs ODD de l'ONU",
+      "learningOpportunities": "Opportunités d'Apprentissage"
+    },
+    "mission": {
+      "title": "Notre Mission",
+      "content": "AI Ethical Compass a été développé pour le Défi d'Innovation en IA ISTE+ASCD 2025 avec une mission claire : aider les lycéens et les éducateurs à développer des compétences de pensée critique concernant l'utilisation éthique, responsable et inclusive de l'Intelligence Artificielle.",
+      "additional": "Dans un monde où l'IA influence de plus en plus l'éducation et la vie quotidienne, il est essentiel que les jeunes et les éducateurs apprennent à naviguer dans les questions éthiques complexes sur la façon dont ces technologies devraient être utilisées."
+    },
+    "themes": {
+      "title": "Thèmes du Défi",
+      "digitalInclusion": {
+        "title": "Inclusion Numérique",
+        "content": "Notre plateforme examine comment les outils d'IA peuvent promouvoir ou entraver l'inclusion numérique dans les contextes éducatifs. Nous explorons les questions d'accès, d'équité, de barrières linguistiques et comment l'IA peut réduire ou élargir les fractures numériques existantes."
+      },
+      "responsibleCitizenship": {
+        "title": "Citoyenneté Numérique Responsable",
+        "content": "À travers nos scénarios, les utilisateurs sont confrontés à des questions sur l'utilisation responsable de l'IA, notamment la transparence, la divulgation, les préoccupations concernant le plagiat, les implications sur la vie privée et le développement de cadres éthiques pour les technologies émergentes."
+      }
+    },
+    "sdg": {
+      "title": "Objectifs de Développement Durable de l'ONU",
+      "intro": "Notre plateforme s'aligne sur plusieurs Objectifs de Développement Durable de l'ONU, avec un accent particulier sur la transformation de l'éducation et la réduction des inégalités grâce à la mise en œuvre éthique de l'IA. Nous croyons qu'en abordant ces défis fondamentaux, nous pouvons créer un avenir plus équitable et inclusif pour tous les apprenants.",
+      "goals": {
+        "sdg4": {
+          "title": "ODD 4: Éducation de Qualité",
+          "content": "Au cœur de notre mission, nous soutenons l'ODD 4 en promouvant l'analyse critique de la façon dont l'IA peut améliorer ou nuire à l'éducation de qualité. Nos scénarios complets examinent les considérations éthiques que les éducateurs et les étudiants doivent naviguer à mesure que l'IA devient plus prévalente dans les environnements d'apprentissage, assurant que le progrès technologique serve l'excellence éducative."
+        },
+        "sdg10": {
+          "title": "ODD 10: Réduction des Inégalités",
+          "content": "Un pilier fondamental de notre travail, nous abordons l'ODD 10 en explorant profondément comment l'IA peut amplifier ou réduire les inégalités. Nos scénarios invitent les utilisateurs à considérer les biais algorithmiques, les considérations d'accessibilité et comment les choix de conception de l'IA impactent différentes populations, avec un accent sur la création d'opportunités éducatives plus équitables."
+        },
+        "sdg9": {
+          "title": "ODD 9: Industrie, Innovation et Infrastructure",
+          "content": "Nos scénarios examinent comment l'innovation en IA dans l'éducation peut être équilibrée avec le développement responsable et l'accès inclusif, assurant que le progrès technologique profite à tous les apprenants."
+        },
+        "sdg16": {
+          "title": "ODD 16: Paix, Justice et Institutions Efficaces",
+          "content": "Nous explorons comment la mise en œuvre de l'IA affecte l'intégrité institutionnelle, la transparence et la justice dans les environnements éducatifs, promouvant des cadres éthiques et une gouvernance responsable."
+        },
+        "sdg8": {
+          "title": "ODD 8: Travail Décent et Croissance Économique",
+          "content": "Nos scénarios considèrent comment l'IA affecte les opportunités d'emploi et le développement des compétences dans l'éducation, préparant les étudiants au marché du travail en évolution tout en assurant une croissance juste et inclusive."
+        },
+        "sdg3": {
+          "title": "ODD 3: Bonne Santé et Bien-être",
+          "content": "Nous examinons comment l'IA peut soutenir le bien-être et la santé mentale des étudiants dans les environnements éducatifs, tout en abordant les risques potentiels et en assurant une approche équilibrée de l'utilisation de la technologie."
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "Impliquez-vous",
+      "content": "Rejoignez les éducateurs et les étudiants du monde entier pour explorer les dimensions éthiques de l'IA dans l'éducation. Votre perspective est importante pour façonner l'avenir de l'utilisation responsable de l'IA."
+    }
+  },
+  "resources": {
+    "hero": {
+      "titlePart1": "Ressources Éducatives",
+      "titlePart2": "sur l'IA",
+      "description": "Explorez notre collection de ressources sur la mise en œuvre éthique de l'IA dans l'éducation, des directives complètes aux outils pratiques et aux études de cas réels."
+    },
+    "categories": {
+      "all": "Tous",
+      "guidelines": "Directives",
+      "research": "Recherche",
+      "tools": "Outils",
+      "examples": "Exemples",
+      "coursesTutorials": "Cours & Tutoriels"
+    },
+    "learnMore": "En savoir plus",
+    "items": {
+      "unescoGuidelines": {
+        "title": "Directives de l'UNESCO sur l'éthique de l'IA",
+        "description": "Le premier instrument normatif mondial sur l'éthique de l'intelligence artificielle, fournissant des cadres complets pour la mise en œuvre éducative.",
+        "link": "https://www.unesco.org/fr/artificial-intelligence/recommendation-ethics"
+      },
+      "ai4k12Guidelines": {
+        "title": "Directives AI4K12",
+        "description": "Directives complètes pour l'enseignement des concepts de l'IA dans l'éducation K-12, développées par CSTA & AAAI.",
+        "link": "https://ai4k12.org/"
+      },
+      "isteResearch": {
+        "title": "Recherche ISTE sur l'IA dans l'éducation",
+        "description": "Dernières recherches et directives pour les éducateurs sur la mise en œuvre responsable de l'IA dans les milieux éducatifs.",
+        "link": "https://www.iste.org/areas-of-focus/AI-in-education"
+      },
+      "elementsOfAiCourse": {
+        "title": "Cours Elements of AI",
+        "description": "Cours en ligne gratuit couvrant les bases de l'IA et l'éthique, parfait pour les éducateurs et les étudiants.",
+        "link": "https://www.elementsofai.com/fr/"
+      },
+      "aif360Toolkit": {
+        "title": "Boîte à outils AI Fairness 360",
+        "description": "Boîte à outils open-source pour aider à détecter et atténuer les biais discriminatoires dans les systèmes d'IA.",
+        "link": "https://github.com/Trusted-AI/AIF360"
+      },
+      "algorithmicJusticeLeague": {
+        "title": "Ligue pour la Justice Algorithmique",
+        "description": "Outils et ressources pour identifier et traiter les biais algorithmiques dans les systèmes d'IA.",
+        "link": "https://www.ajl.org/"
+      },
+      "digitalEquity": {
+        "title": "Équité Numérique dans l'Éducation",
+        "description": "Ressources pour relever les défis de l'équité numérique dans les environnements éducatifs améliorés par l'IA.",
+        "link": "https://www.iste.org/areas-of-focus/digital-equity"
+      },
+      "euGuidelines": {
+        "title": "Directives éthiques de l'UE pour une IA digne de confiance",
+        "description": "Directives de l'Union européenne pour parvenir à une intelligence artificielle digne de confiance.",
+        "link": "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
+      }
+    },
+    "cta": {
+      "title": "Pour les Éducateurs",
+      "description": "Vous cherchez à intégrer l'éthique de l'IA dans votre programme ? Ces ressources peuvent vous aider à créer des leçons engageantes et à favoriser des discussions significatives sur le rôle de l'IA dans l'éducation.",
+      "prompts": {
+        "title": "Sujets de Discussion",
+        "description": "Utilisez nos scénarios comme points de départ pour les discussions en classe sur l'éthique de l'IA."
+      },
+      "activities": {
+        "title": "Idées d'Activités",
+        "description": "Engagez les étudiants avec des activités pratiques explorant l'impact de l'IA sur l'éducation."
+      }
+    }
+  },
+  "notFound": {
+    "title": "Page Introuvable",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backToHome": "Retour à l'Accueil"
+  }
+} 

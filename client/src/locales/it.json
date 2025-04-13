@@ -1,0 +1,72 @@
+{
+  "about": {
+    "title": "Plasmare il Futuro dell'IA nell'Istruzione",
+    "subtitle": "AI Ethical Compass permette a studenti ed educatori di navigare nel complesso panorama etico dell'intelligenza artificiale nell'istruzione.",
+    "buttons": {
+      "startExploring": "Inizia ad Esplorare",
+      "viewResources": "Vedi le Risorse",
+      "startScenario": "Inizia con lo Scenario 1",
+      "browseResources": "Sfoglia le Risorse"
+    },
+    "stats": {
+      "scenarios": "Scenari Etici",
+      "sdgGoals": "Obiettivi SDG delle Nazioni Unite",
+      "learningOpportunities": "Opportunità di Apprendimento"
+    },
+    "mission": {
+      "title": "La Nostra Missione",
+      "content": "AI Ethical Compass è stato sviluppato per la Sfida di Innovazione in IA ISTE+ASCD 2025 con una missione chiara: aiutare gli studenti delle scuole superiori e gli educatori a sviluppare competenze di pensiero critico riguardo all'uso etico, responsabile e inclusivo dell'Intelligenza Artificiale.",
+      "additional": "In un mondo in cui l'IA influenza sempre più l'istruzione e la vita quotidiana, è essenziale che i giovani e gli educatori imparino a navigare nelle complesse questioni etiche su come queste tecnologie dovrebbero essere utilizzate."
+    },
+    "themes": {
+      "title": "Temi della Sfida",
+      "digitalInclusion": {
+        "title": "Inclusione Digitale",
+        "content": "La nostra piattaforma esamina come gli strumenti di IA possono promuovere o ostacolare l'inclusione digitale nei contesti educativi. Esploriamo questioni di accesso, equità, barriere linguistiche e come l'IA può ridurre o ampliare le divisioni digitali esistenti."
+      },
+      "responsibleCitizenship": {
+        "title": "Cittadinanza Digitale Responsabile",
+        "content": "Attraverso i nostri scenari, gli utenti affrontano questioni sull'uso responsabile dell'IA, inclusa la trasparenza, la divulgazione, le preoccupazioni sul plagio, le implicazioni sulla privacy e lo sviluppo di quadri etici per le tecnologie emergenti."
+      }
+    },
+    "sdg": {
+      "title": "Obiettivi di Sviluppo Sostenibile delle Nazioni Unite",
+      "intro": "La nostra piattaforma si allinea con diversi Obiettivi di Sviluppo Sostenibile delle Nazioni Unite, con particolare attenzione alla trasformazione dell'istruzione e alla riduzione delle disuguaglianze attraverso l'implementazione etica dell'IA. Crediamo che affrontando queste sfide fondamentali, possiamo creare un futuro più equo e inclusivo per tutti gli studenti.",
+      "goals": {
+        "sdg4": {
+          "title": "SDG 4: Istruzione di Qualità",
+          "content": "Al centro della nostra missione, sosteniamo l'SDG 4 promuovendo l'analisi critica di come l'IA può migliorare o danneggiare l'istruzione di qualità. I nostri scenari completi esaminano le considerazioni etiche che educatori e studenti devono navigare man mano che l'IA diventa più prevalente negli ambienti di apprendimento, assicurando che il progresso tecnologico serva l'eccellenza educativa."
+        },
+        "sdg10": {
+          "title": "SDG 10: Riduzione delle Disuguaglianze",
+          "content": "Un pilastro fondamentale del nostro lavoro, affrontiamo l'SDG 10 esplorando profondamente come l'IA può amplificare o ridurre le disuguaglianze. I nostri scenari invitano gli utenti a considerare i pregiudizi algoritmici, le considerazioni di accessibilità e come le scelte di progettazione dell'IA impattano diverse popolazioni, con un focus sulla creazione di opportunità educative più eque."
+        },
+        "sdg9": {
+          "title": "SDG 9: Industria, Innovazione e Infrastrutture",
+          "content": "I nostri scenari esaminano come l'innovazione in IA nell'istruzione possa essere bilanciata con lo sviluppo responsabile e l'accesso inclusivo, assicurando che il progresso tecnologico avvantaggi tutti gli studenti."
+        },
+        "sdg16": {
+          "title": "SDG 16: Pace, Giustizia e Istituzioni Forti",
+          "content": "Esploriamo come l'implementazione dell'IA influisce sull'integrità istituzionale, la trasparenza e la giustizia negli ambienti educativi, promuovendo quadri etici e una governance responsabile."
+        },
+        "sdg8": {
+          "title": "SDG 8: Lavoro Dignitoso e Crescita Economica",
+          "content": "I nostri scenari considerano come l'IA influisce sulle opportunità di lavoro e lo sviluppo delle competenze nell'istruzione, preparando gli studenti al mercato del lavoro in evoluzione mentre si assicura una crescita giusta e inclusiva."
+        },
+        "sdg3": {
+          "title": "SDG 3: Salute e Benessere",
+          "content": "Esaminiamo come l'IA può supportare il benessere e la salute mentale degli studenti negli ambienti educativi, affrontando i potenziali rischi e assicurando un approccio equilibrato all'uso della tecnologia."
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "Partecipa",
+      "content": "Unisciti a educatori e studenti di tutto il mondo per esplorare le dimensioni etiche dell'IA nell'istruzione. La tua prospettiva è importante per plasmare il futuro dell'uso responsabile dell'IA."
+    }
+  },
+  "notFound": {
+    "title": "Pagina Non Trovata",
+    "description": "La pagina che stai cercando non esiste o è stata spostata.",
+    "backToHome": "Torna alla Home"
+  }
+} 

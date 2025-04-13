@@ -1,0 +1,142 @@
+{
+  "about": {
+    "title": "塑造人工智能在教育中的未来",
+    "subtitle": "AI Ethical Compass 帮助学生和教育工作者在教育领域的人工智能复杂伦理环境中导航。",
+    "buttons": {
+      "startExploring": "开始探索",
+      "viewResources": "查看资源",
+      "startScenario": "开始场景1",
+      "browseResources": "浏览资源"
+    },
+    "stats": {
+      "scenarios": "伦理场景",
+      "sdgGoals": "联合国可持续发展目标",
+      "learningOpportunities": "学习机会"
+    },
+    "mission": {
+      "title": "我们的使命",
+      "content": "AI Ethical Compass 是为 ISTE+ASCD 2025 人工智能创新挑战赛开发的，具有明确的使命：帮助中学生和教育工作者培养关于人工智能的伦理、负责任和包容性使用的批判性思维能力。",
+      "additional": "在人工智能日益影响教育和日常生活的世界中，年轻人和教育工作者必须学会应对这些技术使用中的复杂伦理问题。"
+    },
+    "themes": {
+      "title": "挑战主题",
+      "digitalInclusion": {
+        "title": "数字包容性",
+        "content": "我们的平台研究人工智能工具如何促进或阻碍教育环境中的数字包容性。我们探讨访问、公平、语言障碍等问题，以及人工智能如何减少或扩大现有的数字鸿沟。"
+      },
+      "responsibleCitizenship": {
+        "title": "负责任的数字公民",
+        "content": "通过我们的场景，用户面对关于负责任使用人工智能的问题，包括透明度、披露、抄袭问题、隐私影响以及为新兴技术开发伦理框架。"
+      }
+    },
+    "sdg": {
+      "title": "联合国可持续发展目标",
+      "intro": "我们的平台与多个联合国可持续发展目标保持一致，特别强调通过伦理人工智能实施来转变教育和减少不平等。我们相信，通过解决这些基本挑战，我们可以为所有学习者创造一个更公平、更包容的未来。",
+      "goals": {
+        "sdg4": {
+          "title": "可持续发展目标4：优质教育",
+          "content": "作为我们使命的核心，我们通过促进批判性分析人工智能如何改善或损害优质教育来支持可持续发展目标4。我们的全面场景研究了教育工作者和学生在人工智能在学习环境中日益普遍时必须考虑的伦理问题，确保技术进步服务于教育卓越。"
+        },
+        "sdg10": {
+          "title": "可持续发展目标10：减少不平等",
+          "content": "作为我们工作的基本支柱，我们通过深入探讨人工智能如何放大或减少不平等来解决可持续发展目标10。我们的场景邀请用户考虑算法偏见、可访问性考虑以及人工智能设计决策如何影响不同人群，重点关注创造更公平的教育机会。"
+        },
+        "sdg9": {
+          "title": "可持续发展目标9：产业、创新和基础设施",
+          "content": "我们的场景研究教育中的人工智能创新如何与负责任的发展和包容性访问相平衡，确保技术进步使所有学习者受益。"
+        },
+        "sdg16": {
+          "title": "可持续发展目标16：和平、正义和强大机构",
+          "content": "我们探讨人工智能实施如何影响教育环境中的机构诚信、透明度和正义，促进伦理框架和负责任的治理。"
+        },
+        "sdg8": {
+          "title": "可持续发展目标8：体面工作和经济增长",
+          "content": "我们的场景考虑人工智能如何影响教育中的就业机会和技能发展，为学生准备不断变化的劳动力市场，同时确保公平和包容性增长。"
+        },
+        "sdg3": {
+          "title": "可持续发展目标3：健康与福祉",
+          "content": "我们研究人工智能如何支持教育环境中学生的福祉和心理健康，同时解决潜在风险并确保技术使用的平衡方法。"
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "参与其中",
+      "content": "加入全球教育工作者和学生的行列，探索人工智能在教育中的伦理维度。您的观点对于塑造负责任的人工智能使用的未来至关重要。"
+    }
+  },
+  "resources": {
+    "hero": {
+      "titlePart1": "教育资源",
+      "titlePart2": "关于人工智能",
+      "description": "探索我们关于教育中人工智能伦理实施的资源集合，从全面指南到实用工具和案例研究。"
+    },
+    "categories": {
+      "all": "全部",
+      "guidelines": "指南",
+      "research": "研究",
+      "tools": "工具",
+      "examples": "示例",
+      "coursesTutorials": "课程和教程"
+    },
+    "learnMore": "了解更多",
+    "items": {
+      "unescoGuidelines": {
+        "title": "联合国教科文组织人工智能伦理指南",
+        "description": "第一个关于人工智能伦理的全球规范性文书，为教育实施提供全面框架。",
+        "link": "https://www.unesco.org/zh/artificial-intelligence/recommendation-ethics"
+      },
+      "ai4k12Guidelines": {
+        "title": "AI4K12指南",
+        "description": "由CSTA和AAAI开发的K-12教育中教授人工智能概念的全面指南。",
+        "link": "https://ai4k12.org/"
+      },
+      "isteResearch": {
+        "title": "ISTE关于教育中人工智能的研究",
+        "description": "为教育工作者提供关于在教育环境中负责任实施人工智能的最新研究和指南。",
+        "link": "https://www.iste.org/areas-of-focus/AI-in-education"
+      },
+      "elementsOfAiCourse": {
+        "title": "人工智能基础课程",
+        "description": "涵盖人工智能基础和伦理的免费在线课程，非常适合教育工作者和学生。",
+        "link": "https://www.elementsofai.com/zh/"
+      },
+      "aif360Toolkit": {
+        "title": "AI Fairness 360工具包",
+        "description": "开源工具包，帮助检测和减轻人工智能系统中的歧视性偏见。",
+        "link": "https://github.com/Trusted-AI/AIF360"
+      },
+      "algorithmicJusticeLeague": {
+        "title": "算法正义联盟",
+        "description": "用于识别和解决人工智能系统中算法偏见的工具和资源。",
+        "link": "https://www.ajl.org/"
+      },
+      "digitalEquity": {
+        "title": "教育中的数字公平",
+        "description": "解决人工智能增强教育环境中数字公平挑战的资源。",
+        "link": "https://www.iste.org/areas-of-focus/digital-equity"
+      },
+      "euGuidelines": {
+        "title": "欧盟可信人工智能伦理指南",
+        "description": "欧盟关于实现可信人工智能的指南。",
+        "link": "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
+      }
+    },
+    "cta": {
+      "title": "面向教育工作者",
+      "description": "想要将人工智能伦理纳入您的课程吗？这些资源可以帮助您创建引人入胜的课程，并促进关于人工智能在教育中角色的有意义的讨论。",
+      "prompts": {
+        "title": "讨论主题",
+        "description": "使用我们的场景作为课堂讨论人工智能伦理的起点。"
+      },
+      "activities": {
+        "title": "活动创意",
+        "description": "通过探索人工智能对教育影响的实践活动吸引学生参与。"
+      }
+    }
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "description": "您要查找的页面不存在或已被移动。",
+    "backToHome": "返回首页"
+  }
+} 

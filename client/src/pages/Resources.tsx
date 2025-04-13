@@ -2,74 +2,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 const Resources = () => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  const resources = [
-    {
-      title: "UNESCO AI Ethics Guidelines",
-      description: "The first global standard-setting instrument on the ethics of artificial intelligence, providing comprehensive frameworks for educational implementation.",
-      icon: "policy",
-      category: "Guidelines",
-      link: "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics"
-    },
-    {
-      title: "AI4K12 Guidelines",
-      description: "Comprehensive guidelines for teaching AI concepts in K-12 education, developed by CSTA & AAAI.",
-      icon: "school",
-      category: "Guidelines",
-      link: "https://ai4k12.org/"
-    },
-    {
-      title: "ISTE AI in Education Research",
-      description: "Latest research and guidelines for educators on implementing AI in educational settings responsibly.",
-      icon: "science",
-      category: "Research",
-      link: "https://www.iste.org/areas-of-focus/AI-in-education"
-    },
-    {
-      title: "Elements of AI Course",
-      description: "Free online course covering AI basics and ethics, perfect for educators and students.",
-      icon: "school",
-      category: "Courses & Tutorials",
-      link: "https://www.elementsofai.com/"
-    },
-    {
-      title: "AI Fairness 360 Toolkit",
-      description: "Open-source toolkit to help detect and mitigate discriminatory biases in AI systems.",
-      icon: "balance",
-      category: "Tools",
-      link: "https://github.com/Trusted-AI/AIF360"
-    },
-    {
-      title: "Algorithmic Justice League",
-      description: "Tools and resources for identifying and addressing algorithmic bias in AI systems.",
-      icon: "gavel",
-      category: "Tools",
-      link: "https://www.ajl.org/"
-    },
-    {
-      title: "Digital Equity in Education",
-      description: "Resources for addressing digital equity challenges in AI-enhanced educational settings.",
-      icon: "laptop",
-      category: "Guidelines",
-      link: "https://www.iste.org/areas-of-focus/digital-equity"
-    },
-    {
-      title: "EU Ethics Guidelines for Trustworthy AI",
-      description: "European Union's guidelines for achieving trustworthy artificial intelligence.",
-      icon: "policy",
-      category: "Guidelines",
-      link: "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
-    }
+  // Keep the data structure here, but we'll fetch text from translations
+  const resourcesData = [
+    { key: "unescoGuidelines", icon: "policy", categoryKey: "guidelines" },
+    { key: "ai4k12Guidelines", icon: "school", categoryKey: "guidelines" },
+    { key: "isteResearch", icon: "science", categoryKey: "research" },
+    { key: "elementsOfAiCourse", icon: "school", categoryKey: "coursesTutorials" },
+    { key: "aif360Toolkit", icon: "balance", categoryKey: "tools" },
+    { key: "algorithmicJusticeLeague", icon: "gavel", categoryKey: "tools" },
+    { key: "digitalEquity", icon: "laptop", categoryKey: "guidelines" },
+    { key: "euGuidelines", icon: "policy", categoryKey: "guidelines" }
   ];
 
-  const categories = ["All", "Guidelines", "Research", "Tools", "Examples"];
+  const resources = resourcesData.map(res => ({
+    ...res,
+    title: t(`resources.items.${res.key}.title`),
+    description: t(`resources.items.${res.key}.description`),
+    category: t(`resources.categories.${res.categoryKey}`),
+    link: t(`resources.items.${res.key}.link`)
+  }));
+
+  const categories = ["all", "guidelines", "research", "tools", "examples"];
 
   const filteredResources = selectedCategory === "All" 
     ? resources 
-    : resources.filter(resource => resource.category === selectedCategory);
+    : resources.filter(resource => resource.category === t(`resources.categories.${selectedCategory.toLowerCase()}`));
 
   return (
     <div className="min-h-screen bg-white">
@@ -78,17 +41,16 @@ const Resources = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900">
-              Educational{" "}
+              {t("resources.hero.titlePart1")}{" "}
               <span className="relative inline-block">
                 <span className="relative z-10 text-primary-800">
-                  AI Resources
+                  {t("resources.hero.titlePart2")}
                 </span>
                 <span className="absolute inset-x-0 bottom-0 h-3 bg-primary-100"></span>
               </span>
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
-              Explore our curated collection of resources on ethical AI implementation in education, 
-              from comprehensive guidelines to practical tools and real-world case studies.
+              {t("resources.hero.description")}
             </p>
           </div>
         </div>
@@ -98,20 +60,23 @@ const Resources = () => {
       <div className="sticky top-0 z-10 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant="outline"
-                onClick={() => setSelectedCategory(category)}
-                className={
-                  selectedCategory === category
-                    ? "border-2 border-primary-300 bg-primary-50 text-slate-800 font-medium"
-                    : "border-2 border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-primary-300 font-medium"
-                }
-              >
-                {category}
-              </Button>
-            ))}
+            {categories.map((categoryKey) => {
+              const categoryLabel = t(`resources.categories.${categoryKey}`);
+              return (
+                <Button
+                  key={categoryKey}
+                  variant="outline"
+                  onClick={() => setSelectedCategory(categoryKey === 'all' ? 'All' : categoryLabel)}
+                  className={
+                    selectedCategory === (categoryKey === 'all' ? 'All' : categoryLabel)
+                      ? "border-2 border-primary-300 bg-primary-50 text-slate-800 font-medium"
+                      : "border-2 border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-primary-300 font-medium"
+                  }
+                >
+                  {categoryLabel}
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -148,7 +113,7 @@ const Resources = () => {
                     {resource.description}
                   </p>
                   <div className="mt-6 flex items-center text-primary-800 font-medium">
-                    <span className="text-base">Learn More</span>
+                    <span className="text-base">{t("resources.learnMore")}</span>
                     <span className="material-icons ml-2 text-xl group-hover:translate-x-1 transition-transform">
                       arrow_forward
                     </span>
@@ -169,28 +134,27 @@ const Resources = () => {
                 <span className="material-icons text-2xl text-primary-800">school</span>
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-slate-900 mb-4">For Educators</h2>
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">{t("resources.cta.title")}</h2>
                 <p className="text-slate-600 mb-6">
-                  Looking to incorporate AI ethics into your curriculum? These resources can help you create 
-                  engaging lessons and foster meaningful discussions about AI's role in education.
+                  {t("resources.cta.description")}
                 </p>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
                     <h3 className="font-medium text-slate-900 mb-2 flex items-center">
                       <span className="material-icons text-xl text-primary-800 mr-2">format_quote</span>
-                      Discussion Prompts
+                      {t("resources.cta.prompts.title")}
                     </h3>
                     <p className="text-slate-600">
-                      Use our scenarios as starting points for classroom discussions about AI ethics.
+                      {t("resources.cta.prompts.description")}
                     </p>
                   </div>
                   <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
                     <h3 className="font-medium text-slate-900 mb-2 flex items-center">
                       <span className="material-icons text-xl text-primary-800 mr-2">assignment</span>
-                      Activity Ideas
+                      {t("resources.cta.activities.title")}
                     </h3>
                     <p className="text-slate-600">
-                      Engage students with hands-on activities exploring AI's impact on education.
+                      {t("resources.cta.activities.description")}
                     </p>
                   </div>
                 </div>

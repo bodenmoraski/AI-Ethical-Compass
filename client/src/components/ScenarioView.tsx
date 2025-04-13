@@ -213,6 +213,10 @@ const ScenarioView = () => {
   // Fetch perspectives for the current scenario
   const { data: perspectives = [], isLoading: perspectivesLoading, error: perspectivesError } = useQuery<Perspective[]>({
     queryKey: ["/api/scenarios", scenarioId, "perspectives"],
+    queryFn: async () => {
+      // For now, return an empty array since we don't have a backend
+      return [];
+    },
     enabled: !!scenarioId && currentStep === Step.Viewing
   });
 
