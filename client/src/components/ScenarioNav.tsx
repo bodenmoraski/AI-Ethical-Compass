@@ -44,12 +44,33 @@ const getRelevance = (sdgNumber: string, scenarioTitle: string) => {
     }
   };
 
-  return relevanceMap[sdgNumber]?.[scenarioTitle] || relevanceMap[sdgNumber].default;
+  // If the SDG number doesn't exist in our map, return a generic message
+  if (!relevanceMap[sdgNumber]) {
+    return `This scenario relates to Sustainable Development Goal ${sdgNumber} and its impact on education.`;
+  }
+
+  // If we have a specific message for this scenario, use it
+  if (relevanceMap[sdgNumber][scenarioTitle]) {
+    return relevanceMap[sdgNumber][scenarioTitle];
+  }
+
+  // Otherwise, use the default message for this SDG
+  return relevanceMap[sdgNumber].default;
 };
 
 // Transform the raw data to match the Scenario type
 const transformScenarios = (data: any[]): Scenario[] => {
+  if (!Array.isArray(data)) {
+    console.error("Invalid data format:", data);
+    return [];
+  }
+
   return data.map(scenario => {
+    if (!scenario || !scenario.sdgTags) {
+      console.error("Invalid scenario format:", scenario);
+      return null;
+    }
+
     const sdgDetails = scenario.sdgTags.map((tag: string) => {
       const normalizedTag = getNormalizedSdgNumber(tag);
       const sdgDescriptions: Record<string, { goal: string; description: string; icon: string }> = {
@@ -106,7 +127,10 @@ const transformScenarios = (data: any[]): Scenario[] => {
       };
 
       const description = sdgDescriptions[normalizedTag];
-      if (!description) return null;
+      if (!description) {
+        console.warn(`No description found for SDG ${normalizedTag}`);
+        return null;
+      }
 
       return {
         goal: description.goal,
@@ -129,7 +153,7 @@ const transformScenarios = (data: any[]): Scenario[] => {
       })),
       order: scenario.id
     };
-  });
+  }).filter(Boolean);
 };
 
 interface ScenarioNavProps {
