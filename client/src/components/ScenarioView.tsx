@@ -154,12 +154,7 @@ const transformScenarios = (data: any[]): Scenario[] => {
     ...scenario,
     options: scenario.options.map((opt: any) => opt.text),
     aiUseAnswer: scenario.description,
-    sdgDetails: scenario.sdgTags.map((tag: string) => ({
-      goal: tag,
-      description: `Description for ${tag}`,
-      relevance: `Relevance for ${tag}`,
-      icon: `Icon for ${tag}`
-    })),
+    sdgDetails: getDefaultSdgDetails(scenario.sdgTags, scenario),
     relatedResources: scenario.resources.map((res: any) => ({
       title: res.title,
       source: res.type,
