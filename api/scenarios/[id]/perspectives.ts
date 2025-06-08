@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from "../../../server/storage";
+import { serverlessStorage } from "../../storage-serverless";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`Fetching perspectives for scenario ID: ${scenarioId}`);
       
       // Get all perspectives from storage
-      const perspectives = await storage.getPerspectivesByScenarioId(scenarioId);
+      const perspectives = await serverlessStorage.getPerspectivesByScenarioId(scenarioId);
       
       // Log the results
       console.log(`Found ${perspectives.length} perspectives for scenario ${scenarioId}`);

@@ -4,7 +4,7 @@ import { apiRequest } from "./queryClient";
 export async function submitPerspective(scenarioId: number, content: string, parentId?: number): Promise<Perspective> {
   const response = await apiRequest(
     "POST",
-    "/api/perspectives-simple",
+    "/api/perspectives",
     { scenarioId, content, parentId }
   );
   return await response.json();

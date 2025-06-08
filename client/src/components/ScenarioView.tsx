@@ -214,8 +214,12 @@ const ScenarioView = () => {
   const { data: perspectives = [], isLoading: perspectivesLoading, error: perspectivesError } = useQuery<Perspective[]>({
     queryKey: ["/api/scenarios", scenarioId, "perspectives"],
     queryFn: async () => {
-      // For now, return an empty array since we don't have a backend
-      return [];
+      if (!scenarioId) return [];
+      const response = await fetch(`/api/scenarios/${scenarioId}/perspectives`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch perspectives');
+      }
+      return await response.json();
     },
     enabled: !!scenarioId && currentStep === Step.Viewing
   });
