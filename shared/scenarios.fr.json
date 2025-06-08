@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    "title": "Dissertation Générée par l'IA",
+    "description": "Un enseignant du secondaire reçoit une dissertation d'un élève qui semble inhabituellement sophistiquée. Le style d'écriture est poli, les références sont nombreuses et précises, et les arguments sont bien structurés. L'enseignant soupçonne que l'élève a peut-être utilisé un outil d'IA pour générer une partie ou la totalité de la dissertation, mais n'a pas de preuve définitive.\n\nL'élève en question a précédemment soumis des travaux de qualité variable et vient d'un foyer où l'anglais n'est pas la langue principale. Le devoir était une partie cruciale de la note du semestre.",
+    "options": [
+      {
+        "text": "Oui - L'élève a probablement utilisé un générateur de texte IA pour écrire toute la dissertation",
+        "consequence": "Soulève des questions sur l'intégrité académique et les résultats d'apprentissage"
+      },
+      {
+        "text": "Oui - L'élève a peut-être utilisé l'IA pour aider à éditer ou améliorer son propre écrit",
+        "consequence": "Brouille la frontière entre l'assistance et la paternité"
+      },
+      {
+        "text": "Oui - L'élève a peut-être utilisé l'IA pour la recherche ou la recherche de références",
+        "consequence": "Remet en question la valeur de la recherche assistée par l'IA"
+      },
+      {
+        "text": "Non - L'amélioration est probablement due à l'aide extérieure ou aux efforts supplémentaires de l'élève",
+        "consequence": "Met en évidence l'importance de ne pas tirer de conclusions hâtives"
+      },
+      {
+        "text": "Incertain - Il n'y a pas assez d'informations pour déterminer l'utilisation de l'IA",
+        "consequence": "Souligne la nécessité de politiques claires et de preuves"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Intégrité académique",
+      "Équité dans l'évaluation",
+      "Soutien aux élèves non anglophones",
+      "Technologie dans l'éducation"
+    ],
+    "sdgTags": ["4", "10", "16"],
+    "resources": [
+      {
+        "title": "L'IA dans l'Éducation : Directives pour une Utilisation Éthique",
+        "url": "https://fr.unesco.org/artificial-intelligence/education",
+        "type": "article"
+      },
+      {
+        "title": "Équité Numérique dans l'Apprentissage Amélioré par l'IA",
+        "url": "https://www.iste.org/areas-of-focus/AI-in-education",
+        "type": "video"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Reconnaissance Faciale dans les Écoles",
+    "description": "Un lycée envisage d'implémenter la technologie de reconnaissance faciale aux entrées de l'école pour renforcer la sécurité. Le système scannerait les visages des élèves à l'entrée pour vérifier leur identité dans une base de données et alerter le personnel de sécurité de toute personne non reconnue.\n\nCertains élèves et parents ont exprimé des préoccupations concernant la vie privée, tandis que d'autres estiment que les avantages en matière de sécurité l'emportent sur ces préoccupations. De plus, des questions se posent sur la précision de la reconnaissance faciale avec des populations étudiantes diverses.",
+    "options": [
+      {
+        "text": "Oui - La reconnaissance faciale est une forme d'IA utilisée pour la vérification d'identité",
+        "consequence": "Soulève des préoccupations concernant la vie privée et la surveillance"
+      },
+      {
+        "text": "Oui - Le système utilise des algorithmes d'IA pour faire correspondre les visages à une base de données",
+        "consequence": "Met en évidence les biais potentiels dans la reconnaissance faciale"
+      },
+      {
+        "text": "Partiellement - Il y a de l'IA impliquée mais c'est principalement un système de caméras de sécurité",
+        "consequence": "Brouille la frontière entre la sécurité et la surveillance"
+      },
+      {
+        "text": "Non - C'est une technologie de sécurité standard sans IA avancée",
+        "consequence": "Sous-estime les capacités d'IA impliquées"
+      },
+      {
+        "text": "Incertain - Plus de détails techniques sont nécessaires pour déterminer l'implication de l'IA",
+        "consequence": "Souligne la nécessité de transparence"
+      }
+    ],
+    "ethicalConsiderations": [
+      "Droits à la vie privée",
+      "Sécurité vs liberté",
+      "Biais algorithmique",
+      "Protection des données"
+    ],
+    "sdgTags": ["4", "10", "16", "11"],
+    "resources": [
+      {
+        "title": "Technologie de Reconnaissance Faciale dans les Écoles : Préoccupations de Vie Privée",
+        "url": "https://www.eff.org/issues/facial-recognition",
+        "type": "article"
+      },
+      {
+        "title": "Biais Algorithmique dans les Technologies de Reconnaissance Faciale",
+        "url": "https://www.media.mit.edu/projects/gender-shades/overview/",
+        "type": "recherche"
+      }
+    ]
+  }
+] 
