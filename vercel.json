@@ -1,31 +1,4 @@
 {
-  "functions": {
-    "server/index.ts": {
-      "runtime": "@vercel/node"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/scenarios/([^/]+)/perspectives",
-      "destination": "/api/scenarios/[id]/perspectives?id=$1"
-    },
-    {
-      "source": "/api/perspectives/([^/]+)/like",
-      "destination": "/api/perspectives/[id]/like?id=$1"
-    },
-    {
-      "source": "/api/perspectives/([^/]+)/replies",
-      "destination": "/api/perspectives/[id]/replies?id=$1"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public"
 } 
