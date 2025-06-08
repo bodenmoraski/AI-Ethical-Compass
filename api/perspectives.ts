@@ -19,6 +19,76 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).end();
   }
 
+  // Add GET handler for testing imports
+  if (req.method === 'GET') {
+    try {
+      console.log('Testing imports with GET request...');
+      
+      // Try to import storage
+      console.log('Importing storage...');
+      let storage;
+      try {
+        const storageModule = await import("../server/storage");
+        storage = storageModule.storage;
+        console.log('Storage imported successfully:', !!storage);
+        console.log('Storage type:', typeof storage);
+        console.log('Storage methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(storage)));
+      } catch (importError) {
+        console.error('Failed to import storage:', importError);
+        return res.status(500).json({ 
+          message: "Storage import failed", 
+          error: importError instanceof Error ? importError.message : String(importError),
+          stack: importError instanceof Error ? importError.stack : undefined
+        });
+      }
+
+      // Try to import schema
+      console.log('Importing schema...');
+      let insertPerspectiveSchema;
+      try {
+        const schemaModule = await import("../shared/schema");
+        insertPerspectiveSchema = schemaModule.insertPerspectiveSchema;
+        console.log('Schema imported successfully:', !!insertPerspectiveSchema);
+        console.log('Schema type:', typeof insertPerspectiveSchema);
+      } catch (importError) {
+        console.error('Failed to import schema:', importError);
+        return res.status(500).json({ 
+          message: "Schema import failed", 
+          error: importError instanceof Error ? importError.message : String(importError),
+          stack: importError instanceof Error ? importError.stack : undefined
+        });
+      }
+
+      // Test storage methods
+      try {
+        console.log('Testing storage methods...');
+        const scenarios = await storage.getAllScenarios();
+        console.log('Found scenarios:', scenarios.length);
+      } catch (storageError) {
+        console.error('Storage method failed:', storageError);
+        return res.status(500).json({ 
+          message: "Storage method failed", 
+          error: storageError instanceof Error ? storageError.message : String(storageError),
+          stack: storageError instanceof Error ? storageError.stack : undefined
+        });
+      }
+
+      return res.status(200).json({
+        message: 'Import test successful',
+        storageWorking: !!storage,
+        schemaWorking: !!insertPerspectiveSchema,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error in GET test:', error);
+      return res.status(500).json({
+        message: 'Import test failed',
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+    }
+  }
+
   if (req.method === 'POST') {
     try {
       console.log('Processing POST request...');
