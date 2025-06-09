@@ -86,18 +86,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: `Scenario with ID ${scenarioId} does not exist` });
       }
       
-                    // Create the perspective
-       const perspective = {
-         id: currentId++,
-         scenarioId,
-         content: content.trim(),
-         authorName: authorName || "Anonymous",
-         likes: 0,
-         parentId: null,
-         createdAt: new Date()
-       };
-       
-       perspectives.push(perspective);
+      // Create the perspective
+      const perspective = {
+        id: currentId++,
+        scenarioId,
+        content: content.trim(),
+        authorName: authorName || "Anonymous",
+        likes: 0,
+        parentId: null,
+        createdAt: new Date()
+      };
+      
+      perspectives.push(perspective);
       
       console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenarioId}`);
       

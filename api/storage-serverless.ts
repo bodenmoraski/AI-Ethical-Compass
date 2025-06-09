@@ -1,5 +1,5 @@
 // Simplified serverless storage without complex initialization
-import { type Perspective, type InsertPerspective } from "../shared/schema";
+import { type Perspective, type InsertPerspective } from "./schema-serverless";
 
 // Simple in-memory storage that gets reset on each function call
 // In a real app, this would be a database

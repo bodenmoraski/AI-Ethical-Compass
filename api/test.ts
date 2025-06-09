@@ -26,21 +26,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { z } = await import('zod');
       console.log('Zod imported successfully');
       
-      // Test if we can access shared schema
+      // Test if we can access serverless schema
       try {
-        const schemaModule = await import("../shared/schema");
-        console.log('Schema module imported:', Object.keys(schemaModule));
+        const schemaModule = await import("./schema-serverless");
+        console.log('Serverless schema module imported:', Object.keys(schemaModule));
       } catch (importError) {
-        console.error('Failed to import schema:', importError);
+        console.error('Failed to import serverless schema:', importError);
       }
       
-      // Test if we can access server storage
+      // Test if we can access serverless storage
       try {
-        const storageModule = await import("../server/storage");
-        console.log('Storage module imported:', Object.keys(storageModule));
-        console.log('Storage instance:', !!storageModule.storage);
+        const storageModule = await import("./storage-serverless");
+        console.log('Serverless storage module imported:', Object.keys(storageModule));
+        console.log('Storage instance:', !!storageModule.serverlessStorage);
       } catch (importError) {
-        console.error('Failed to import storage:', importError);
+        console.error('Failed to import serverless storage:', importError);
       }
       
       return res.status(200).json({

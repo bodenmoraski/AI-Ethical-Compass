@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from "../../../server/storage";
+import { serverlessStorage } from "../../storage-serverless";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers
@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: "Invalid perspective ID" });
       }
       
-      const perspective = await storage.likePerspective(perspectiveId);
+      const perspective = await serverlessStorage.likePerspective(perspectiveId);
       return res.json(perspective);
     } catch (error) {
       return res.status(500).json({ message: "Failed to like perspective" });

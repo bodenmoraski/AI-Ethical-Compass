@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Simple in-memory storage
+// Same in-memory storage as the main perspectives endpoint
 let perspectives: Array<{
   id: number;
   scenarioId: number;
@@ -39,12 +39,10 @@ let perspectives: Array<{
   }
 ];
 
-let currentId = 4;
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PERSPECTIVES API CALLED ===');
+  console.log('=== SCENARIOS PERSPECTIVES API CALLED ===');
   console.log('Method:', req.method);
-  console.log('Body:', JSON.stringify(req.body, null, 2));
+  console.log('Query:', req.query);
 
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -53,66 +51,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
     return res.status(200).end();
   }
 
-  if (req.method === 'POST') {
+  if (req.method === 'GET') {
     try {
-      console.log('Processing POST request...');
-      console.log("Received perspective submission request:", req.body);
+      const { scenarioId } = req.query;
+      const id = parseInt(scenarioId as string);
       
-      const { scenarioId, content, authorName } = req.body;
-      
-      // Basic validation
-      if (!scenarioId || typeof scenarioId !== 'number') {
-        return res.status(400).json({ message: "scenarioId is required and must be a number" });
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid scenario ID" });
       }
       
-      if (!content || typeof content !== 'string' || content.trim().length === 0) {
-        return res.status(400).json({ message: "content is required and cannot be empty" });
-      }
+      console.log(`Fetching perspectives for scenario ID: ${id}`);
       
-      if (content.trim().length < 5) {
-        return res.status(400).json({ message: "content is too short (minimum 5 characters)" });
-      }
+      // Get perspectives for this scenario
+      const scenarioPerspectives = perspectives
+        .filter(p => p.scenarioId === id)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
-      if (content.trim().length > 2000) {
-        return res.status(400).json({ message: "content is too long (maximum 2000 characters)" });
-      }
-      
-      // Validate scenario exists (simple check for IDs 1-10)
-      if (scenarioId < 1 || scenarioId > 10) {
-        return res.status(400).json({ message: `Scenario with ID ${scenarioId} does not exist` });
-      }
-      
-                    // Create the perspective
-       const perspective = {
-         id: currentId++,
-         scenarioId,
-         content: content.trim(),
-         authorName: authorName || "Anonymous",
-         likes: 0,
-         parentId: null,
-         createdAt: new Date()
-       };
-       
-       perspectives.push(perspective);
-      
-      console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenarioId}`);
-      
-      return res.status(201).json(perspective);
-    } catch (error) {
-      console.error("=== ERROR IN PERSPECTIVES API ===");
-      console.error("Error:", error);
-      
-      return res.status(500).json({ 
-        message: "Failed to create perspective", 
-        error: error instanceof Error ? error.message : String(error)
+      console.log(`Found ${scenarioPerspectives.length} perspectives for scenario ${id}`);
+      scenarioPerspectives.forEach(p => {
+        console.log(`- Perspective ID ${p.id}, author: ${p.authorName}`);
       });
+      
+      return res.json(scenarioPerspectives);
+    } catch (error) {
+      console.error("Error retrieving perspectives:", error);
+      return res.status(500).json({ message: "Failed to retrieve perspectives" });
     }
   }
 
-  console.log('Method not allowed:', req.method);
   return res.status(405).json({ message: 'Method not allowed' });
 } 

@@ -1,8 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { z } from "zod";
-import { storage } from "../server/storage";
+
+// Simple in-memory storage for serverless - in production this would be a database
+let progressData: Array<{ userId: number | null; scenarioId: number; completed: boolean }> = [];
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('=== PROGRESS API CALLED ===');
+  console.log('Method:', req.method);
+  console.log('Body:', JSON.stringify(req.body, null, 2));
+
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -15,20 +20,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'POST') {
     try {
-      // Simple validation
-      const schema = z.object({
-        userId: z.number().nullable().optional(),
-        scenarioId: z.number(),
-        completed: z.boolean().default(true)
+      const { userId, scenarioId, completed } = req.body;
+      
+      // Basic validation
+      if (!scenarioId || typeof scenarioId !== 'number') {
+        return res.status(400).json({ message: "scenarioId is required and must be a number" });
+      }
+      
+      // Simple storage - just add to array
+      const progress = {
+        id: progressData.length + 1,
+        userId: userId || null,
+        scenarioId,
+        completed: completed !== false, // default to true
+        completedAt: new Date()
+      };
+      
+      progressData.push({
+        userId: progress.userId,
+        scenarioId: progress.scenarioId,
+        completed: progress.completed
       });
       
-      const progressData = schema.parse(req.body);
-      const progress = await storage.updateUserProgress(progressData);
+      console.log(`Progress updated for scenario ${scenarioId}`);
+      
       return res.json(progress);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid progress data", errors: error.errors });
-      }
+      console.error('Error updating progress:', error);
       return res.status(500).json({ message: "Failed to update progress" });
     }
   }

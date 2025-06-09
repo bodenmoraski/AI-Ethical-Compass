@@ -212,10 +212,10 @@ const ScenarioView = () => {
 
   // Fetch perspectives for the current scenario
   const { data: perspectives = [], isLoading: perspectivesLoading, error: perspectivesError } = useQuery<Perspective[]>({
-    queryKey: ["/api/scenarios", scenarioId, "perspectives"],
+    queryKey: ["/api/scenarios-perspectives", scenarioId],
     queryFn: async () => {
       if (!scenarioId) return [];
-      const response = await fetch(`/api/scenarios/${scenarioId}/perspectives`);
+      const response = await fetch(`/api/scenarios-perspectives?scenarioId=${scenarioId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch perspectives');
       }
@@ -276,7 +276,7 @@ const ScenarioView = () => {
     }) => submitPerspective(scenarioId, content),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["/api/scenarios", scenarioId, "perspectives"],
+        queryKey: ["/api/scenarios-perspectives", scenarioId],
       });
       toast({
         title: "Perspective submitted",
