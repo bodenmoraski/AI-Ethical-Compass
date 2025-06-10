@@ -67,6 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         content: perspective.content,
         likes: perspective.likes,
         moderationStatus: perspective.moderation_status,
+        parentId: null, // All perspectives are top-level, replies are in separate table
         createdAt: perspective.created_at,
         updatedAt: perspective.updated_at
       }));

@@ -1101,28 +1101,17 @@ const ScenarioView = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Check if perspectives array exists and has items with top-level perspectives */}
-                  {Array.isArray(perspectives) && perspectives.length > 0 && 
-                    (() => {
-                      // Filter to get only top-level perspectives
-                      const topLevelPerspectives = perspectives.filter((p: Perspective) => !p.parentId);
-                      
-                      if (topLevelPerspectives.length > 0) {
-                        return topLevelPerspectives.map((perspective: Perspective) => (
-                          <PerspectiveCard
-                            key={perspective.id}
-                            perspective={perspective}
-                            scenarioId={scenarioId!}
-                          />
-                        ));
-                      }
-                      return null;
-                    })()
-                  }
-                  
-                  {/* Show no perspectives message if none found or empty array */}
-                  {(!Array.isArray(perspectives) || perspectives.length === 0 || 
-                    !perspectives.filter((p: Perspective) => !p.parentId).length) && (
+                  {/* Show perspectives if any exist */}
+                  {Array.isArray(perspectives) && perspectives.length > 0 ? (
+                    perspectives.map((perspective: Perspective) => (
+                      <PerspectiveCard
+                        key={perspective.id}
+                        perspective={perspective}
+                        scenarioId={scenarioId!}
+                      />
+                    ))
+                  ) : (
+                    /* Show no perspectives message if none found */
                     <div className="bg-neutral-50 border-2 border-blue-200 rounded-lg p-6 text-center">
                       <div className="flex justify-center mb-4">
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">

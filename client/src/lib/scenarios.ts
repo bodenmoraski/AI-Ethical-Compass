@@ -5,7 +5,12 @@ export async function submitPerspective(scenarioId: number, content: string, par
   const response = await apiRequest(
     "POST",
     "/api/perspectives",
-    { scenarioId, content, parentId }
+    { 
+      scenarioId, 
+      content, 
+      authorName: "Anonymous User", // Default author name for anonymous submissions
+      parentId 
+    }
   );
   return await response.json();
 }
