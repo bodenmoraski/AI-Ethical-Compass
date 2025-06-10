@@ -1,49 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Same in-memory storage as the main perspectives endpoint
-let perspectives: Array<{
-  id: number;
-  scenarioId: number;
-  content: string;
-  authorName: string;
-  likes: number;
-  parentId: number | null;
-  createdAt: Date;
-}> = [
-  {
-    id: 1,
-    scenarioId: 1,
-    content: "I believe AI was definitely used in this scenario. The sudden improvement in writing quality, especially from a student who speaks English as a second language, is a telltale sign. Educators need to establish clear guidelines on acceptable AI use for editing vs. generating content.",
-    authorName: "Teacher23",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T10:00:00Z')
-  },
-  {
-    id: 2,
-    scenarioId: 1,
-    content: "As someone who struggled with English growing up, I think we should consider that the student might have worked extra hard on this assignment. Before assuming AI was used, the teacher should have a conversation with the student about their process.",
-    authorName: "ESL_Advocate",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T11:00:00Z')
-  },
-  {
-    id: 3,
-    scenarioId: 2,
-    content: "Facial recognition in schools raises serious privacy concerns. While security is important, students shouldn't have to sacrifice their biometric data just to attend class. There are less invasive security measures that could be implemented instead.",
-    authorName: "PrivacyFirst",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T12:00:00Z')
-  }
-];
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== SCENARIOS PERSPECTIVES API CALLED ===');
+  console.log('=== SCENARIOS PERSPECTIVES DB API CALLED ===');
   console.log('Method:', req.method);
   console.log('Query:', req.query);
-
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -57,30 +18,71 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
       const { scenarioId } = req.query;
-      const id = parseInt(scenarioId as string);
       
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid scenario ID" });
+      if (!scenarioId) {
+        return res.status(400).json({ 
+          message: 'scenarioId query parameter is required' 
+        });
       }
+      
+      const id = parseInt(scenarioId as string);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          message: 'scenarioId must be a valid number' 
+        });
+      }
+      
+      // Dynamic import to avoid module resolution issues
+      const postgres = (await import('postgres')).default;
+      
+      const connectionString = process.env.DATABASE_URL!;
+      const client = postgres(connectionString, { prepare: false });
       
       console.log(`Fetching perspectives for scenario ID: ${id}`);
       
-      // Get perspectives for this scenario
-      const scenarioPerspectives = perspectives
-        .filter(p => p.scenarioId === id)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      // Get all approved perspectives for the scenario
+      const perspectives = await client`
+        SELECT 
+          id,
+          scenario_id,
+          author_name,
+          content,
+          likes,
+          moderation_status,
+          created_at,
+          updated_at
+        FROM perspectives 
+        WHERE scenario_id = ${id} 
+          AND moderation_status = 'approved'
+        ORDER BY created_at DESC
+      `;
       
-      console.log(`Found ${scenarioPerspectives.length} perspectives for scenario ${id}`);
-      scenarioPerspectives.forEach(p => {
-        console.log(`- Perspective ID ${p.id}, author: ${p.authorName}`);
-      });
+      console.log(`Found ${perspectives.length} perspectives for scenario ${id}`);
       
-      return res.json(scenarioPerspectives);
+      // Format the response to match the expected format
+      const formattedPerspectives = perspectives.map(perspective => ({
+        id: perspective.id,
+        scenarioId: perspective.scenario_id,
+        authorName: perspective.author_name,
+        content: perspective.content,
+        likes: perspective.likes,
+        moderationStatus: perspective.moderation_status,
+        createdAt: perspective.created_at,
+        updatedAt: perspective.updated_at
+      }));
+      
+      await client.end();
+      
+      res.status(200).json(formattedPerspectives);
+      
     } catch (error) {
-      console.error("Error retrieving perspectives:", error);
-      return res.status(500).json({ message: "Failed to retrieve perspectives" });
+      console.error('Database error:', error);
+      res.status(500).json({
+        message: 'Failed to fetch perspectives from database',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
-
-  return res.status(405).json({ message: 'Method not allowed' });
 } 

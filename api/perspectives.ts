@@ -1,51 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-// Simple in-memory storage
-let perspectives: Array<{
-  id: number;
-  scenarioId: number;
-  content: string;
-  authorName: string;
-  likes: number;
-  parentId: number | null;
-  createdAt: Date;
-}> = [
-  {
-    id: 1,
-    scenarioId: 1,
-    content: "I believe AI was definitely used in this scenario. The sudden improvement in writing quality, especially from a student who speaks English as a second language, is a telltale sign. Educators need to establish clear guidelines on acceptable AI use for editing vs. generating content.",
-    authorName: "Teacher23",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T10:00:00Z')
-  },
-  {
-    id: 2,
-    scenarioId: 1,
-    content: "As someone who struggled with English growing up, I think we should consider that the student might have worked extra hard on this assignment. Before assuming AI was used, the teacher should have a conversation with the student about their process.",
-    authorName: "ESL_Advocate",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T11:00:00Z')
-  },
-  {
-    id: 3,
-    scenarioId: 2,
-    content: "Facial recognition in schools raises serious privacy concerns. While security is important, students shouldn't have to sacrifice their biometric data just to attend class. There are less invasive security measures that could be implemented instead.",
-    authorName: "PrivacyFirst",
-    likes: 0,
-    parentId: null,
-    createdAt: new Date('2024-01-01T12:00:00Z')
-  }
-];
-
-let currentId = 4;
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PERSPECTIVES API CALLED ===');
+  console.log('=== PERSPECTIVES DB API CALLED ===');
   console.log('Method:', req.method);
-  console.log('Body:', JSON.stringify(req.body, null, 2));
-
+  console.log('Body:', req.body);
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -53,66 +12,93 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
     return res.status(200).end();
   }
 
   if (req.method === 'POST') {
     try {
       console.log('Processing POST request...');
-      console.log("Received perspective submission request:", req.body);
       
-      const { scenarioId, content, authorName } = req.body;
+      // Dynamic import to avoid module resolution issues
+      const postgres = (await import('postgres')).default;
+      
+      const connectionString = process.env.DATABASE_URL!;
+      const client = postgres(connectionString, { prepare: false });
       
       // Basic validation
-      if (!scenarioId || typeof scenarioId !== 'number') {
-        return res.status(400).json({ message: "scenarioId is required and must be a number" });
+      const { scenarioId, content, authorName } = req.body;
+      
+      if (!scenarioId || !content) {
+        return res.status(400).json({ 
+          message: 'scenarioId and content are required' 
+        });
       }
       
-      if (!content || typeof content !== 'string' || content.trim().length === 0) {
-        return res.status(400).json({ message: "content is required and cannot be empty" });
+      if (!authorName || authorName.trim().length === 0) {
+        return res.status(400).json({ 
+          message: 'authorName is required' 
+        });
       }
       
       if (content.trim().length < 5) {
-        return res.status(400).json({ message: "content is too short (minimum 5 characters)" });
+        return res.status(400).json({ 
+          message: 'Perspective content is too short (minimum 5 characters)' 
+        });
       }
       
       if (content.trim().length > 2000) {
-        return res.status(400).json({ message: "content is too long (maximum 2000 characters)" });
+        return res.status(400).json({ 
+          message: 'Perspective content exceeds maximum length of 2000 characters' 
+        });
       }
       
-      // Validate scenario exists (simple check for IDs 1-10)
-      if (scenarioId < 1 || scenarioId > 10) {
-        return res.status(400).json({ message: `Scenario with ID ${scenarioId} does not exist` });
+      // Verify scenario exists
+      const scenarioCheck = await client`
+        SELECT id FROM scenarios WHERE id = ${scenarioId} AND is_active = true
+      `;
+      
+      if (scenarioCheck.length === 0) {
+        await client.end();
+        return res.status(400).json({ 
+          message: `Scenario with ID ${scenarioId} does not exist` 
+        });
       }
       
-                    // Create the perspective
-       const perspective = {
-         id: currentId++,
-         scenarioId,
-         content: content.trim(),
-         authorName: authorName || "Anonymous",
-         likes: 0,
-         parentId: null,
-         createdAt: new Date()
-       };
-       
-       perspectives.push(perspective);
+      console.log(`Verified scenario ${scenarioId} exists`);
       
-      console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenarioId}`);
+      // Insert the perspective
+      const result = await client`
+        INSERT INTO perspectives (scenario_id, author_name, content, moderation_status)
+        VALUES (${scenarioId}, ${authorName.trim()}, ${content.trim()}, 'approved')
+        RETURNING id, scenario_id, author_name, content, likes, moderation_status, created_at, updated_at
+      `;
       
-      return res.status(201).json(perspective);
+      const perspective = result[0];
+      
+      console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenario_id}`);
+      
+      await client.end();
+      
+      // Format the response to match the expected format
+      res.status(201).json({
+        id: perspective.id,
+        scenarioId: perspective.scenario_id,
+        authorName: perspective.author_name,
+        content: perspective.content,
+        likes: perspective.likes,
+        moderationStatus: perspective.moderation_status,
+        createdAt: perspective.created_at,
+        updatedAt: perspective.updated_at
+      });
+      
     } catch (error) {
-      console.error("=== ERROR IN PERSPECTIVES API ===");
-      console.error("Error:", error);
-      
-      return res.status(500).json({ 
-        message: "Failed to create perspective", 
-        error: error instanceof Error ? error.message : String(error)
+      console.error('Database error:', error);
+      res.status(500).json({
+        message: 'Failed to create perspective',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
-
-  console.log('Method not allowed:', req.method);
-  return res.status(405).json({ message: 'Method not allowed' });
 } 
