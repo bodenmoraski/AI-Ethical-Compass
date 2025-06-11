@@ -221,7 +221,9 @@ const ScenarioView = () => {
       }
       return await response.json();
     },
-    enabled: !!scenarioId && currentStep === Step.Viewing
+    enabled: !!scenarioId && currentStep === Step.Viewing,
+    staleTime: 0, // Always refetch when query is enabled
+    refetchOnMount: true, // Refetch when component mounts
   });
 
   // Navigate to first scenario if none selected and scenarios are loaded
@@ -274,10 +276,7 @@ const ScenarioView = () => {
       scenarioId: number;
       content: string;
     }) => submitPerspective(scenarioId, content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["/api/scenarios-perspectives", scenarioId],
-      });
+    onSuccess: async () => {
       toast({
         title: "Perspective submitted",
         description:
@@ -287,6 +286,14 @@ const ScenarioView = () => {
       setPerspectiveContent("");
       // Update progress
       updateProgress(scenarioId!, true);
+      
+      // Force immediate refetch of perspectives
+      await queryClient.invalidateQueries({
+        queryKey: ["/api/scenarios-perspectives", scenarioId],
+      });
+      queryClient.refetchQueries({
+        queryKey: ["/api/scenarios-perspectives", scenarioId],
+      });
     },
     onError: () => {
       toast({
@@ -1095,6 +1102,23 @@ const ScenarioView = () => {
                         Thank you for sharing your perspective. By engaging in
                         these ethical discussions, you're helping to shape
                         responsible AI use in education.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Loading info message */}
+                <div className="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center">
+                    <span className="material-icons text-amber-600 mr-3 animate-pulse">
+                      hourglass_empty
+                    </span>
+                    <div>
+                      <p className="text-amber-800 font-medium">
+                        Loading community perspectives...
+                      </p>
+                      <p className="text-amber-700 text-sm mt-1">
+                        Please wait a few seconds for perspectives to appear. Great discussions take time to load! ⏰
                       </p>
                     </div>
                   </div>
