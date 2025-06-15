@@ -1,10 +1,17 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { LanguageSelector } from "./LanguageSelector";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
+import AuthModal from "./AuthModal";
+import UserMenu from "./UserMenu";
 
 export const Navbar = () => {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
+  const { user, loading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -48,11 +55,28 @@ export const Navbar = () => {
               </NavLink>
             </nav>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-3">
             <LanguageSelector />
+            
+            {/* Auth Section */}
+            {loading ? (
+              <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full"></div>
+            ) : user ? (
+              <UserMenu />
+            ) : (
+              <Button
+                onClick={() => setAuthModalOpen(true)}
+                size="sm"
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
+                <span className="material-icons mr-1 text-sm">person</span>
+                Sign In
+              </Button>
+            )}
+            
             <button 
               type="button" 
-              className="bg-primary-600 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors hover:bg-primary-700 ml-2" 
+              className="bg-primary-600 text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors hover:bg-primary-700" 
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
             >
@@ -63,6 +87,12 @@ export const Navbar = () => {
           </div>
         </div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </header>
   );
 }; 

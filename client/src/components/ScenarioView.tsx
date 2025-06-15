@@ -22,6 +22,7 @@ import SdgDetails from "./SdgDetails";
 import PerspectiveCard from "./PerspectiveCard";
 import ScenarioNav from "./ScenarioNav";
 import scenariosData from "../../../shared/scenarios.json";
+import { useAuth } from "@/lib/auth";
 
 enum Step {
   Identification = 1,
@@ -169,6 +170,7 @@ const ScenarioView = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const scenarioId = params.id ? parseInt(params.id) : null;
 
   const [currentStep, setCurrentStep] = useState<Step>(Step.Identification);
@@ -272,10 +274,12 @@ const ScenarioView = () => {
     mutationFn: ({
       scenarioId,
       content,
+      authorName,
     }: {
       scenarioId: number;
       content: string;
-    }) => submitPerspective(scenarioId, content),
+      authorName: string;
+    }) => submitPerspective(scenarioId, content, authorName),
     onSuccess: async () => {
       toast({
         title: "Perspective submitted",
@@ -312,6 +316,7 @@ const ScenarioView = () => {
     perspectiveMutation.mutate({
       scenarioId,
       content: perspectiveContent,
+      authorName: user?.email || "Anonymous User",
     });
   };
 
@@ -985,23 +990,39 @@ const ScenarioView = () => {
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-                  <div className="mb-5">
-                    <Label
-                      htmlFor="perspective"
-                      className="block text-md font-medium text-neutral-900 mb-2"
-                    >
-                      Your Perspective
-                    </Label>
-                    <Textarea
-                      id="perspective"
-                      value={perspectiveContent}
-                      onChange={(e) => setPerspectiveContent(e.target.value)}
-                      placeholder="Share your thoughts on the ethical implications of this scenario..."
-                      className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
-                      rows={4}
-                    />
+                {/* Auth Check */}
+                {!user ? (
+                  <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5 shadow-sm">
+                    <div className="flex items-center">
+                      <span className="material-icons text-blue-600 mr-3 text-xl">
+                        info
+                      </span>
+                      <div>
+                        <p className="text-blue-800 font-medium">Sign in to share your perspective</p>
+                        <p className="text-blue-700 text-sm mt-1">
+                          You need to be signed in to contribute to the discussion and see community perspectives.
+                        </p>
+                      </div>
+                    </div>
                   </div>
+                ) : (
+                  <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                    <div className="mb-5">
+                      <Label
+                        htmlFor="perspective"
+                        className="block text-md font-medium text-neutral-900 mb-2"
+                      >
+                        Your Perspective
+                      </Label>
+                      <Textarea
+                        id="perspective"
+                        value={perspectiveContent}
+                        onChange={(e) => setPerspectiveContent(e.target.value)}
+                        placeholder="Share your thoughts on the ethical implications of this scenario..."
+                        className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
+                        rows={4}
+                      />
+                    </div>
 
                   <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-4">
                     <div className="flex items-start">
@@ -1037,36 +1058,37 @@ const ScenarioView = () => {
                       </p>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-6 flex justify-center">
-                  <Button
-                    onClick={handlePerspectiveSubmit}
-                    disabled={
-                      !perspectiveContent.trim() || perspectiveMutation.isPending
-                    }
-                    className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
-                      perspectiveContent.trim() && !perspectiveMutation.isPending
-                        ? "bg-indigo-600 hover:bg-indigo-700"
-                        : "bg-neutral-500 opacity-70"
-                    }`}
-                    size="lg"
-                  >
-                    {perspectiveMutation.isPending ? (
-                      <>
-                        <span className="mr-2">Submitting...</span>
-                        <span className="material-icons animate-spin text-sm">
-                          refresh
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-2">Submit Perspective</span>
-                        <span className="material-icons text-sm">send</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
+                    <div className="mt-6 flex justify-center">
+                      <Button
+                        onClick={handlePerspectiveSubmit}
+                        disabled={
+                          !perspectiveContent.trim() || perspectiveMutation.isPending || !user
+                        }
+                        className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
+                          perspectiveContent.trim() && !perspectiveMutation.isPending && user
+                            ? "bg-indigo-600 hover:bg-indigo-700"
+                            : "bg-neutral-500 opacity-70"
+                        }`}
+                        size="lg"
+                      >
+                        {perspectiveMutation.isPending ? (
+                          <>
+                            <span className="mr-2">Submitting...</span>
+                            <span className="material-icons animate-spin text-sm">
+                              refresh
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="mr-2">Submit Perspective</span>
+                            <span className="material-icons text-sm">send</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

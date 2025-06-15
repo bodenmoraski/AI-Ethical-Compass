@@ -1,14 +1,14 @@
 import { type Scenario, type Perspective } from "@shared/schema";
 import { apiRequest } from "./queryClient";
 
-export async function submitPerspective(scenarioId: number, content: string, parentId?: number): Promise<Perspective> {
+export async function submitPerspective(scenarioId: number, content: string, authorName: string = "Anonymous User", parentId?: number): Promise<Perspective> {
   const response = await apiRequest(
     "POST",
     "/api/perspectives",
     { 
       scenarioId, 
       content, 
-      authorName: "Anonymous User", // Default author name for anonymous submissions
+      authorName,
       parentId 
     }
   );

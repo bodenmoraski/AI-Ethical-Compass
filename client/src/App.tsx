@@ -17,6 +17,8 @@ import AccessibilityControls from "@/components/AccessibilityControls";
 import "@/styles/accessibility.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import NotFound from "@/pages/NotFound";
+import AuthCallback from "@/pages/AuthCallback";
+import { AuthProvider } from "@/lib/auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,8 +46,9 @@ function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <Layout>
+        <AuthProvider>
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
@@ -55,6 +58,7 @@ function App() {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
@@ -64,8 +68,9 @@ function App() {
             onHighContrastToggle={handleHighContrastToggle}
             onScreenReaderToggle={handleScreenReaderToggle}
           />
-        </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+          </ThemeProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </AuthProvider>
       </QueryClientProvider>
     </I18nextProvider>
   );
