@@ -7,3 +7,4 @@ vite.config.ts.*
 .env
 !dist/public
 .vercel
+.env.local
