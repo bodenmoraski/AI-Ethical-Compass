@@ -1006,23 +1006,23 @@ const ScenarioView = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
-                    <div className="mb-5">
-                      <Label
-                        htmlFor="perspective"
-                        className="block text-md font-medium text-neutral-900 mb-2"
-                      >
-                        Your Perspective
-                      </Label>
-                      <Textarea
-                        id="perspective"
-                        value={perspectiveContent}
-                        onChange={(e) => setPerspectiveContent(e.target.value)}
-                        placeholder="Share your thoughts on the ethical implications of this scenario..."
-                        className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
-                        rows={4}
-                      />
-                    </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                  <div className="mb-5">
+                    <Label
+                      htmlFor="perspective"
+                      className="block text-md font-medium text-neutral-900 mb-2"
+                    >
+                      Your Perspective
+                    </Label>
+                    <Textarea
+                      id="perspective"
+                      value={perspectiveContent}
+                      onChange={(e) => setPerspectiveContent(e.target.value)}
+                      placeholder="Share your thoughts on the ethical implications of this scenario..."
+                      className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
+                      rows={4}
+                    />
+                  </div>
 
                   <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-4">
                     <div className="flex items-start">
@@ -1056,37 +1056,37 @@ const ScenarioView = () => {
                       <p className="text-neutral-500 text-sm">
                         All submissions are anonymous by default
                       </p>
-                    </div>
                   </div>
+                </div>
 
-                    <div className="mt-6 flex justify-center">
-                      <Button
-                        onClick={handlePerspectiveSubmit}
-                        disabled={
+                <div className="mt-6 flex justify-center">
+                  <Button
+                    onClick={handlePerspectiveSubmit}
+                    disabled={
                           !perspectiveContent.trim() || perspectiveMutation.isPending || !user
-                        }
-                        className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
+                    }
+                    className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
                           perspectiveContent.trim() && !perspectiveMutation.isPending && user
-                            ? "bg-indigo-600 hover:bg-indigo-700"
-                            : "bg-neutral-500 opacity-70"
-                        }`}
-                        size="lg"
-                      >
-                        {perspectiveMutation.isPending ? (
-                          <>
-                            <span className="mr-2">Submitting...</span>
-                            <span className="material-icons animate-spin text-sm">
-                              refresh
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="mr-2">Submit Perspective</span>
-                            <span className="material-icons text-sm">send</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                        ? "bg-indigo-600 hover:bg-indigo-700"
+                        : "bg-neutral-500 opacity-70"
+                    }`}
+                    size="lg"
+                  >
+                    {perspectiveMutation.isPending ? (
+                      <>
+                        <span className="mr-2">Submitting...</span>
+                        <span className="material-icons animate-spin text-sm">
+                          refresh
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="mr-2">Submit Perspective</span>
+                        <span className="material-icons text-sm">send</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
                   </div>
                 )}
               </div>
@@ -1150,11 +1150,11 @@ const ScenarioView = () => {
                   {/* Show perspectives if any exist */}
                   {Array.isArray(perspectives) && perspectives.length > 0 ? (
                     perspectives.map((perspective: Perspective) => (
-                      <PerspectiveCard
-                        key={perspective.id}
-                        perspective={perspective}
-                        scenarioId={scenarioId!}
-                      />
+                          <PerspectiveCard
+                            key={perspective.id}
+                            perspective={perspective}
+                            scenarioId={scenarioId!}
+                          />
                     ))
                   ) : (
                     /* Show no perspectives message if none found */

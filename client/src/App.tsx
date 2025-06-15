@@ -47,8 +47,8 @@ function App() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-            <Layout>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
@@ -68,8 +68,8 @@ function App() {
             onHighContrastToggle={handleHighContrastToggle}
             onScreenReaderToggle={handleScreenReaderToggle}
           />
-          </ThemeProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+        </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
         </AuthProvider>
       </QueryClientProvider>
     </I18nextProvider>
