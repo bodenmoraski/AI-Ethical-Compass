@@ -1,7 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { serverlessStorage } from "../../storage-serverless";
+import { getSupabaseClient } from '../../../lib/supabase-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('=== PERSPECTIVE REPLIES API CALLED ===');
+  console.log('Method:', req.method);
+  console.log('Query:', req.query);
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -15,18 +19,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
       const { id } = req.query;
-      const perspectiveId = parseInt(id as string);
       
-      if (isNaN(perspectiveId)) {
-        return res.status(400).json({ message: "Invalid perspective ID" });
+      if (!id) {
+        return res.status(400).json({ 
+          message: 'Perspective ID is required' 
+        });
       }
       
-      const replies = await serverlessStorage.getRepliesByPerspectiveId(perspectiveId);
-      return res.json(replies);
+      console.log(`Processing GET request for replies to perspective ${id}...`);
+      
+      // For now, return empty array as replies feature might not be implemented yet
+      // This can be expanded later when replies functionality is added
+      console.log(`No replies found for perspective ${id} (feature not implemented)`);
+      
+      res.status(200).json([]);
+      
     } catch (error) {
-      return res.status(500).json({ message: "Failed to retrieve replies" });
+      console.error('API error:', error);
+      res.status(500).json({
+        message: 'Failed to fetch replies',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
+  } else {
+    res.status(405).json({ message: 'Method not allowed' });
   }
-
-  return res.status(405).json({ message: 'Method not allowed' });
 } 

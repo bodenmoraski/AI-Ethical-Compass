@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSupabaseClient, type Perspective } from '../lib/supabase-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PERSPECTIVES DB API CALLED ===');
+  console.log('=== PERSPECTIVES API CALLED ===');
   console.log('Method:', req.method);
   console.log('Body:', req.body);
   
@@ -19,11 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       console.log('Processing POST request...');
       
-      // Dynamic import to avoid module resolution issues
-      const postgres = (await import('postgres')).default;
-      
-      const connectionString = process.env.DATABASE_URL!;
-      const client = postgres(connectionString, { prepare: false });
+      const supabase = getSupabaseClient();
       
       // Basic validation
       const { scenarioId, content, authorName } = req.body;
@@ -53,31 +50,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       // Verify scenario exists
-      const scenarioCheck = await client`
-        SELECT id FROM scenarios WHERE id = ${scenarioId} AND is_active = true
-      `;
+      const { data: scenarioCheck, error: scenarioError } = await supabase
+        .from('scenarios')
+        .select('id')
+        .eq('id', scenarioId)
+        .eq('is_active', true)
+        .single();
       
-      if (scenarioCheck.length === 0) {
-        await client.end();
+      if (scenarioError || !scenarioCheck) {
+        console.error('Scenario check error:', scenarioError);
         return res.status(400).json({ 
-          message: `Scenario with ID ${scenarioId} does not exist` 
+          message: `Scenario with ID ${scenarioId} does not exist or is not active` 
         });
       }
       
       console.log(`Verified scenario ${scenarioId} exists`);
       
       // Insert the perspective
-      const result = await client`
-        INSERT INTO perspectives (scenario_id, author_name, content, moderation_status)
-        VALUES (${scenarioId}, ${authorName.trim()}, ${content.trim()}, 'approved')
-        RETURNING id, scenario_id, author_name, content, likes, moderation_status, created_at, updated_at
-      `;
+      const { data: perspective, error: insertError } = await supabase
+        .from('perspectives')
+        .insert({
+          scenario_id: scenarioId,
+          author_name: authorName.trim(),
+          content: content.trim(),
+          moderation_status: 'approved'
+        })
+        .select()
+        .single();
       
-      const perspective = result[0];
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        return res.status(500).json({
+          message: 'Failed to create perspective',
+          error: insertError.message
+        });
+      }
       
       console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenario_id}`);
-      
-      await client.end();
       
       // Format the response to match the expected format
       res.status(201).json({
@@ -92,7 +101,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       
     } catch (error) {
-      console.error('Database error:', error);
+      console.error('API error:', error);
       res.status(500).json({
         message: 'Failed to create perspective',
         error: error instanceof Error ? error.message : 'Unknown error'

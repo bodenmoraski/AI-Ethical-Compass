@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
+import { supabase } from '../../../lib/supabase-client';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../../lib/supabase';
 
 const AuthCallback = () => {
   const navigate = useNavigate();

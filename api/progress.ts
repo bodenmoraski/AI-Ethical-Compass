@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSupabaseClient, type UserProgress } from '../lib/supabase-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PROGRESS DB API CALLED ===');
+  console.log('=== PROGRESS API CALLED ===');
   console.log('Method:', req.method);
   console.log('Body:', req.body);
   
@@ -17,70 +18,116 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'POST') {
     try {
-      // Dynamic import to avoid module resolution issues
-      const postgres = (await import('postgres')).default;
+      console.log('Processing POST request...');
       
-      const connectionString = process.env.DATABASE_URL!;
-      const client = postgres(connectionString, { prepare: false });
+      const supabase = getSupabaseClient();
       
       // Basic validation
-      const { userId, scenarioId, completed } = req.body;
+      const { userId, scenarioId, completed, perspectiveSubmitted } = req.body;
       
-      if (!scenarioId) {
+      if (!userId || !scenarioId) {
         return res.status(400).json({ 
-          message: 'scenarioId is required' 
-        });
-      }
-      
-      const id = parseInt(scenarioId);
-      if (isNaN(id)) {
-        return res.status(400).json({ 
-          message: 'scenarioId must be a valid number' 
+          message: 'userId and scenarioId are required' 
         });
       }
       
       // Verify scenario exists
-      const scenarioCheck = await client`
-        SELECT id FROM scenarios WHERE id = ${id} AND is_active = true
-      `;
+      const { data: scenarioCheck, error: scenarioError } = await supabase
+        .from('scenarios')
+        .select('id')
+        .eq('id', scenarioId)
+        .eq('is_active', true)
+        .single();
       
-      if (scenarioCheck.length === 0) {
-        await client.end();
+      if (scenarioError || !scenarioCheck) {
+        console.error('Scenario check error:', scenarioError);
         return res.status(400).json({ 
-          message: `Scenario with ID ${id} does not exist` 
+          message: `Scenario with ID ${scenarioId} does not exist or is not active` 
         });
       }
       
-      console.log(`Updating progress for scenario ${id}`);
+      console.log(`Verified scenario ${scenarioId} exists`);
       
-      // Insert progress record (simple approach for now)
-      const now = new Date().toISOString();
+      // Check if progress record already exists
+      const { data: existingProgress, error: checkError } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('scenario_id', scenarioId)
+        .single();
       
-      const result = await client`
-        INSERT INTO user_progress (user_id, scenario_id, completed, completed_at)
-        VALUES (${userId || null}, ${id}, ${completed || true}, ${completed ? now : null})
-        RETURNING id, user_id, scenario_id, completed, completed_at, created_at, updated_at
-      `;
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" error
+        console.error('Progress check error:', checkError);
+        return res.status(500).json({
+          message: 'Failed to check existing progress',
+          error: checkError.message
+        });
+      }
       
-      const progress = result[0];
+      let progressRecord;
       
-      console.log(`Progress updated for scenario ${id}`);
+      if (existingProgress) {
+        // Update existing progress
+        const { data: updatedProgress, error: updateError } = await supabase
+          .from('user_progress')
+          .update({
+            completed: completed ?? existingProgress.completed,
+            perspective_submitted: perspectiveSubmitted ?? existingProgress.perspective_submitted,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .eq('scenario_id', scenarioId)
+          .select()
+          .single();
+        
+        if (updateError) {
+          console.error('Update error:', updateError);
+          return res.status(500).json({
+            message: 'Failed to update progress',
+            error: updateError.message
+          });
+        }
+        
+        progressRecord = updatedProgress;
+        console.log(`Updated progress for user ${userId}, scenario ${scenarioId}`);
+      } else {
+        // Create new progress record
+        const { data: newProgress, error: insertError } = await supabase
+          .from('user_progress')
+          .insert({
+            user_id: userId,
+            scenario_id: scenarioId,
+            completed: completed ?? false,
+            perspective_submitted: perspectiveSubmitted ?? false
+          })
+          .select()
+          .single();
+        
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          return res.status(500).json({
+            message: 'Failed to create progress',
+            error: insertError.message
+          });
+        }
+        
+        progressRecord = newProgress;
+        console.log(`Created new progress for user ${userId}, scenario ${scenarioId}`);
+      }
       
-      await client.end();
-      
-      // Format the response to match the expected format
+      // Format the response to match expected format
       res.status(200).json({
-        id: progress.id,
-        userId: progress.user_id,
-        scenarioId: progress.scenario_id,
-        completed: progress.completed,
-        completedAt: progress.completed_at,
-        createdAt: progress.created_at,
-        updatedAt: progress.updated_at
+        id: progressRecord.id,
+        userId: progressRecord.user_id,
+        scenarioId: progressRecord.scenario_id,
+        completed: progressRecord.completed,
+        perspectiveSubmitted: progressRecord.perspective_submitted,
+        createdAt: progressRecord.created_at,
+        updatedAt: progressRecord.updated_at
       });
       
     } catch (error) {
-      console.error('Database error:', error);
+      console.error('API error:', error);
       res.status(500).json({
         message: 'Failed to update progress',
         error: error instanceof Error ? error.message : 'Unknown error'

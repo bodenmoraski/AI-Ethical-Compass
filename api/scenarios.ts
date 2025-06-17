@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSupabaseClient, type Scenario } from '../lib/supabase-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== SCENARIOS DB API CALLED ===');
+  console.log('=== SCENARIOS API CALLED ===');
   console.log('Method:', req.method);
   
   // Set CORS headers
@@ -16,52 +17,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'GET') {
     try {
-      // Dynamic import to avoid module resolution issues
-      const postgres = (await import('postgres')).default;
+      console.log('Processing GET request for scenarios...');
       
-      const connectionString = process.env.DATABASE_URL!;
-      const client = postgres(connectionString, { prepare: false });
-      
-      console.log('Fetching scenarios from database...');
+      const supabase = getSupabaseClient();
       
       // Fetch all active scenarios
-      const scenarios = await client`
-        SELECT 
-          id,
-          title,
-          description,
-          context,
-          dilemma,
-          stakeholders,
-          created_at,
-          updated_at
-        FROM scenarios 
-        WHERE is_active = true
-        ORDER BY id
-      `;
+      const { data: scenarios, error } = await supabase
+        .from('scenarios')
+        .select('*')
+        .eq('is_active', true)
+        .order('id', { ascending: true });
       
-      console.log(`Found ${scenarios.length} scenarios in database`);
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({
+          message: 'Failed to fetch scenarios',
+          error: error.message
+        });
+      }
       
-      // Parse stakeholders JSON for each scenario
-      const formattedScenarios = scenarios.map(scenario => ({
+      console.log(`Found ${scenarios?.length || 0} active scenarios`);
+      
+      // Format the response to match expected format
+      const formattedScenarios = scenarios?.map(scenario => ({
         id: scenario.id,
         title: scenario.title,
         description: scenario.description,
-        context: scenario.context,
-        dilemma: scenario.dilemma,
-        stakeholders: scenario.stakeholders, // Already parsed by postgres
+        category: scenario.category,
+        difficultyLevel: scenario.difficulty_level,
+        isActive: scenario.is_active,
         createdAt: scenario.created_at,
         updatedAt: scenario.updated_at
-      }));
-      
-      await client.end();
+      })) || [];
       
       res.status(200).json(formattedScenarios);
       
     } catch (error) {
-      console.error('Database error:', error);
+      console.error('API error:', error);
       res.status(500).json({
-        message: 'Failed to fetch scenarios from database',
+        message: 'Failed to fetch scenarios',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }

@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSupabaseClient, type Perspective } from '../lib/supabase-server';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== SCENARIOS PERSPECTIVES DB API CALLED ===');
+  console.log('=== SCENARIOS PERSPECTIVES API CALLED ===');
   console.log('Method:', req.method);
   console.log('Query:', req.query);
   
@@ -21,65 +22,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       if (!scenarioId) {
         return res.status(400).json({ 
-          message: 'scenarioId query parameter is required' 
+          message: 'scenarioId is required' 
         });
       }
       
-      const id = parseInt(scenarioId as string);
-      if (isNaN(id)) {
-        return res.status(400).json({ 
-          message: 'scenarioId must be a valid number' 
+      console.log(`Processing GET request for perspectives of scenario ${scenarioId}...`);
+      
+      const supabase = getSupabaseClient();
+      
+      // Verify scenario exists
+      const { data: scenarioCheck, error: scenarioError } = await supabase
+        .from('scenarios')
+        .select('id')
+        .eq('id', scenarioId)
+        .eq('is_active', true)
+        .single();
+      
+      if (scenarioError || !scenarioCheck) {
+        console.error('Scenario check error:', scenarioError);
+        return res.status(404).json({ 
+          message: `Scenario with ID ${scenarioId} not found or not active` 
         });
       }
       
-      // Dynamic import to avoid module resolution issues
-      const postgres = (await import('postgres')).default;
+      // Fetch perspectives for the scenario
+      const { data: perspectives, error } = await supabase
+        .from('perspectives')
+        .select('*')
+        .eq('scenario_id', scenarioId)
+        .eq('moderation_status', 'approved')
+        .order('created_at', { ascending: false });
       
-      const connectionString = process.env.DATABASE_URL!;
-      const client = postgres(connectionString, { prepare: false });
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({
+          message: 'Failed to fetch perspectives',
+          error: error.message
+        });
+      }
       
-      console.log(`Fetching perspectives for scenario ID: ${id}`);
+      console.log(`Found ${perspectives?.length || 0} perspectives for scenario ${scenarioId}`);
       
-      // Get all approved perspectives for the scenario
-      const perspectives = await client`
-        SELECT 
-          id,
-          scenario_id,
-          author_name,
-          content,
-          likes,
-          moderation_status,
-          created_at,
-          updated_at
-        FROM perspectives 
-        WHERE scenario_id = ${id} 
-          AND moderation_status = 'approved'
-        ORDER BY created_at DESC
-      `;
-      
-      console.log(`Found ${perspectives.length} perspectives for scenario ${id}`);
-      
-      // Format the response to match the expected format
-      const formattedPerspectives = perspectives.map(perspective => ({
+      // Format the response to match expected format
+      const formattedPerspectives = perspectives?.map(perspective => ({
         id: perspective.id,
         scenarioId: perspective.scenario_id,
         authorName: perspective.author_name,
         content: perspective.content,
         likes: perspective.likes,
         moderationStatus: perspective.moderation_status,
-        parentId: null, // All perspectives are top-level, replies are in separate table
         createdAt: perspective.created_at,
         updatedAt: perspective.updated_at
-      }));
-      
-      await client.end();
+      })) || [];
       
       res.status(200).json(formattedPerspectives);
       
     } catch (error) {
-      console.error('Database error:', error);
+      console.error('API error:', error);
       res.status(500).json({
-        message: 'Failed to fetch perspectives from database',
+        message: 'Failed to fetch perspectives',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
