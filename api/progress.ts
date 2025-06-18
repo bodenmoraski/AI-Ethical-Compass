@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient, type UserProgress } from '../lib/supabase-server';
+import { getSupabaseClient, type UserProgress } from '../lib/supabase-server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PROGRESS API CALLED ===');
+  console.log('=== PROGRESS DB API CALLED ===');
   console.log('Method:', req.method);
   console.log('Body:', req.body);
   
@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const supabase = getSupabaseClient();
       
       // Basic validation
-      const { userId, scenarioId, completed, perspectiveSubmitted } = req.body;
+      const { userId, scenarioId, completed } = req.body;
       
       if (!userId || !scenarioId) {
         return res.status(400).json({ 
@@ -72,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from('user_progress')
           .update({
             completed: completed ?? existingProgress.completed,
-            perspective_submitted: perspectiveSubmitted ?? existingProgress.perspective_submitted,
+            completed_at: completed ? new Date().toISOString() : existingProgress.completed_at,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userId)
@@ -98,7 +98,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             user_id: userId,
             scenario_id: scenarioId,
             completed: completed ?? false,
-            perspective_submitted: perspectiveSubmitted ?? false
+            completed_at: completed ? new Date().toISOString() : null
           })
           .select()
           .single();
@@ -121,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         userId: progressRecord.user_id,
         scenarioId: progressRecord.scenario_id,
         completed: progressRecord.completed,
-        perspectiveSubmitted: progressRecord.perspective_submitted,
+        completedAt: progressRecord.completed_at,
         createdAt: progressRecord.created_at,
         updatedAt: progressRecord.updated_at
       });

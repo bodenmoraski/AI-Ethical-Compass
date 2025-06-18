@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient, type Scenario } from '../lib/supabase-server';
+import { getSupabaseClient, type Scenario } from '../lib/supabase-server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('=== SCENARIOS API CALLED ===');

@@ -1,44 +1,39 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
-import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
 import path from "path";
-import { fileURLToPath, URL } from "node:url";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig(async ({ mode }) => {
-  // Load env file based on `mode` in the current directory.
-  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
-  const env = loadEnv(mode, process.cwd(), '');
+  // Load env file from parent directory
+  const env = loadEnv(mode, '../', '');
   
-  // Get the directory of this config file
+  // Get the directory of this config file (client directory)
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   
   return {
     plugins: [
       react(),
-      runtimeErrorOverlay(),
-      themePlugin(),
-      ...(process.env.NODE_ENV !== "production" &&
-      process.env.REPL_ID !== undefined
-        ? [
-            await import("@replit/vite-plugin-cartographer").then((m) =>
-              m.cartographer(),
-            ),
-          ]
-        : []),
     ],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "client", "src"),
-        "@shared": path.resolve(__dirname, "shared"),
-        "@assets": path.resolve(__dirname, "client", "src", "assets"),
+        "@": path.resolve(__dirname, "src"),
+        "@shared": path.resolve(__dirname, "..", "shared"),
+        "@assets": path.resolve(__dirname, "src", "assets"),
       },
     },
-    root: "client",
-    publicDir: path.resolve(__dirname, "client", "public"),
+    root: ".",
+    publicDir: "public",
     build: {
-      outDir: path.resolve(__dirname, "dist/public"),
+      outDir: path.resolve(__dirname, "..", "dist/public"),
       emptyOutDir: true,
+    },
+    server: {
+      port: 3000,
+      host: true,
+      strictPort: false,
+      hmr: {
+        port: 3001,
+      },
     },
     define: {
       global: "globalThis",
@@ -55,4 +50,4 @@ export default defineConfig(async ({ mode }) => {
       include: [],
     },
   };
-});
+}); 

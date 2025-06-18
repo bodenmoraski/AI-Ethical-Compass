@@ -48,10 +48,10 @@ export interface Perspective {
 
 export interface UserProgress {
   id: number;
-  user_id: string;
+  user_id: number;
   scenario_id: number;
   completed: boolean;
-  perspective_submitted: boolean;
+  completed_at: string | null;
   created_at: string;
   updated_at: string;
 } 

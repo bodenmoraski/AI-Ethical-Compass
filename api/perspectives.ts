@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient, type Perspective } from '../lib/supabase-server';
+import { getSupabaseClient, type Perspective } from '../lib/supabase-server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PERSPECTIVES API CALLED ===');
+  console.log('=== PERSPECTIVES DB API CALLED ===');
   console.log('Method:', req.method);
   console.log('Body:', req.body);
   

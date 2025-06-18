@@ -16,11 +16,10 @@ export async function submitPerspective(scenarioId: number, content: string, aut
 }
 
 export async function updateProgress(scenarioId: number, completed: boolean = true): Promise<void> {
-  await apiRequest(
-    "POST",
-    "/api/progress",
-    { userId: null, scenarioId, completed }
-  );
+  // Progress tracking is disabled for now
+  // This can be enabled later when user authentication is implemented
+  console.log(`Progress would be updated for scenario ${scenarioId}: completed=${completed}`);
+  return Promise.resolve();
 }
 
 export const getRelativeTimeString = (date: Date | string | number): string => {

@@ -299,11 +299,24 @@ const ScenarioView = () => {
         queryKey: ["/api/scenarios-perspectives", scenarioId],
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
+      // Extract the error message from the response
+      let errorMessage = "There was an error submitting your perspective. Please try again.";
+      
+      // Try to parse the error message from the API response
+      if (error.message.includes("400:")) {
+        try {
+          const errorBody = error.message.split("400: ")[1];
+          const parsedError = JSON.parse(errorBody);
+          errorMessage = parsedError.message || errorMessage;
+        } catch {
+          // If parsing fails, keep the default message
+        }
+      }
+      
       toast({
         title: "Submission failed",
-        description:
-          "There was an error submitting your perspective. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -1019,9 +1032,38 @@ const ScenarioView = () => {
                       value={perspectiveContent}
                       onChange={(e) => setPerspectiveContent(e.target.value)}
                       placeholder="Share your thoughts on the ethical implications of this scenario..."
-                      className="mt-1 w-full p-3 min-h-[120px] border-neutral-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md"
+                      className={`mt-1 w-full p-3 min-h-[120px] focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md ${
+                        perspectiveContent.trim().length > 0 && perspectiveContent.trim().length < 5
+                          ? "border-red-300 focus:border-red-300"
+                          : "border-neutral-300 focus:border-indigo-300"
+                      }`}
                       rows={4}
                     />
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="text-sm">
+                        {perspectiveContent.trim().length > 0 && perspectiveContent.trim().length < 5 && (
+                          <span className="text-red-600 flex items-center">
+                            <span className="material-icons text-sm mr-1">warning</span>
+                            Minimum 5 characters required
+                          </span>
+                        )}
+                        {perspectiveContent.trim().length >= 5 && (
+                          <span className="text-green-600 flex items-center">
+                            <span className="material-icons text-sm mr-1">check_circle</span>
+                            Good length
+                          </span>
+                        )}
+                      </div>
+                      <span className={`text-sm ${
+                        perspectiveContent.length > 2000 
+                          ? "text-red-600" 
+                          : perspectiveContent.trim().length < 5 
+                            ? "text-red-500" 
+                            : "text-neutral-500"
+                      }`}>
+                        {perspectiveContent.length}/2000
+                      </span>
+                    </div>
                   </div>
 
                   <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-4">
@@ -1063,10 +1105,18 @@ const ScenarioView = () => {
                   <Button
                     onClick={handlePerspectiveSubmit}
                     disabled={
-                          !perspectiveContent.trim() || perspectiveMutation.isPending || !user
+                          !perspectiveContent.trim() || 
+                          perspectiveContent.trim().length < 5 || 
+                          perspectiveContent.length > 2000 ||
+                          perspectiveMutation.isPending || 
+                          !user
                     }
                     className={`py-2 px-8 rounded-lg shadow-md hover:shadow-lg transition-all text-white ${
-                          perspectiveContent.trim() && !perspectiveMutation.isPending && user
+                          perspectiveContent.trim() && 
+                          perspectiveContent.trim().length >= 5 && 
+                          perspectiveContent.length <= 2000 &&
+                          !perspectiveMutation.isPending && 
+                          user
                         ? "bg-indigo-600 hover:bg-indigo-700"
                         : "bg-neutral-500 opacity-70"
                     }`}
