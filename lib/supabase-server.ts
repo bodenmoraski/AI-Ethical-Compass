@@ -24,6 +24,18 @@ export function getSupabaseClient() {
 }
 
 // Database types for TypeScript support
+export interface User {
+  id: number;
+  email: string;
+  name: string | null;
+  username: string;
+  institutionName: string | null;
+  institutionType: string | null;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Scenario {
   id: number;
   title: string;

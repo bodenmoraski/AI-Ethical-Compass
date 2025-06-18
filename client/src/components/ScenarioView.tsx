@@ -170,7 +170,7 @@ const ScenarioView = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const scenarioId = params.id ? parseInt(params.id) : null;
 
   const [currentStep, setCurrentStep] = useState<Step>(Step.Identification);
@@ -329,7 +329,7 @@ const ScenarioView = () => {
     perspectiveMutation.mutate({
       scenarioId,
       content: perspectiveContent,
-      authorName: user?.email || "Anonymous User",
+      authorName: userProfile?.username || "Anonymous User",
     });
   };
 

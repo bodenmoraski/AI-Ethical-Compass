@@ -4,13 +4,32 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  institutionName: text("institution_name"),
+  institutionType: text("institution_type"),
+  role: text("role").default("user").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
+  name: true,
   username: true,
-  password: true,
+  institutionName: true,
+  institutionType: true,
+});
+
+export const updateUserProfileSchema = createInsertSchema(users).pick({
+  username: true,
+  institutionName: true,
+  institutionType: true,
+}).extend({
+  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  institutionName: z.string().optional(),
+  institutionType: z.string().optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

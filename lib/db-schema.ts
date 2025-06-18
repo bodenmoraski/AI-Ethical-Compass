@@ -5,6 +5,9 @@ export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   email: text('email').unique(),
   name: text('name'),
+  username: text('username').unique().notNull(), // Public display name for perspectives
+  institutionName: text('institution_name'), // Name of school/organization, optional
+  institutionType: text('institution_type'), // Type of institution, optional
   role: text('role').default('user'), // 'user', 'moderator', 'admin'
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
