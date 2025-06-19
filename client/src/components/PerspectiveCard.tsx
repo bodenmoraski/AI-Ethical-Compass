@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { getRelativeTimeString } from "@/lib/scenarios";
+import { useAuth } from "@/lib/auth";
 
 interface PerspectiveCardProps {
   perspective: Perspective;
@@ -24,20 +25,29 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     loadingReplies: false
   });
   
+  // Local state for optimistic like updates
+  const [isLiked, setIsLiked] = useState(false);
+  const [localLikeCount, setLocalLikeCount] = useState(perspective.likes || 0);
+  
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { userProfile } = useAuth();
 
   const handleLike = async () => {
-    if (loading.like) return;
+    if (loading.like || isLiked) return; // Prevent multiple likes
     
+    // Optimistic update - update UI immediately
+    setIsLiked(true);
+    setLocalLikeCount(prev => prev + 1);
     setLoading((prev) => ({ ...prev, like: true }));
+    
     try {
       await apiRequest(
         "POST",
         `/api/perspectives/${perspective.id}/like`
       );
       
-      // Update local perspective data
+      // Update cache to reflect the new like count
       queryClient.invalidateQueries({ 
         queryKey: [`/api/scenarios/${scenarioId}/perspectives`] 
       });
@@ -47,6 +57,10 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
         description: "You liked this perspective."
       });
     } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(false);
+      setLocalLikeCount(prev => prev - 1);
+      
       toast({
         title: "Error",
         description: "Failed to like this perspective. Please try again.",
@@ -65,11 +79,10 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     try {
       const response = await apiRequest(
         "POST",
-        "/api/perspectives",
+        `/api/perspectives/${perspective.id}/replies`,
         {
-          scenarioId,
           content: replyContent,
-          parentId: perspective.id
+          authorName: userProfile?.username || "Anonymous"
         }
       );
       
@@ -157,14 +170,17 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-neutral-500 hover:text-indigo-600"
+                  className={`transition-colors ${isLiked 
+                    ? "text-red-500 hover:text-red-600" 
+                    : "text-neutral-500 hover:text-indigo-600"
+                  }`}
                   onClick={handleLike}
-                  disabled={loading.like}
+                  disabled={loading.like || isLiked}
                 >
                   <span className="material-icons text-base mr-1">
-                    favorite_border
+                    {isLiked ? "favorite" : "favorite_border"}
                   </span>
-                  {perspective.likes || 0}
+                  {localLikeCount}
                 </Button>
               </div>
             </div>
