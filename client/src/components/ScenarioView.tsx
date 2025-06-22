@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -199,6 +200,11 @@ const ScenarioView = () => {
   // Form state for perspective submission
   const [perspectiveContent, setPerspectiveContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(true);
+  
+  // Perspective sorting state
+  const [sortBy, setSortBy] = useState<string>('smart_ranking');
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('Initializing...');
 
   // Fetch scenario data
   const { data: scenarios = [] } = useQuery<Scenario[]>({
@@ -212,12 +218,12 @@ const ScenarioView = () => {
     ? scenarios.find((s) => s.id === scenarioId)
     : scenarios[0];
 
-  // Fetch perspectives for the current scenario
-  const { data: perspectives = [], isLoading: perspectivesLoading, error: perspectivesError } = useQuery<Perspective[]>({
-    queryKey: ["/api/scenarios-perspectives", scenarioId],
+  // Fetch perspectives for the current scenario with ranking
+  const { data: perspectivesData, isLoading: perspectivesLoading, error: perspectivesError } = useQuery({
+    queryKey: ["/api/perspective-rankings", scenarioId, sortBy],
     queryFn: async () => {
-      if (!scenarioId) return [];
-      const response = await fetch(`/api/scenarios-perspectives?scenarioId=${scenarioId}`);
+      if (!scenarioId) return { perspectives: [], pagination: {}, ranking: {}, metadata: {} };
+      const response = await fetch(`/api/perspective-rankings?scenarioId=${scenarioId}&rankBy=${sortBy}&limit=50`);
       if (!response.ok) {
         throw new Error('Failed to fetch perspectives');
       }
@@ -227,6 +233,8 @@ const ScenarioView = () => {
     staleTime: 0, // Always refetch when query is enabled
     refetchOnMount: true, // Refetch when component mounts
   });
+
+  const perspectives = perspectivesData?.perspectives || [];
 
   // Navigate to first scenario if none selected and scenarios are loaded
   useEffect(() => {
@@ -248,6 +256,65 @@ const ScenarioView = () => {
   useEffect(() => {
     setSelectedQuestions(selectRandomQuestions(questionCount));
   }, [questionCount]);
+
+  // Simulate loading progress
+  useEffect(() => {
+    if (perspectivesLoading) {
+      setLoadingProgress(0);
+      setLoadingMessage('Fetching perspectives...');
+      
+      const messages = [
+        'Fetching perspectives...',
+        'Analyzing quality scores...',
+        'Calculating user reputation...',
+        'Applying sorting algorithm...',
+        'Organizing results...',
+        'Almost ready...'
+      ];
+      
+      let messageIndex = 0;
+      const interval = setInterval(() => {
+        setLoadingProgress((prev) => {
+          const newProgress = prev + Math.random() * 15;
+          
+          // Update message based on progress
+          if (newProgress > 20 && messageIndex === 0) {
+            messageIndex = 1;
+            setLoadingMessage(messages[1]);
+          } else if (newProgress > 40 && messageIndex === 1) {
+            messageIndex = 2;
+            setLoadingMessage(messages[2]);
+          } else if (newProgress > 60 && messageIndex === 2) {
+            messageIndex = 3;
+            setLoadingMessage(messages[3]);
+          } else if (newProgress > 80 && messageIndex === 3) {
+            messageIndex = 4;
+            setLoadingMessage(messages[4]);
+          } else if (newProgress > 85 && messageIndex === 4) {
+            messageIndex = 5;
+            setLoadingMessage(messages[5]);
+          }
+          
+          if (newProgress >= 90) {
+            clearInterval(interval);
+            return 90; // Stay at 90% until actual loading completes
+          }
+          return newProgress;
+        });
+      }, 200);
+      
+      return () => clearInterval(interval);
+    } else {
+      setLoadingProgress(100);
+      setLoadingMessage('Complete!');
+      // Reset after a brief delay
+      const timeout = setTimeout(() => {
+        setLoadingProgress(0);
+        setLoadingMessage('Initializing...');
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [perspectivesLoading]);
 
   // Reset form state when scenario changes
   useEffect(() => {
@@ -297,10 +364,10 @@ const ScenarioView = () => {
       
       // Force immediate refetch of perspectives
       await queryClient.invalidateQueries({
-        queryKey: ["/api/scenarios-perspectives", scenarioId],
+        queryKey: ["/api/perspective-rankings", scenarioId],
       });
       queryClient.refetchQueries({
-        queryKey: ["/api/scenarios-perspectives", scenarioId],
+        queryKey: ["/api/perspective-rankings", scenarioId, sortBy],
       });
     },
     onError: (error: Error) => {
@@ -1185,26 +1252,135 @@ const ScenarioView = () => {
                   </div>
                 </div>
 
-                {/* Loading info message */}
-                <div className="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center">
-                    <span className="material-icons text-amber-600 mr-3 animate-pulse">
-                      hourglass_empty
-                    </span>
-                    <div>
-                      <p className="text-amber-800 font-medium">
-                        Loading community perspectives...
+                {/* Sorting Controls */}
+                <div className="mb-6 bg-white border border-neutral-200 rounded-lg p-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="material-icons text-neutral-600">sort</span>
+                      <span className="font-medium text-neutral-700">Sort perspectives by:</span>
+                    </div>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full sm:w-64">
+                        <SelectValue placeholder="Choose sorting method" />
+                        {perspectivesLoading && (
+                          <span className="material-icons animate-spin text-sm ml-2">refresh</span>
+                        )}
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="smart_ranking">
+                          <span className="material-icons text-sm mr-2">psychology</span>
+                          Smart Ranking
+                        </SelectItem>
+                        <SelectItem value="highest_quality">
+                          <span className="material-icons text-sm mr-2">star</span>
+                          Highest Quality
+                        </SelectItem>
+                        <SelectItem value="most_liked">
+                          <span className="material-icons text-sm mr-2">favorite</span>
+                          Most Liked
+                        </SelectItem>
+                        <SelectItem value="most_reputable">
+                          <span className="material-icons text-sm mr-2">verified</span>
+                          Most Reputable
+                        </SelectItem>
+                        <SelectItem value="most_recent">
+                          <span className="material-icons text-sm mr-2">schedule</span>
+                          Most Recent
+                        </SelectItem>
+                        <SelectItem value="oldest_first">
+                          <span className="material-icons text-sm mr-2">history</span>
+                          Oldest First
+                        </SelectItem>
+                        <SelectItem value="most_helpful">
+                          <span className="material-icons text-sm mr-2">thumb_up</span>
+                          Most Helpful
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Ranking Info */}
+                  {perspectivesData?.ranking && perspectives.length > 0 && (
+                    <div className="mt-3 p-3 bg-neutral-50 rounded-md">
+                      <div className="flex items-center gap-2 text-sm text-neutral-600">
+                        <span className="material-icons text-sm">info</span>
+                        <span>{perspectivesData.ranking.description}</span>
+                      </div>
+                      {perspectivesData.metadata && (
+                        <div className="mt-2 text-xs text-neutral-500">
+                          {perspectives.length} perspectives • {perspectivesData.metadata.total_users_with_reputation} contributors
+                          {perspectivesData.metadata.avg_quality_score && !isNaN(perspectivesData.metadata.avg_quality_score) && (
+                            <> • Avg quality: {(perspectivesData.metadata.avg_quality_score * 100).toFixed(0)}%</>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Sorting Description */}
+                  {perspectives.length > 0 && (
+                    <div className="mt-2 text-xs text-neutral-500 flex items-center gap-1">
+                      <span className="material-icons text-xs">sort</span>
+                      <span>
+                        {sortBy === 'smart_ranking' && 'Quality + Reputation + Engagement + Recency'}
+                        {sortBy === 'highest_quality' && 'AI-assessed reasoning quality'}
+                        {sortBy === 'most_liked' && 'Community favorites'}
+                        {sortBy === 'most_reputable' && 'From trusted contributors'}
+                        {sortBy === 'most_recent' && 'Newest first'}
+                        {sortBy === 'oldest_first' && 'Original discussions'}
+                        {sortBy === 'most_helpful' && 'Community rated'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Loading Spinner */}
+                {perspectivesLoading && (
+                  <div className="mb-6 flex flex-col items-center justify-center py-12">
+                    {/* Main Spinner */}
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                      <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-indigo-400 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+                    </div>
+                    
+                    {/* Loading Text */}
+                    <div className="mt-4 text-center">
+                      <p className="text-lg font-medium text-neutral-700 mb-1">
+                        {loadingMessage}
                       </p>
-                      <p className="text-amber-700 text-sm mt-1">
-                        Please wait a few seconds for perspectives to appear. Great discussions take time to load! ⏰
+                      <p className="text-sm text-neutral-500">
+                        Ranking and organizing community insights
                       </p>
                     </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="mt-4 w-64 bg-neutral-200 rounded-full h-2 overflow-hidden shadow-inner">
+                      <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-300 ease-out relative" 
+                           style={{
+                             width: `${loadingProgress}%`
+                           }}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Progress Percentage */}
+                    <div className="mt-2 text-xs text-neutral-400 font-mono">
+                      {Math.round(loadingProgress)}% complete
+                    </div>
+                    
+                    {/* Sorting indicator */}
+                    <div className="mt-3 flex items-center gap-2 text-xs text-neutral-400">
+                      <span className="material-icons text-sm animate-spin">sort</span>
+                      <span className="animate-pulse">
+                        Applying {sortBy.replace('_', ' ')} sorting...
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="space-y-4">
                   {/* Show perspectives if any exist */}
-                  {Array.isArray(perspectives) && perspectives.length > 0 ? (
+                  {!perspectivesLoading && Array.isArray(perspectives) && perspectives.length > 0 ? (
                     perspectives.map((perspective: Perspective) => (
                           <PerspectiveCard
                             key={perspective.id}
@@ -1212,8 +1388,8 @@ const ScenarioView = () => {
                             scenarioId={scenarioId!}
                           />
                     ))
-                  ) : (
-                    /* Show no perspectives message if none found */
+                  ) : !perspectivesLoading ? (
+                    /* Show no perspectives message if none found and not loading */
                     <div className="bg-neutral-50 border-2 border-blue-200 rounded-lg p-6 text-center">
                       <div className="flex justify-center mb-4">
                         <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
@@ -1224,6 +1400,11 @@ const ScenarioView = () => {
                       <p className="text-neutral-600 mb-4">
                         This is your opportunity to be the first to contribute your thoughts on this ethical dilemma.
                       </p>
+                      {perspectivesError && (
+                        <p className="text-red-600 text-sm mb-4">
+                          Error loading perspectives: {perspectivesError.message}
+                        </p>
+                      )}
                       <Button
                         onClick={() => setCurrentStep(Step.Submission)}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -1231,7 +1412,7 @@ const ScenarioView = () => {
                         Share Your Perspective
                       </Button>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-4 justify-center">
