@@ -5,8 +5,13 @@
       "destination": "/api/$1"
     }
   ],
-  "buildCommand": "npm run build",
+  "buildCommand": "npm ci && npm run build",
   "devCommand": "vite --port $PORT",
   "outputDirectory": "dist/public",
-  "installCommand": "npm install"
+  "installCommand": "npm ci",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  }
 } 

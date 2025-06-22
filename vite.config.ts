@@ -39,6 +39,8 @@ export default defineConfig(async ({ mode }) => {
     build: {
       outDir: path.resolve(__dirname, "dist/public"),
       emptyOutDir: true,
+      target: 'esnext' as const,
+      minify: 'esbuild' as const,
     },
     define: {
       global: "globalThis",
