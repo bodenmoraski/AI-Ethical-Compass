@@ -44,7 +44,11 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     try {
       await apiRequest(
         "POST",
-        `/api/perspectives/${perspective.id}/like`
+        `/api/perspectives/${perspective.id}/like`,
+        {
+          userId: userProfile?.id,
+          userEmail: userProfile?.email
+        }
       );
       
       // Update cache to reflect the new like count

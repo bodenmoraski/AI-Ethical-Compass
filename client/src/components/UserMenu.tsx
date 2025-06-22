@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 const UserMenu = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   if (!user) return null;
@@ -73,6 +75,14 @@ const UserMenu = () => {
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => navigate('/dashboard')}
+          className="cursor-pointer"
+        >
+          <span className="material-icons mr-2 text-sm">dashboard</span>
+          Dashboard
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}

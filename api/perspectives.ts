@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const supabase = getSupabaseClient();
       
       // Basic validation
-      const { scenarioId, content, authorName } = req.body;
+      const { scenarioId, content, authorName, userId, userEmail } = req.body;
       
       if (!scenarioId || !content) {
         return res.status(400).json({ 
@@ -73,6 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           scenario_id: scenarioId,
           author_name: authorName.trim(),
           content: content.trim(),
+          user_id: userId || userEmail || null,
           moderation_status: 'approved'
         })
         .select()

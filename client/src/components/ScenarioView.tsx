@@ -275,11 +275,15 @@ const ScenarioView = () => {
       scenarioId,
       content,
       authorName,
+      userId,
+      userEmail,
     }: {
       scenarioId: number;
       content: string;
       authorName: string;
-    }) => submitPerspective(scenarioId, content, authorName),
+      userId?: string;
+      userEmail?: string;
+    }) => submitPerspective(scenarioId, content, authorName, userId, userEmail),
     onSuccess: async () => {
       toast({
         title: "Perspective submitted",
@@ -330,6 +334,8 @@ const ScenarioView = () => {
       scenarioId,
       content: perspectiveContent,
       authorName: userProfile?.username || "Anonymous User",
+      userId: userProfile?.id?.toString(),
+      userEmail: userProfile?.email,
     });
   };
 
