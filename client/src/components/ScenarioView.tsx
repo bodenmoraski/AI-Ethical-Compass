@@ -1329,7 +1329,7 @@ const ScenarioView = () => {
                         {sortBy === 'most_recent' && 'Newest first'}
                         {sortBy === 'oldest_first' && 'Original discussions'}
                         {sortBy === 'most_helpful' && 'Community rated'}
-                      </span>
+                    </span>
                     </div>
                   )}
                 </div>
@@ -1360,8 +1360,8 @@ const ScenarioView = () => {
                              width: `${loadingProgress}%`
                            }}>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
-                      </div>
-                    </div>
+                  </div>
+                </div>
                     
                     {/* Progress Percentage */}
                     <div className="mt-2 text-xs text-neutral-400 font-mono">
