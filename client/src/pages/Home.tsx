@@ -205,8 +205,8 @@ const Home = () => {
                 <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
                   <div className="text-3xl font-bold mb-2">{stats.scenariosAnalyzed.toLocaleString()}</div>
                   <div className="text-purple-100 font-medium">Scenarios Analyzed</div>
-                </div>
-              </div>
+            </div>
+          </div>
               <div className="text-center">
                 <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
                   <div className="text-3xl font-bold mb-2">{stats.countriesReached}</div>
