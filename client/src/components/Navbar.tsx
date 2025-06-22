@@ -34,6 +34,26 @@ export const Navbar = () => {
                 Scenarios
               </NavLink>
               <NavLink 
+                to="/user-scenarios"
+                className={({ isActive }) => 
+                  isActive 
+                    ? "border-b-2 border-primary-600 text-primary-600 px-1 py-4 text-sm font-medium" 
+                    : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
+                }
+              >
+                Community
+              </NavLink>
+              <NavLink 
+                to="/leaderboard"
+                className={({ isActive }) => 
+                  isActive 
+                    ? "border-b-2 border-primary-600 text-primary-600 px-1 py-4 text-sm font-medium" 
+                    : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
+                }
+              >
+                Leaderboard
+              </NavLink>
+              <NavLink 
                 to="/about"
                 className={({ isActive }) => 
                   isActive 

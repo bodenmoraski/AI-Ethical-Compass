@@ -11,6 +11,8 @@ import Resources from "@/pages/Resources";
 import ScenarioView from "@/components/ScenarioView";
 import Scenarios from "@/pages/Scenarios";
 import Dashboard from "@/pages/Dashboard";
+import UserScenarios from "@/pages/UserScenarios";
+import Leaderboard from "@/pages/Leaderboard";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
@@ -88,6 +90,8 @@ function AppContent() {
           <Route path="/resources" element={<Resources />} />
           <Route path="/scenarios" element={<Scenarios />} />
           <Route path="/scenarios/:id" element={<ScenarioView />} />
+          <Route path="/user-scenarios" element={<UserScenarios />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />

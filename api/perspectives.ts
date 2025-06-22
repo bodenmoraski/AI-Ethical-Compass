@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient, type Perspective } from '../lib/supabase-server.js';
+import { analyzePerspective } from '../lib/ai-analysis.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('=== PERSPECTIVES DB API CALLED ===');
@@ -88,6 +89,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenario_id}`);
+      
+      // Perform AI analysis in the background (don't block the response)
+      analyzePerspective(content.trim())
+        .then(async (analysis) => {
+          const { error: analysisError } = await supabase
+            .from('perspective_analysis')
+            .insert({
+              perspective_id: perspective.id,
+              bias_score: analysis.bias_score,
+              quality_score: analysis.quality_score,
+              ethical_frameworks: analysis.ethical_frameworks,
+              sentiment_analysis: analysis.sentiment_analysis,
+              key_themes: analysis.key_themes,
+              improvement_suggestions: analysis.improvement_suggestions
+            });
+          
+          if (analysisError) {
+            console.error('Error saving AI analysis:', analysisError);
+          } else {
+            console.log(`AI analysis saved for perspective ${perspective.id}`);
+          }
+        })
+        .catch(error => {
+          console.error('Error performing AI analysis:', error);
+        });
       
       // Format the response to match the expected format
       res.status(201).json({

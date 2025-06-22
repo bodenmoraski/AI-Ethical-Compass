@@ -7,8 +7,6 @@ Create a `.env.local` file in your project root with these variables:
 ```bash
 # Database Configuration
 DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres"
-SUPABASE_URL="https://[PROJECT_REF].supabase.co"
-SUPABASE_ANON_KEY="[YOUR_ANON_KEY]"
 SUPABASE_SERVICE_ROLE_KEY="[YOUR_SERVICE_ROLE_KEY]"
 
 # Content Moderation (Optional - for later phases)

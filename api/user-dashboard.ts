@@ -74,7 +74,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const likedError = null;
       
       // Skip scenario progress for now due to table structure issues  
-      const scenarioProgress = [];
+      const scenarioProgress: any[] = [];
       const progressError = null;
       
       // Calculate statistics
