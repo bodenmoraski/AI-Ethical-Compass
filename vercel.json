@@ -8,10 +8,5 @@
   "buildCommand": "npm ci && npm run build",
   "devCommand": "vite --port $PORT",
   "outputDirectory": "dist/public",
-  "installCommand": "npm ci",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "@vercel/node"
-    }
-  }
+  "installCommand": "npm ci"
 } 
