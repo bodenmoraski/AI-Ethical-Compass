@@ -3,14 +3,14 @@ import { describe, test, expect, beforeEach, afterEach } from '@jest/globals';
 
 // Mock the handler import
 const mockHandler = jest.fn();
-jest.mock('../../api/teacher-classes', () => ({ default: mockHandler }));
+jest.mock('../../api/teacher', () => ({ default: mockHandler }));
 
 describe('Teacher Classes API', () => {
   beforeEach(() => {
     mockHandler.mockClear();
   });
 
-  describe('POST /api/teacher-classes', () => {
+  describe('POST /api/teacher/classes', () => {
     test('should create a new class successfully', async () => {
       const classData = {
         name: 'Ethics in AI',
@@ -121,7 +121,7 @@ describe('Teacher Classes API', () => {
     });
   });
 
-  describe('GET /api/teacher-classes', () => {
+  describe('GET /api/teacher/classes', () => {
     test('should return teacher classes', async () => {
       const mockClasses = [
         {
@@ -190,7 +190,7 @@ describe('Teacher Classes API', () => {
     });
   });
 
-  describe('PUT /api/teacher-classes', () => {
+  describe('PUT /api/teacher/classes', () => {
     test('should update class successfully', async () => {
       const updateData = {
         id: 1,
@@ -225,7 +225,7 @@ describe('Teacher Classes API', () => {
     });
   });
 
-  describe('DELETE /api/teacher-classes', () => {
+  describe('DELETE /api/teacher/classes', () => {
     test('should deactivate class instead of deleting', async () => {
       mockHandler.mockImplementation((req, res) => {
         if (req.method === 'DELETE') {

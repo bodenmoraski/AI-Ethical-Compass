@@ -1,14 +1,14 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 
 const mockHandler = jest.fn();
-jest.mock('../../api/assignments', () => ({ default: mockHandler }));
+jest.mock('../../api/teacher', () => ({ default: mockHandler }));
 
 describe('Assignments API', () => {
   beforeEach(() => {
     mockHandler.mockClear();
   });
 
-  describe('POST /api/assignments', () => {
+  describe('POST /api/teacher/assignments', () => {
     test('should create assignment with scenario selection', async () => {
       const assignmentData = {
         classId: 1,
@@ -140,7 +140,7 @@ describe('Assignments API', () => {
     });
   });
 
-  describe('GET /api/assignments', () => {
+  describe('GET /api/teacher/assignments', () => {
     test('should return assignments for a class', async () => {
       const mockAssignments = [
         {
@@ -232,7 +232,7 @@ describe('Assignments API', () => {
     });
   });
 
-  describe('PUT /api/assignments', () => {
+  describe('PUT /api/teacher/assignments', () => {
     test('should update assignment successfully', async () => {
       const updateData = {
         id: 1,
@@ -306,7 +306,7 @@ describe('Assignments API', () => {
 
       const req = { 
         method: 'POST', 
-        url: '/api/assignments/publish',
+        url: '/api/teacher/assignments/publish',
         body: publishData 
       };
       const res = {
@@ -321,7 +321,7 @@ describe('Assignments API', () => {
     });
   });
 
-  describe('POST /api/assignments/grade', () => {
+  describe('POST /api/teacher/assignments/grade', () => {
     test('should grade assignment submission', async () => {
       const gradeData = {
         submissionId: 1,
@@ -348,7 +348,7 @@ describe('Assignments API', () => {
 
       const req = { 
         method: 'POST', 
-        url: '/api/assignments/grade',
+        url: '/api/teacher/assignments/grade',
         body: gradeData 
       };
       const res = {
@@ -379,7 +379,7 @@ describe('Assignments API', () => {
 
       const req = { 
         method: 'POST', 
-        url: '/api/assignments/grade',
+        url: '/api/teacher/assignments/grade',
         body: invalidGradeData 
       };
       const res = {

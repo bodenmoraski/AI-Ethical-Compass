@@ -62,7 +62,7 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
     setError(null);
 
     try {
-      const response = await fetch('/api/teacher-access', {
+      const response = await fetch('/api/teacher?endpoint=access', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
