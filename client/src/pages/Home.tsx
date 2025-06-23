@@ -152,7 +152,7 @@ const Home = () => {
             
             <p className="mt-6 max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
               The world's most advanced platform for developing critical thinking about AI ethics in education. 
-              Powered by artificial intelligence, driven by community wisdom.
+              Powered by artificial intelligence, driven by community wisdom, with comprehensive teacher tools for classroom management.
             </p>
             
             {/* CTA Buttons */}
@@ -165,6 +165,16 @@ const Home = () => {
                 <span className="material-icons mr-2">rocket_launch</span>
             {t('home.buttons.exploreScenarios')}
           </Button>
+          
+          <Button 
+            size="lg" 
+            onClick={() => navigate("/teacher")}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+                <span className="material-icons mr-2">school</span>
+                Teacher Dashboard
+          </Button>
+          
           <Button 
             size="lg" 
             variant="outline" 
@@ -222,9 +232,9 @@ const Home = () => {
       <div className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Enterprise-Grade AI Ethics Platform</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Complete Educational AI Ethics Platform</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Sophisticated features designed for serious educational impact
+              Advanced student engagement tools with comprehensive teacher dashboard for complete classroom management
             </p>
           </div>
           
@@ -324,24 +334,26 @@ const Home = () => {
               </CardContent>
             </Card>
 
-            {/* Real-time Analytics */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
+            {/* Teacher Dashboard */}
+            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
               <CardContent className="p-8">
-                <div className="bg-gradient-to-br from-violet-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-2xl">analytics</span>
+                <div className="bg-gradient-to-br from-purple-600 to-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="material-icons text-white text-2xl">school</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Real-time Analytics</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Comprehensive Teacher Dashboard</h3>
                 <p className="text-gray-600 mb-4">
-                  Comprehensive user dashboards, progress tracking, and impact metrics provide 
-                  insights for both learners and educators.
+                  Complete classroom management with real-time student analytics, assignment creation, 
+                  gradebook integration, and live discussion monitoring with FERPA compliance.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="text-xs">User Dashboard</Badge>
-                  <Badge variant="secondary" className="text-xs">Progress Tracking</Badge>
-                  <Badge variant="secondary" className="text-xs">Impact Metrics</Badge>
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">Class Management</Badge>
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">Live Monitoring</Badge>
+                  <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">FERPA Compliant</Badge>
                 </div>
               </CardContent>
             </Card>
+
+           
           </div>
         </div>
             </div>
@@ -468,16 +480,24 @@ const Home = () => {
               className="bg-white text-blue-600 hover:bg-gray-50 font-bold px-10 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
             >
               <span className="material-icons mr-2">play_arrow</span>
-              Start Your Journey
+              Start Learning
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/teacher")}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-10 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <span className="material-icons mr-2">school</span>
+              Teacher Portal
             </Button>
             <Button 
               size="lg" 
               variant="outline"
-              onClick={() => navigate("/community")}
+              onClick={() => navigate("/about")}
               className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-bold px-10 py-4 text-lg transition-all duration-300"
             >
-              <span className="material-icons mr-2">people</span>
-              Join Community
+              <span className="material-icons mr-2">info</span>
+              Learn More
         </Button>
           </div>
 

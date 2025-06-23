@@ -14,6 +14,11 @@ import Dashboard from "@/pages/Dashboard";
 import UserScenarios from "@/pages/UserScenarios";
 import Leaderboard from "@/pages/Leaderboard";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TeacherDashboard from "@/pages/TeacherDashboard";
+import ClassDetailView from "@/components/teacher/ClassDetailView";
+import LiveClassroomMonitor from "@/components/teacher/LiveClassroomMonitor";
+import UserTutorial from "@/pages/UserTutorial";
+import TeacherTutorial from "@/pages/TeacherTutorial";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import AccessibilityControls from "@/components/AccessibilityControls";
@@ -93,6 +98,11 @@ function AppContent() {
           <Route path="/user-scenarios" element={<UserScenarios />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/teacher" element={<TeacherDashboard />} />
+          <Route path="/teacher/class/:classId" element={<ClassDetailView classId="1" />} />
+          <Route path="/teacher/classroom/:classId" element={<LiveClassroomMonitor classId={1} userId={1} />} />
+          <Route path="/tutorial/user" element={<UserTutorial />} />
+          <Route path="/tutorial/teacher" element={<TeacherTutorial />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />

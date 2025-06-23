@@ -45,13 +45,12 @@ export default defineConfig(async ({ mode }) => {
     define: {
       global: "globalThis",
       // Define environment variables for browser access
+      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || env.SUPABASE_URL),
+      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY),
+      'import.meta.env.VITE_DATABASE_URL': JSON.stringify(env.DATABASE_URL),
+      // Keep backwards compatibility
       'import.meta.env.VITE_NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(env.NEXT_PUBLIC_SUPABASE_URL),
       'import.meta.env.VITE_NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
-      'import.meta.env.VITE_DATABASE_URL': JSON.stringify(env.DATABASE_URL),
-      // Also define them on globalThis for fallback access
-      'globalThis.NEXT_PUBLIC_SUPABASE_URL': JSON.stringify(env.NEXT_PUBLIC_SUPABASE_URL),
-      'globalThis.NEXT_PUBLIC_SUPABASE_ANON_KEY': JSON.stringify(env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
-      'globalThis.DATABASE_URL': JSON.stringify(env.DATABASE_URL),
     },
     optimizeDeps: {
       include: [],

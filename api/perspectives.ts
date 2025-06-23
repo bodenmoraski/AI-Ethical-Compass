@@ -7,17 +7,217 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('Method:', req.method);
   console.log('Body:', req.body);
   console.log('Query:', req.query);
+  console.log('URL:', req.url);
   
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // Parse URL to determine sub-route
+  const url = req.url || '';
+  const pathParts = url.split('/').filter(part => part && part !== 'api' && part !== 'perspectives');
+  
+  // Handle like functionality: /api/perspectives/[id]/like
+  if (pathParts.length === 2 && pathParts[1] === 'like' && req.method === 'POST') {
+    const perspectiveId = pathParts[0];
+    const { userId, userEmail } = req.body;
+    
+    if (!perspectiveId) {
+      return res.status(400).json({ message: 'Perspective ID is required' });
+    }
+
+    const effectiveUserId = userId || userEmail || 'anonymous_user';
+    
+    try {
+      const supabase = getSupabaseClient();
+      
+      // Check if user already liked this perspective
+      const { data: existingLike, error: likeCheckError } = await supabase
+        .from('user_likes')
+        .select('id')
+        .eq('user_id', effectiveUserId)
+        .eq('perspective_id', perspectiveId)
+        .single();
+      
+      if (existingLike) {
+        return res.status(400).json({
+          message: 'You have already liked this perspective',
+          already_liked: true
+        });
+      }
+      
+      // Add the like to user_likes table
+      const { data: newLike, error: insertError } = await supabase
+        .from('user_likes')
+        .insert({
+          user_id: effectiveUserId,
+          perspective_id: parseInt(perspectiveId)
+        })
+        .select('id')
+        .single();
+      
+      if (insertError) {
+        console.error('Insert like error:', insertError);
+        return res.status(500).json({
+          message: 'Failed to record like',
+          error: insertError.message
+        });
+      }
+      
+      // Get current perspective and increment likes
+      const { data: currentPerspective, error: fetchError } = await supabase
+        .from('perspectives')
+        .select('likes')
+        .eq('id', perspectiveId)
+        .single();
+      
+      if (fetchError) {
+        return res.status(404).json({
+          message: 'Perspective not found',
+          error: fetchError.message
+        });
+      }
+      
+      // Increment the likes count
+      const { data: perspective, error } = await supabase
+        .from('perspectives')
+        .update({ likes: (currentPerspective.likes || 0) + 1 })
+        .eq('id', perspectiveId)
+        .select('id, likes')
+        .single();
+      
+      if (error) {
+        return res.status(500).json({
+          message: 'Failed to like perspective',
+          error: error.message
+        });
+      }
+      
+      return res.status(200).json({
+        id: perspective.id,
+        likes: perspective.likes,
+        user_like_id: newLike.id,
+        message: 'Perspective liked successfully'
+      });
+      
+    } catch (error) {
+      console.error('Like error:', error);
+      return res.status(500).json({
+        message: 'Failed to like perspective',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // Handle replies functionality: /api/perspectives/[id]/replies
+  if (pathParts.length === 2 && pathParts[1] === 'replies') {
+    const perspectiveId = pathParts[0];
+    
+    if (!perspectiveId) {
+      return res.status(400).json({ message: 'Perspective ID is required' });
+    }
+
+    try {
+      const supabase = getSupabaseClient();
+
+      if (req.method === 'GET') {
+        // Fetch replies
+        const { data: replies, error } = await supabase
+          .from('replies')
+          .select('id, content, author_name, likes, created_at, updated_at')
+          .eq('perspective_id', perspectiveId)
+          .order('created_at', { ascending: true });
+        
+        if (error) {
+          return res.status(500).json({
+            message: 'Failed to fetch replies',
+            error: error.message
+          });
+        }
+        
+        const formattedReplies = replies?.map(reply => ({
+          id: reply.id,
+          content: reply.content,
+          authorName: reply.author_name,
+          likes: reply.likes || 0,
+          createdAt: reply.created_at,
+          updatedAt: reply.updated_at
+        })) || [];
+        
+        return res.status(200).json(formattedReplies);
+        
+      } else if (req.method === 'POST') {
+        // Create reply
+        const { content, authorName } = req.body;
+        
+        if (!content || !authorName) {
+          return res.status(400).json({ message: 'content and authorName are required' });
+        }
+        
+        if (content.trim().length < 5) {
+          return res.status(400).json({ message: 'Reply content is too short (minimum 5 characters)' });
+        }
+        
+        if (content.trim().length > 1000) {
+          return res.status(400).json({ message: 'Reply content exceeds maximum length of 1000 characters' });
+        }
+        
+        // Verify perspective exists
+        const { data: perspectiveCheck, error: perspectiveError } = await supabase
+          .from('perspectives')
+          .select('id')
+          .eq('id', perspectiveId)
+          .single();
+        
+        if (perspectiveError || !perspectiveCheck) {
+          return res.status(400).json({ message: `Perspective with ID ${perspectiveId} does not exist` });
+        }
+        
+        // Insert the reply
+        const { data: reply, error: insertError } = await supabase
+          .from('replies')
+          .insert({
+            perspective_id: perspectiveId,
+            author_name: authorName.trim(),
+            content: content.trim(),
+            moderation_status: 'approved'
+          })
+          .select('id, content, author_name, likes, created_at, updated_at')
+          .single();
+        
+        if (insertError) {
+          return res.status(500).json({
+            message: 'Failed to create reply',
+            error: insertError.message
+          });
+        }
+        
+        return res.status(201).json({
+          id: reply.id,
+          content: reply.content,
+          authorName: reply.author_name,
+          likes: reply.likes || 0,
+          createdAt: reply.created_at,
+          updatedAt: reply.updated_at
+        });
+      }
+      
+    } catch (error) {
+      console.error('Replies error:', error);
+      return res.status(500).json({
+        message: 'Failed to handle replies',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  // Default perspectives functionality (GET and POST for perspectives)
   if (req.method === 'GET') {
     try {
       const supabase = getSupabaseClient();
