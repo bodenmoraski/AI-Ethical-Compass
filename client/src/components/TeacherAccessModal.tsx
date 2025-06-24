@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -38,8 +39,9 @@ const INSTITUTION_TYPES = [
 ];
 
 export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessModalProps) {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, refreshUserProfile } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -62,35 +64,54 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
     setError(null);
 
     try {
-      const response = await fetch('/api/teacher?endpoint=access', {
+      const response = await fetch('/api/teacher?action=access', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.email}`,
         },
         body: JSON.stringify({
-          email: user.email,
-          username: userProfile.username,
-          institutionName: formData.institutionName || null,
-          institutionType: formData.institutionType || null,
+          userEmail: user.email,
+          institution_name: formData.institutionName || null,
+          institution_type: formData.institutionType || null,
           department: formData.department || null,
-          requestReason: formData.requestReason,
+          request_reason: formData.requestReason,
         }),
       });
 
-      const result = await response.json();
+      // Log the response for debugging
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON:', parseError);
+        console.error('Raw response:', responseText);
+        throw new Error(`Server returned invalid JSON: ${responseText.substring(0, 100)}...`);
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to submit teacher access request');
+        throw new Error(result.message || result.error || 'Failed to submit teacher access request');
       }
 
       toast({
         title: "Teacher Access Granted! 🎉",
-        description: "Your teacher access has been approved. You can now access the teacher dashboard.",
+        description: "Your teacher access has been approved. Redirecting to teacher dashboard...",
       });
 
-      // Refresh the page to update user permissions
-      window.location.reload();
+      // Close the modal
+      onClose();
+
+      // Refresh user profile to get updated role
+      await refreshUserProfile();
+
+      // Navigate to teacher dashboard
+      navigate('/teacher/dashboard');
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

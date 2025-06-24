@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
@@ -68,6 +68,7 @@ export default function TeacherDashboard() {
   const { user, userProfile } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [dashboardData, setDashboardData] = useState<TeacherDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +76,13 @@ export default function TeacherDashboard() {
   const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [teacherAccessModalOpen, setTeacherAccessModalOpen] = useState(false);
+
+  // Redirect teachers from /teacher to /teacher/dashboard
+  useEffect(() => {
+    if (user && userProfile?.role === 'teacher' && location.pathname === '/teacher') {
+      navigate('/teacher/dashboard', { replace: true });
+    }
+  }, [user, userProfile, location.pathname, navigate]);
 
   useEffect(() => {
     if (user && userProfile?.role === 'teacher') {

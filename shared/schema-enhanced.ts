@@ -433,4 +433,30 @@ export const insertTeacherAccessRequestSchema = createInsertSchema(teacherAccess
 
 export type TeacherAccessRequest = typeof teacherAccessRequests.$inferSelect;
 export type InsertTeacherAccessRequest = z.infer<typeof insertTeacherAccessRequestSchema>;
-export type RoleChangeLog = typeof roleChangeLog.$inferSelect; 
+export type RoleChangeLog = typeof roleChangeLog.$inferSelect;
+
+// Real-time activities table
+export const realtimeActivities = pgTable("realtime_activities", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(),
+  classId: integer("class_id").notNull(),
+  userId: text("user_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  priority: text("priority").default("medium"),
+  data: json("data").$type<Record<string, any>>().default({}),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertRealtimeActivitySchema = createInsertSchema(realtimeActivities).omit({
+  id: true,
+  timestamp: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type RealtimeActivity = typeof realtimeActivities.$inferSelect;
+export type InsertRealtimeActivity = z.infer<typeof insertRealtimeActivitySchema>; 

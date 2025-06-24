@@ -91,7 +91,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   } = useQuery<ClassData>({
     queryKey: ['class', classId],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?endpoint=classes&classId=${classId}`);
+              const response = await fetch(`/api/teacher?action=classes&classId=${classId}`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('Class not found');
@@ -110,7 +110,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   } = useQuery<{ data: Student[]; total: number }>({
     queryKey: ['class-students', classId],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?endpoint=classes&classId=${classId}&include=students`);
+              const response = await fetch(`/api/teacher?action=students&classId=${classId}`);
       if (!response.ok) throw new Error('Failed to fetch students');
       return response.json();
     },
@@ -124,7 +124,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   } = useQuery<{ data: Assignment[]; total: number }>({
     queryKey: ['class-assignments', classId],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?endpoint=assignments&classId=${classId}`);
+              const response = await fetch(`/api/teacher?action=assignments&classId=${classId}`);
       if (!response.ok) throw new Error('Failed to fetch assignments');
       return response.json();
     },

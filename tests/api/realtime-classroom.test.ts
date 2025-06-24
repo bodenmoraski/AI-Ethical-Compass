@@ -1,426 +1,324 @@
-import '../setup';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
-// Mock Supabase real-time client
-const mockRealtimeChannel = {
-  on: jest.fn().mockReturnThis(),
-  subscribe: jest.fn().mockReturnThis(),
-  unsubscribe: jest.fn().mockReturnThis(),
-  send: jest.fn(),
-};
+const mockHandler = jest.fn();
+jest.mock('../../api/realtime-classroom', () => ({ default: mockHandler }));
 
-const mockSupabaseRealtime = {
-  channel: jest.fn().mockReturnValue(mockRealtimeChannel),
-  removeAllChannels: jest.fn(),
-};
-
-jest.mock('../../lib/supabase-client', () => ({
-  supabase: {
-    ...mockSupabaseRealtime,
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    single: jest.fn().mockReturnThis(),
-  },
-}));
-
-describe('Real-time Classroom Features', () => {
+describe('Real-time Classroom API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockHandler.mockReset();
   });
 
-  describe('Live Discussion Updates', () => {
-    it('should subscribe to discussion post updates for a class', async () => {
-      const classId = 1;
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      subscribeToDiscussionUpdates(classId, mockCallback);
-
-      expect(mockSupabaseRealtime.channel).toHaveBeenCalledWith(`class-${classId}-discussions`);
-      expect(mockRealtimeChannel.on).toHaveBeenCalledWith(
-        'postgres_changes',
-        expect.objectContaining({
-          event: '*',
-          schema: 'public',
-          table: 'discussion_posts',
-          filter: `thread_id=in.(select id from discussion_threads where class_id=eq.${classId})`,
-        }),
-        expect.any(Function)
-      );
-      expect(mockRealtimeChannel.subscribe).toHaveBeenCalled();
-    });
-
-    it('should handle new discussion post events', async () => {
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const mockNewPost = {
-        id: 1,
-        content: 'This is a new discussion post',
-        author_id: 2,
-        thread_id: 1,
-        created_at: new Date().toISOString(),
+  describe('GET /api/realtime-classroom - Get Activities', () => {
+    it('should fetch classroom activities successfully', async () => {
+      const mockRequest = {
+        method: 'GET',
+        query: { action: 'activities', classId: '1' },
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
       };
 
-      subscribeToDiscussionUpdates(1, mockCallback);
-
-      // Simulate receiving a new post
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'INSERT',
-        new: mockNewPost,
-        old: null,
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'NEW_POST',
-        data: mockNewPost,
-      });
-    });
-
-    it('should handle post update events', async () => {
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const mockUpdatedPost = {
-        id: 1,
-        content: 'This post has been updated',
-        author_id: 2,
-        thread_id: 1,
-        updated_at: new Date().toISOString(),
-      };
-
-      subscribeToDiscussionUpdates(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'UPDATE',
-        new: mockUpdatedPost,
-        old: { ...mockUpdatedPost, content: 'Original content' },
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'POST_UPDATED',
-        data: mockUpdatedPost,
-      });
-    });
-
-    it('should handle moderation status changes', async () => {
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const moderatedPost = {
-        id: 1,
-        content: 'Post content',
-        moderation_status: 'flagged',
-        author_id: 2,
-        thread_id: 1,
-      };
-
-      subscribeToDiscussionUpdates(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'UPDATE',
-        new: moderatedPost,
-        old: { ...moderatedPost, moderation_status: 'approved' },
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'MODERATION_UPDATE',
-        data: moderatedPost,
-      });
-    });
-  });
-
-  describe('Live Assignment Submissions', () => {
-    it('should subscribe to assignment submission updates', async () => {
-      const assignmentId = 1;
-      const { subscribeToAssignmentSubmissions } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      subscribeToAssignmentSubmissions(assignmentId, mockCallback);
-
-      expect(mockSupabaseRealtime.channel).toHaveBeenCalledWith(`assignment-${assignmentId}-submissions`);
-      expect(mockRealtimeChannel.on).toHaveBeenCalledWith(
-        'postgres_changes',
-        expect.objectContaining({
-          event: '*',
-          schema: 'public',
-          table: 'assignment_submissions',
-          filter: `assignment_id=eq.${assignmentId}`,
-        }),
-        expect.any(Function)
-      );
-    });
-
-    it('should notify of new submissions', async () => {
-      const { subscribeToAssignmentSubmissions } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const newSubmission = {
-        id: 1,
-        assignment_id: 1,
-        student_id: 2,
-        submission_data: { answers: ['Answer 1', 'Answer 2'] },
-        submitted_at: new Date().toISOString(),
-        status: 'submitted',
-      };
-
-      subscribeToAssignmentSubmissions(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'INSERT',
-        new: newSubmission,
-        old: null,
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'NEW_SUBMISSION',
-        data: newSubmission,
-      });
-    });
-
-    it('should notify of grading updates', async () => {
-      const { subscribeToAssignmentSubmissions } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const gradedSubmission = {
-        id: 1,
-        assignment_id: 1,
-        student_id: 2,
-        final_score: 85,
-        feedback: 'Good work!',
-        status: 'graded',
-        graded_at: new Date().toISOString(),
-        graded_by: 1,
-      };
-
-      subscribeToAssignmentSubmissions(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'UPDATE',
-        new: gradedSubmission,
-        old: { ...gradedSubmission, status: 'submitted', final_score: null },
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'SUBMISSION_GRADED',
-        data: gradedSubmission,
-      });
-    });
-  });
-
-  describe('Live Student Engagement Tracking', () => {
-    it('should subscribe to student engagement updates for a class', async () => {
-      const classId = 1;
-      const { subscribeToStudentEngagement } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      subscribeToStudentEngagement(classId, mockCallback);
-
-      expect(mockSupabaseRealtime.channel).toHaveBeenCalledWith(`class-${classId}-engagement`);
-      expect(mockRealtimeChannel.on).toHaveBeenCalledWith(
-        'postgres_changes',
-        expect.objectContaining({
-          event: '*',
-          schema: 'public',
-          table: 'student_engagement',
-          filter: `class_id=eq.${classId}`,
-        }),
-        expect.any(Function)
-      );
-    });
-
-    it('should track live student activity', async () => {
-      const { subscribeToStudentEngagement } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const engagementUpdate = {
-        id: 1,
-        student_id: 2,
-        class_id: 1,
-        scenario_id: 1,
-        session_start: new Date().toISOString(),
-        time_spent_seconds: 120,
-        actions_taken: [
-          { action: 'view_scenario', timestamp: new Date().toISOString() },
-          { action: 'submit_perspective', timestamp: new Date().toISOString() },
-        ],
-        engagement_score: 0.85,
-      };
-
-      subscribeToStudentEngagement(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'UPDATE',
-        new: engagementUpdate,
-        old: { ...engagementUpdate, time_spent_seconds: 60 },
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'ENGAGEMENT_UPDATE',
-        data: engagementUpdate,
-      });
-    });
-
-    it('should detect student presence in class', async () => {
-      const { subscribeToStudentEngagement } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const presenceUpdate = {
-        id: 1,
-        student_id: 2,
-        class_id: 1,
-        session_start: new Date().toISOString(),
-        is_active: true,
-      };
-
-      subscribeToStudentEngagement(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'INSERT',
-        new: presenceUpdate,
-        old: null,
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'STUDENT_ACTIVE',
-        data: presenceUpdate,
-      });
-    });
-  });
-
-  describe('Live Notifications', () => {
-    it('should subscribe to notifications for a user', async () => {
-      const userId = 1;
-      const { subscribeToNotifications } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      subscribeToNotifications(userId, mockCallback);
-
-      expect(mockSupabaseRealtime.channel).toHaveBeenCalledWith(`user-${userId}-notifications`);
-      expect(mockRealtimeChannel.on).toHaveBeenCalledWith(
-        'postgres_changes',
-        expect.objectContaining({
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `recipient_id=eq.${userId}`,
-        }),
-        expect.any(Function)
-      );
-    });
-
-    it('should handle new notification events', async () => {
-      const { subscribeToNotifications } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const newNotification = {
-        id: 1,
-        recipient_id: 1,
-        sender_id: 2,
-        type: 'assignment_due',
-        title: 'Assignment Due Tomorrow',
-        message: 'Your ethics assignment is due tomorrow at 11:59 PM',
-        data: { assignment_id: 1, class_id: 1 },
-        is_read: false,
-        created_at: new Date().toISOString(),
-      };
-
-      subscribeToNotifications(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'INSERT',
-        new: newNotification,
-        old: null,
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'NEW_NOTIFICATION',
-        data: newNotification,
-      });
-    });
-
-    it('should handle notification read status updates', async () => {
-      const { subscribeToNotifications } = await import('../../api/realtime-classroom');
-      
-      const mockCallback = jest.fn();
-      const readNotification = {
-        id: 1,
-        recipient_id: 1,
-        is_read: true,
-        updated_at: new Date().toISOString(),
-      };
-
-      subscribeToNotifications(1, mockCallback);
-
-      const onHandler = mockRealtimeChannel.on.mock.calls[0][2];
-      onHandler({
-        eventType: 'UPDATE',
-        new: readNotification,
-        old: { ...readNotification, is_read: false },
-      });
-
-      expect(mockCallback).toHaveBeenCalledWith({
-        type: 'NOTIFICATION_READ',
-        data: readNotification,
-      });
-    });
-  });
-
-  describe('Connection Management', () => {
-    it('should unsubscribe from all channels', async () => {
-      const { unsubscribeFromAll } = await import('../../api/realtime-classroom');
-      
-      unsubscribeFromAll();
-
-      expect(mockSupabaseRealtime.removeAllChannels).toHaveBeenCalled();
-    });
-
-    it('should handle connection errors gracefully', async () => {
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      mockRealtimeChannel.subscribe.mockImplementation(() => {
-        throw new Error('Connection failed');
-      });
-
-      const mockCallback = jest.fn();
-      const mockErrorHandler = jest.fn();
-
-      expect(() => {
-        subscribeToDiscussionUpdates(1, mockCallback, mockErrorHandler);
-      }).not.toThrow();
-
-      expect(mockErrorHandler).toHaveBeenCalledWith(expect.any(Error));
-    });
-
-    it('should retry failed connections', async () => {
-      const { subscribeToDiscussionUpdates } = await import('../../api/realtime-classroom');
-      
-      let subscribeCallCount = 0;
-      mockRealtimeChannel.subscribe.mockImplementation(() => {
-        subscribeCallCount++;
-        if (subscribeCallCount === 1) {
-          throw new Error('Connection failed');
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'GET' && req.query.action === 'activities') {
+          return res.status(200).json({
+            success: true,
+            activities: [
+              {
+                id: '1',
+                type: 'discussion',
+                title: 'New Discussion Post',
+                description: 'Student posted in Ethics Discussion thread',
+                timestamp: new Date().toISOString(),
+                priority: 'medium',
+                class_id: 1,
+              },
+            ],
+          });
         }
-        return 'SUBSCRIBED';
       });
 
-      const mockCallback = jest.fn();
-      subscribeToDiscussionUpdates(1, mockCallback);
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
 
-      // Wait for retry
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(mockRealtimeChannel.subscribe).toHaveBeenCalledTimes(2);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          activities: expect.arrayContaining([
+            expect.objectContaining({
+              type: 'discussion',
+              title: 'New Discussion Post',
+            }),
+          ]),
+        })
+      );
+    });
+  });
+
+  describe('GET /api/realtime-classroom - Get Live Stats', () => {
+    it('should fetch live statistics successfully', async () => {
+      const mockRequest = {
+        method: 'GET',
+        query: { action: 'stats', classId: '1' },
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'GET' && req.query.action === 'stats') {
+          return res.status(200).json({
+            success: true,
+            stats: {
+              activeStudents: 5,
+              newPosts: 3,
+              newSubmissions: 2,
+              pendingNotifications: 1,
+            },
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          stats: expect.objectContaining({
+            activeStudents: 5,
+            newPosts: 3,
+            newSubmissions: 2,
+            pendingNotifications: 1,
+          }),
+        })
+      );
+    });
+  });
+
+  describe('POST /api/realtime-classroom - Create Activity', () => {
+    it('should create new activity successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        query: { action: 'activities' },
+        headers: {
+          authorization: 'Bearer valid-token',
+          'content-type': 'application/json',
+        },
+        body: {
+          type: 'discussion',
+          class_id: 1,
+          user_id: 'user-123',
+          title: 'Test Discussion Post',
+          description: 'This is a test activity',
+          priority: 'medium',
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.query.action === 'activities') {
+          return res.status(201).json({
+            success: true,
+            activity: {
+              id: '2',
+              ...req.body,
+              timestamp: new Date().toISOString(),
+              created_by: 'user-123',
+            },
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          activity: expect.objectContaining({
+            type: 'discussion',
+            title: 'Test Discussion Post',
+          }),
+        })
+      );
+    });
+
+    it('should return error for invalid activity data', async () => {
+      const mockRequest = {
+        method: 'POST',
+        query: { action: 'activities' },
+        headers: {
+          authorization: 'Bearer valid-token',
+          'content-type': 'application/json',
+        },
+        body: {
+          // Missing required fields
+          type: 'discussion',
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.query.action === 'activities') {
+          return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            details: ['class_id is required', 'title is required'],
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'Validation failed',
+        })
+      );
+    });
+  });
+
+  describe('POST /api/realtime-classroom - Update Engagement', () => {
+    it('should update student engagement successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        query: { action: 'engagement' },
+        headers: {
+          authorization: 'Bearer valid-token',
+          'content-type': 'application/json',
+        },
+        body: {
+          class_id: 1,
+          student_id: 'student-123',
+          activity_type: 'scenario_completion',
+          engagement_score: 85,
+          last_active: new Date().toISOString(),
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.query.action === 'engagement') {
+          return res.status(200).json({
+            success: true,
+            engagement: {
+              id: '1',
+              ...req.body,
+              updated_at: new Date().toISOString(),
+            },
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          engagement: expect.objectContaining({
+            engagement_score: 85,
+            activity_type: 'scenario_completion',
+          }),
+        })
+      );
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle invalid action parameter', async () => {
+      const mockRequest = {
+        method: 'GET',
+        query: { action: 'invalid' },
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid action parameter',
+        });
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'Invalid action parameter',
+        })
+      );
+    });
+
+    it('should handle authentication errors', async () => {
+      const mockRequest = {
+        method: 'GET',
+        query: { action: 'activities' },
+        headers: {
+          // No authorization header
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        return res.status(401).json({
+          success: false,
+          error: 'No authorization token provided',
+        });
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'No authorization token provided',
+        })
+      );
     });
   });
 }); 

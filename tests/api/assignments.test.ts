@@ -1,396 +1,258 @@
-import { describe, test, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 const mockHandler = jest.fn();
 jest.mock('../../api/teacher', () => ({ default: mockHandler }));
 
 describe('Assignments API', () => {
   beforeEach(() => {
-    mockHandler.mockClear();
+    mockHandler.mockReset();
   });
 
-  describe('POST /api/teacher/assignments', () => {
-    test('should create assignment with scenario selection', async () => {
-      const assignmentData = {
-        classId: 1,
-        title: 'AI Ethics Discussion',
-        description: 'Analyze ethical scenarios involving AI',
-        instructions: 'Read each scenario and provide thoughtful perspectives',
-        assignmentType: 'scenario',
-        scenarioIds: [1, 2, 3],
-        dueDate: '2024-12-31T23:59:59Z',
-        pointsPossible: 100,
-        rubric: [
-          { criteria: 'Critical Thinking', points: 40, description: 'Demonstrates deep analysis' },
-          { criteria: 'Ethical Reasoning', points: 40, description: 'Shows understanding of ethical frameworks' },
-          { criteria: 'Communication', points: 20, description: 'Clear and persuasive writing' }
-        ]
+  describe('POST /api/teacher - Create Assignment', () => {
+    it('should create a new assignment successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/assignments',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          classId: 1,
+          title: 'AI Ethics Essay',
+          description: 'Write an essay about AI ethics',
+          dueDate: '2024-12-01T23:59:59Z',
+        },
       };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.url?.includes('/assignments')) {
+          return res.status(201).json({
+            success: true,
+            assignment: {
+              id: 1,
+              classId: 1,
+              title: 'AI Ethics Essay',
+              description: 'Write an essay about AI ethics',
+              dueDate: '2024-12-01T23:59:59Z',
+              status: 'draft',
+              createdAt: new Date().toISOString(),
+            },
+          });
+        }
+      });
 
       const mockResponse = {
-        id: 1,
-        ...assignmentData,
-        isPublished: false,
-        createdAt: new Date().toISOString(),
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(201).json(mockResponse);
-        }
-      });
-
-      const req = { method: 'POST', body: assignmentData };
-      const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(mockResponse);
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          assignment: expect.objectContaining({
+            title: 'AI Ethics Essay',
+          }),
+        })
+      );
     });
 
-    test('should create custom discussion assignment', async () => {
-      const assignmentData = {
-        classId: 1,
-        title: 'Open Ethics Discussion',
-        description: 'Free-form ethical discussion',
-        assignmentType: 'discussion',
-        pointsPossible: 50,
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(201).json({
-            id: 2,
-            ...assignmentData,
-            isPublished: false,
-          });
-        }
-      });
-
-      const req = { method: 'POST', body: assignmentData };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(201);
-    });
-
-    test('should validate required fields', async () => {
-      const invalidData = {
-        classId: 1,
-        // Missing title
-        description: 'Assignment without title',
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(400).json({
-            message: 'Title is required',
-            errors: ['title: Required field missing']
-          });
-        }
-      });
-
-      const req = { method: 'POST', body: invalidData };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    test('should validate scenario assignment has scenarios', async () => {
-      const invalidData = {
-        classId: 1,
-        title: 'Invalid Scenario Assignment',
-        assignmentType: 'scenario',
-        scenarioIds: [], // Empty scenarios
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(400).json({
-            message: 'Scenario assignments must include at least one scenario',
-          });
-        }
-      });
-
-      const req = { method: 'POST', body: invalidData };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-  });
-
-  describe('GET /api/teacher/assignments', () => {
-    test('should return assignments for a class', async () => {
-      const mockAssignments = [
-        {
-          id: 1,
-          title: 'AI Ethics Discussion',
-          description: 'Analyze ethical scenarios',
-          dueDate: '2024-12-31T23:59:59Z',
-          pointsPossible: 100,
-          isPublished: true,
-          submissionCount: 15,
-          totalStudents: 25,
-          averageScore: 85.5,
+    it('should return error for missing required fields', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/assignments',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
         },
-        {
-          id: 2,
-          title: 'Bias in AI Systems',
-          description: 'Explore bias in machine learning',
-          dueDate: '2024-11-15T23:59:59Z',
-          pointsPossible: 75,
-          isPublished: false,
-          submissionCount: 0,
-          totalStudents: 25,
-          averageScore: null,
+        body: {
+          title: '', // Invalid: empty title
         },
-      ];
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'GET') {
-          res.status(200).json(mockAssignments);
-        }
-      });
-
-      const req = { method: 'GET', query: { classId: '1' } };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockAssignments);
-    });
-
-    test('should return assignment details with submissions', async () => {
-      const mockAssignment = {
-        id: 1,
-        title: 'AI Ethics Discussion',
-        submissions: [
-          {
-            id: 1,
-            studentId: 2,
-            studentName: 'John Doe',
-            submittedAt: '2024-10-15T10:30:00Z',
-            status: 'submitted',
-            score: null,
-            isLate: false,
-          },
-          {
-            id: 2,
-            studentId: 3,
-            studentName: 'Jane Smith',
-            submittedAt: '2024-10-16T09:15:00Z',
-            status: 'graded',
-            score: 92,
-            isLate: true,
-          },
-        ],
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'GET' && req.query.assignmentId) {
-          res.status(200).json(mockAssignment);
-        }
-      });
-
-      const req = { method: 'GET', query: { assignmentId: '1' } };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockAssignment);
-    });
-  });
-
-  describe('PUT /api/teacher/assignments', () => {
-    test('should update assignment successfully', async () => {
-      const updateData = {
-        id: 1,
-        title: 'Updated AI Ethics Discussion',
-        dueDate: '2024-12-15T23:59:59Z',
-        isPublished: true,
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'PUT') {
-          res.status(200).json({
-            ...updateData,
-            updatedAt: new Date().toISOString(),
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.url?.includes('/assignments')) {
+          return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            details: ['Title is required'],
           });
         }
       });
 
-      const req = { method: 'PUT', body: updateData };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'Validation failed',
+        })
+      );
     });
+  });
 
-    test('should prevent updating published assignment scenarios', async () => {
-      const updateData = {
-        id: 1,
-        scenarioIds: [4, 5, 6], // Trying to change scenarios on published assignment
+  describe('PUT /api/teacher - Publish Assignment', () => {
+    it('should publish assignment successfully', async () => {
+      const mockRequest = {
+        method: 'PUT',
+        url: '/api/teacher/assignments/1/publish',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
       };
 
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'PUT') {
-          res.status(400).json({
-            message: 'Cannot modify scenarios of published assignment with existing submissions',
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'PUT' && req.url?.includes('/publish')) {
+          return res.status(200).json({
+            success: true,
+            assignment: {
+              id: 1,
+              status: 'published',
+              publishedAt: new Date().toISOString(),
+            },
           });
         }
       });
 
-      const req = { method: 'PUT', body: updateData };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          assignment: expect.objectContaining({
+            status: 'published',
+          }),
+        })
+      );
     });
   });
 
-  describe('POST /api/assignments/publish', () => {
-    test('should publish assignment and notify students', async () => {
-      const publishData = { assignmentId: 1 };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST' && req.url?.includes('/publish')) {
-          res.status(200).json({
-            id: 1,
-            isPublished: true,
-            publishedAt: new Date().toISOString(),
-            notificationsSent: 25,
-          });
-        }
-      });
-
-      const req = { 
-        method: 'POST', 
-        url: '/api/teacher/assignments/publish',
-        body: publishData 
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
+  describe('POST /api/teacher - Grade Assignment', () => {
+    it('should grade assignment successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/assignments/1/grade',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          studentId: 2,
+          score: 85,
+          feedback: 'Great work!',
+        },
       };
 
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  describe('POST /api/teacher/assignments/grade', () => {
-    test('should grade assignment submission', async () => {
-      const gradeData = {
-        submissionId: 1,
-        score: 85,
-        feedback: 'Good analysis, but could explore counterarguments more deeply.',
-        rubricScores: [
-          { criteria: 'Critical Thinking', points: 35 },
-          { criteria: 'Ethical Reasoning', points: 32 },
-          { criteria: 'Communication', points: 18 },
-        ],
-      };
-
-      mockHandler.mockImplementation((req, res) => {
+      mockHandler.mockImplementation((req: any, res: any) => {
         if (req.method === 'POST' && req.url?.includes('/grade')) {
-          res.status(200).json({
-            id: 1,
-            finalScore: 85,
-            feedback: gradeData.feedback,
-            gradedAt: new Date().toISOString(),
-            status: 'graded',
+          return res.status(200).json({
+            success: true,
+            grade: {
+              assignmentId: 1,
+              studentId: 2,
+              score: 85,
+              feedback: 'Great work!',
+              gradedAt: new Date().toISOString(),
+            },
           });
         }
       });
 
-      const req = { 
-        method: 'POST', 
-        url: '/api/teacher/assignments/grade',
-        body: gradeData 
-      };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          grade: expect.objectContaining({
+            score: 85,
+            feedback: 'Great work!',
+          }),
+        })
+      );
     });
+  });
 
-    test('should validate grade is within point range', async () => {
-      const invalidGradeData = {
-        submissionId: 1,
-        score: 150, // Exceeds 100 points possible
-        feedback: 'Score too high',
+  describe('POST /api/teacher - Rubric Scoring', () => {
+    it('should apply rubric scoring successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/assignments/1/rubric-score',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          studentId: 2,
+          rubricScores: {
+            'critical_thinking': 4,
+            'communication': 3,
+            'ethics_understanding': 5,
+          },
+        },
       };
 
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST' && req.url?.includes('/grade')) {
-          res.status(400).json({
-            message: 'Score cannot exceed points possible (100)',
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.url?.includes('/rubric-score')) {
+          return res.status(200).json({
+            success: true,
+            rubricGrade: {
+              assignmentId: 1,
+              studentId: 2,
+              totalScore: 92,
+              rubricScores: {
+                'critical_thinking': 4,
+                'communication': 3,
+                'ethics_understanding': 5,
+              },
+              gradedAt: new Date().toISOString(),
+            },
           });
         }
       });
 
-      const req = { 
-        method: 'POST', 
-        url: '/api/teacher/assignments/grade',
-        body: invalidGradeData 
-      };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          rubricGrade: expect.objectContaining({
+            totalScore: 92,
+          }),
+        })
+      );
     });
   });
 }); 

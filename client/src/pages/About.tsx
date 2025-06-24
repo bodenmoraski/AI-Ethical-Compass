@@ -40,8 +40,8 @@ export default function About() {
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
               >
                 <span className="material-icons mr-2">explore</span>
-                {t('about.buttons.startExploring')}
-              </Button>
+                  {t('about.buttons.startExploring')}
+                </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
@@ -50,7 +50,7 @@ export default function About() {
               >
                 <span className="material-icons mr-2">help</span>
                 How to Use
-              </Button>
+                </Button>
             </div>
           </div>
         </div>
@@ -100,11 +100,11 @@ export default function About() {
                     <div className="flex items-center mb-3">
                       <span className="material-icons text-purple-600 mr-3">groups</span>
                       <h4 className="font-semibold text-gray-900">Global Community</h4>
-                    </div>
+            </div>
                     <p className="text-gray-600">Connect with learners and educators worldwide</p>
-                  </div>
-                </div>
-              </div>
+            </div>
+            </div>
+          </div>
             </CardContent>
           </Card>
         </div>
@@ -119,7 +119,7 @@ export default function About() {
               Addressing critical themes in AI ethics education
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
               <CardContent className="p-8">
@@ -144,9 +144,9 @@ export default function About() {
                 </p>
               </CardContent>
             </Card>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
       {/* SDG Goals Section */}
       <div className="py-20 bg-white">
@@ -156,7 +156,7 @@ export default function About() {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               {t('about.sdg.intro')}
             </p>
-          </div>
+                  </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* SDG 4 */}
@@ -288,11 +288,11 @@ export default function About() {
                 </Button>
               </CardContent>
             </Card>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Get Involved CTA */}
+          {/* Get Involved CTA */}
       <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="border-0 shadow-2xl bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -302,8 +302,8 @@ export default function About() {
               </div>
               <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('about.getInvolved.title')}</h2>
               <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                {t('about.getInvolved.content')}
-              </p>
+              {t('about.getInvolved.content')}
+            </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button 
                   size="lg" 
@@ -322,7 +322,7 @@ export default function About() {
                   <span className="material-icons mr-2">menu_book</span>
                   {t('about.buttons.browseResources')}
                 </Button>
-              </div>
+            </div>
             </CardContent>
           </Card>
         </div>

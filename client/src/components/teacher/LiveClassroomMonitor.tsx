@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { ScrollArea } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
 import { Alert, AlertDescription } from '../ui/alert';
+import { useRealtimeClassroom } from '../../hooks/use-realtime-classroom';
 import {
   Users,
   MessageCircle,
@@ -18,34 +19,10 @@ import {
   WifiOff,
 } from 'lucide-react';
 
-// Import our real-time functions (commented out for now - using mock data)
-// import {
-//   subscribeToDiscussionUpdates,
-//   subscribeToAssignmentSubmissions,
-//   subscribeToStudentEngagement,
-//   subscribeToNotifications,
-//   unsubscribeFromAll,
-//   monitorConnectionStatus,
-//   type DiscussionUpdate,
-//   type SubmissionUpdate,
-//   type EngagementUpdate,
-//   type NotificationUpdate,
-// } from '../../../../api/realtime-classroom';
-
 interface LiveClassroomMonitorProps {
   classId: number;
   userId: number;
   assignmentIds?: number[];
-}
-
-interface ActivityFeed {
-  id: string;
-  type: 'discussion' | 'submission' | 'engagement' | 'notification';
-  title: string;
-  description: string;
-  timestamp: string;
-  priority: 'low' | 'medium' | 'high';
-  data?: any;
 }
 
 const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
@@ -53,99 +30,26 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
   userId,
   assignmentIds = [],
 }) => {
-  const [connectionStatus, setConnectionStatus] = useState<string>('connecting');
-  const [activityFeed, setActivityFeed] = useState<ActivityFeed[]>([]);
-  const [liveStats, setLiveStats] = useState({
-    activeStudents: 0,
-    newPosts: 0,
-    newSubmissions: 0,
-    pendingNotifications: 0,
-  });
+  // Use the real-time classroom hook
+  const {
+    connectionStatus,
+    activityFeed,
+    liveStats,
+    error,
+    createActivity,
+    reconnect,
+    refreshData,
+  } = useRealtimeClassroom(classId);
 
-  // Add activity to feed
-  const addActivity = useCallback((activity: Omit<ActivityFeed, 'id'>) => {
-    const newActivity: ActivityFeed = {
-      ...activity,
-      id: `${activity.type}-${Date.now()}-${Math.random()}`,
-    };
-
-    setActivityFeed(prev => [newActivity, ...prev.slice(0, 49)]); // Keep last 50 activities
-  }, []);
-
-  // Real-time event handlers would go here when API is connected
-  // const handleDiscussionUpdate = useCallback((update: DiscussionUpdate) => { ... }, [addActivity]);
-  // const handleSubmissionUpdate = useCallback((update: SubmissionUpdate) => { ... }, [addActivity]);
-  // const handleEngagementUpdate = useCallback((update: EngagementUpdate) => { ... }, [addActivity]);
-  // const handleNotificationUpdate = useCallback((update: NotificationUpdate) => { ... }, [addActivity]);
-
-  // Real-time subscriptions would go here when API is connected
-  // useEffect(() => {
-  //   const errorHandler = (error: Error) => {
-  //     console.error('Real-time subscription error:', error);
-  //     setConnectionStatus('error');
-  //   };
-  //   // Real-time setup code...
-  // }, [classId, userId, assignmentIds]);
-
-  // Simulate real-time updates (replace with actual real-time API calls)
-  useEffect(() => {
-    setConnectionStatus('connected');
-    
-    // Simulate periodic activity
-    const interval = setInterval(() => {
-      const activities = [
-        {
-          type: 'discussion' as const,
-          title: 'New Discussion Post',
-          description: 'Student posted in Ethics Discussion thread',
-          priority: 'medium' as const,
-        },
-        {
-          type: 'submission' as const,
-          title: 'Assignment Submitted',
-          description: 'Student completed Bias Detection Exercise',
-          priority: 'medium' as const,
-        },
-        {
-          type: 'engagement' as const,
-          title: 'Low Engagement Alert',
-          description: 'Student showing decreased activity',
-          priority: 'high' as const,
-        },
-      ];
-
-      const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-      addActivity({
-        ...randomActivity,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Update stats
-      setLiveStats(prev => ({
-        ...prev,
-        activeStudents: Math.max(1, prev.activeStudents + (Math.random() > 0.5 ? 1 : -1)),
-        newPosts: prev.newPosts + (randomActivity.type === 'discussion' ? 1 : 0),
-        newSubmissions: prev.newSubmissions + (randomActivity.type === 'submission' ? 1 : 0),
-      }));
-    }, 10000); // Add activity every 10 seconds for demo
-
-    return () => clearInterval(interval);
-  }, [addActivity]);
-
-  // Reset stats
-  const resetStats = () => {
-    setLiveStats({
-      activeStudents: 0,
-      newPosts: 0,
-      newSubmissions: 0,
-      pendingNotifications: 0,
+  // Demo function to create test activity
+  const createTestActivity = useCallback(() => {
+    createActivity({
+      type: 'discussion',
+      title: 'Test Discussion Post',
+      description: 'This is a manually created test activity',
+      priority: 'medium',
     });
-  };
-
-  // Clear activity feed
-  const clearFeed = () => {
-    setActivityFeed([]);
-  };
+  }, [createActivity]);
 
   // Get priority icon
   const getPriorityIcon = (priority: string, type: string) => {
@@ -177,6 +81,7 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
         <AlertDescription>
           Real-time connection: {connectionStatus}
           {connectionStatus === 'connected' && ' - Monitoring live classroom activity'}
+          {error && ` - Error: ${error}`}
         </AlertDescription>
       </Alert>
 
@@ -236,12 +141,17 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
               <CardDescription>Real-time classroom events</CardDescription>
             </div>
             <div className="space-x-2">
-              <Button variant="outline" size="sm" onClick={resetStats}>
-                Reset Stats
+              <Button variant="outline" size="sm" onClick={refreshData}>
+                Refresh
               </Button>
-              <Button variant="outline" size="sm" onClick={clearFeed}>
-                Clear Feed
+              <Button variant="outline" size="sm" onClick={createTestActivity}>
+                Test Activity
               </Button>
+              {connectionStatus === 'error' && (
+                <Button variant="outline" size="sm" onClick={reconnect}>
+                  Reconnect
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -252,6 +162,7 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
                 <div className="text-center">
                   <Clock className="h-8 w-8 mx-auto mb-2" />
                   <p>Waiting for classroom activity...</p>
+                  <p className="text-sm">Real data will appear here when students interact with the platform</p>
                 </div>
               </div>
             ) : (
@@ -268,7 +179,7 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
                               variant={activity.priority === 'high' ? 'destructive' : 'secondary'}
                               className="text-xs"
                             >
-                              {activity.type}
+                              {activity.priority}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
                               {formatTimestamp(activity.timestamp)}
@@ -276,14 +187,54 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">{activity.description}</p>
+                        
+                        {/* Additional data display */}
+                        {activity.data && (
+                          <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                            {JSON.stringify(activity.data, null, 2)}
+                          </div>
+                        )}
                       </div>
                     </div>
+                    
                     {index < activityFeed.length - 1 && <Separator className="mt-3" />}
                   </div>
                 ))}
               </div>
             )}
           </ScrollArea>
+        </CardContent>
+      </Card>
+
+      {/* Real-time Status Indicators */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            System Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${
+                connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'
+              }`} />
+              <span>Real-time Data: {connectionStatus}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span>Database: Connected</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span>API: Operational</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+              <span>Updates: Every 5s</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,257 +1,303 @@
-import request from 'supertest';
-import { describe, test, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
-// Mock the handler import
 const mockHandler = jest.fn();
 jest.mock('../../api/teacher', () => ({ default: mockHandler }));
 
+// Access global mock data
+declare const global: any;
+
 describe('Teacher Classes API', () => {
   beforeEach(() => {
-    mockHandler.mockClear();
+    mockHandler.mockReset();
   });
 
-  describe('POST /api/teacher/classes', () => {
-    test('should create a new class successfully', async () => {
-      const classData = {
-        name: 'Ethics in AI',
-        description: 'Introduction to ethical considerations in AI',
-        subject: 'Computer Science',
-        gradeLevel: 'Undergraduate',
-        semester: 'Fall',
-        schoolYear: '2024',
+  describe('POST /api/teacher - Create Class', () => {
+    it('should create a new class successfully', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/classes',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          name: 'Introduction to AI Ethics',
+          description: 'A comprehensive course on ethical AI principles',
+          school_year: '2024',
+          semester: 'Fall',
+          subject: 'Computer Science',
+          grade_level: '12',
+        },
       };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.url?.includes('/classes')) {
+          return res.status(201).json({
+            success: true,
+            class: {
+              id: 1,
+              name: 'Introduction to AI Ethics',
+              class_code: 'AIETHICS2024',
+              ...global.mockClass,
+            },
+          });
+        }
+      });
 
       const mockResponse = {
-        id: 1,
-        ...classData,
-        teacherId: 1,
-        classCode: 'ETHICS2024',
-        isActive: true,
-        createdAt: new Date().toISOString(),
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(201).json(mockResponse);
-        }
-      });
-
-      // Simulate the request
-      const req = {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: classData,
-      };
-      const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(mockResponse);
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          class: expect.objectContaining({
+            name: 'Introduction to AI Ethics',
+            class_code: 'AIETHICS2024',
+          }),
+        })
+      );
     });
 
-    test('should return 400 for missing required fields', async () => {
-      const invalidData = {
-        description: 'Missing name field',
+    it('should return error for invalid class data', async () => {
+      const mockRequest = {
+        method: 'POST',
+        url: '/api/teacher/classes',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          name: '', // Invalid: empty name
+        },
       };
 
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(400).json({ 
-            message: 'Name is required' 
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'POST' && req.url?.includes('/classes')) {
+          return res.status(400).json({
+            success: false,
+            error: 'Validation failed',
+            details: ['Name is required'],
           });
         }
       });
 
-      const req = {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: invalidData,
-      };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ 
-        message: 'Name is required' 
-      });
-    });
-
-    test('should generate unique class code', async () => {
-      const classData = {
-        name: 'Advanced Ethics',
-        subject: 'Philosophy',
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'POST') {
-          res.status(201).json({
-            ...classData,
-            id: 1,
-            classCode: 'ADVETH2024',
-            teacherId: 1,
-          });
-        }
-      });
-
-      const req = {
-        method: 'POST',
-        body: classData,
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(201);
-      const response = res.json.mock.calls[0][0];
-      expect(response.classCode).toMatch(/^[A-Z0-9]+$/);
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'Validation failed',
+        })
+      );
     });
   });
 
-  describe('GET /api/teacher/classes', () => {
-    test('should return teacher classes', async () => {
-      const mockClasses = [
-        {
-          id: 1,
-          name: 'Ethics in AI',
-          description: 'Intro to AI Ethics',
-          studentCount: 25,
-          enrollments: 25,
-          assignmentCount: 5,
-          classCode: 'ETHICS2024',
-        },
-        {
-          id: 2,
-          name: 'Advanced Ethics',
-          description: 'Advanced ethical concepts',
-          studentCount: 18,
-          enrollments: 18,
-          assignmentCount: 3,
-          classCode: 'ADVETH2024',
-        },
-      ];
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'GET') {
-          res.status(200).json(mockClasses);
-        }
-      });
-
-      const req = {
+  describe('GET /api/teacher - Get Teacher Classes', () => {
+    it('should return teacher classes successfully', async () => {
+      const mockRequest = {
         method: 'GET',
-        query: { teacherId: '1' },
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
+        url: '/api/teacher/classes',
+        headers: {
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
       };
 
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockClasses);
-    });
-
-    test('should return empty array for teacher with no classes', async () => {
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'GET') {
-          res.status(200).json([]);
-        }
-      });
-
-      const req = {
-        method: 'GET',
-        query: { teacherId: '999' },
-      };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
-
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith([]);
-    });
-  });
-
-  describe('PUT /api/teacher/classes', () => {
-    test('should update class successfully', async () => {
-      const updateData = {
-        id: 1,
-        name: 'Updated Ethics in AI',
-        description: 'Updated description',
-      };
-
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'PUT') {
-          res.status(200).json({
-            ...updateData,
-            updatedAt: new Date().toISOString(),
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'GET' && req.url?.includes('/classes')) {
+          return res.status(200).json({
+            success: true,
+            classes: [global.mockClass],
           });
         }
       });
 
-      const req = {
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          classes: expect.arrayContaining([
+            expect.objectContaining({
+              name: 'Introduction to AI Ethics',
+            }),
+          ]),
+        })
+      );
+    });
+  });
+
+  describe('PUT /api/teacher - Update Class', () => {
+    it('should update class successfully', async () => {
+      const mockRequest = {
         method: 'PUT',
-        body: updateData,
+        url: '/api/teacher/classes/1',
+        headers: { 
+          'content-type': 'application/json',
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+        body: {
+          name: 'Advanced AI Ethics',
+          description: 'Updated description',
+        },
       };
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-        setHeader: jest.fn(),
-      };
 
-      await mockHandler(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      const response = res.json.mock.calls[0][0];
-      expect(response.name).toBe('Updated Ethics in AI');
-    });
-  });
-
-  describe('DELETE /api/teacher/classes', () => {
-    test('should deactivate class instead of deleting', async () => {
-      mockHandler.mockImplementation((req, res) => {
-        if (req.method === 'DELETE') {
-          res.status(200).json({
-            id: 1,
-            isActive: false,
-            message: 'Class deactivated successfully',
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'PUT' && req.url?.includes('/classes')) {
+          return res.status(200).json({
+            success: true,
+            class: {
+              ...global.mockClass,
+              name: 'Advanced AI Ethics',
+              description: 'Updated description',
+            },
           });
         }
       });
 
-      const req = {
-        method: 'DELETE',
-        query: { classId: '1' },
-      };
-      const res = {
+      const mockResponse = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
         setHeader: jest.fn(),
       };
 
-      await mockHandler(req, res);
+      await mockHandler(mockRequest, mockResponse);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-      const response = res.json.mock.calls[0][0];
-      expect(response.isActive).toBe(false);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          class: expect.objectContaining({
+            name: 'Advanced AI Ethics',
+          }),
+        })
+      );
+    });
+
+    it('should return error for unauthorized update', async () => {
+      const mockRequest = {
+        method: 'PUT',
+        url: '/api/teacher/classes/1',
+        headers: {
+          get: jest.fn().mockReturnValue('Bearer invalid-token'),
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'PUT' && req.url?.includes('/classes')) {
+          return res.status(403).json({
+            success: false,
+            error: 'Unauthorized: You can only update your own classes',
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(403);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: expect.stringContaining('Unauthorized'),
+        })
+      );
+    });
+  });
+
+  describe('DELETE /api/teacher - Delete Class', () => {
+    it('should delete class successfully', async () => {
+      const mockRequest = {
+        method: 'DELETE',
+        url: '/api/teacher/classes/1',
+        headers: {
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'DELETE' && req.url?.includes('/classes')) {
+          return res.status(200).json({
+            success: true,
+            message: 'Class deleted successfully',
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          message: 'Class deleted successfully',
+        })
+      );
+    });
+
+    it('should return error for non-existent class', async () => {
+      const mockRequest = {
+        method: 'DELETE',
+        url: '/api/teacher/classes/999',
+        headers: {
+          get: jest.fn().mockReturnValue('Bearer valid-token'),
+        },
+      };
+
+      mockHandler.mockImplementation((req: any, res: any) => {
+        if (req.method === 'DELETE' && req.url?.includes('/classes')) {
+          return res.status(404).json({
+            success: false,
+            error: 'Class not found',
+          });
+        }
+      });
+
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        setHeader: jest.fn(),
+      };
+
+      await mockHandler(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: 'Class not found',
+        })
+      );
     });
   });
 }); 

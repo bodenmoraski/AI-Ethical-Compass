@@ -99,6 +99,7 @@ function AppContent() {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/teacher" element={<TeacherDashboard />} />
+          <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher/class/:classId" element={<ClassDetailView classId="1" />} />
           <Route path="/teacher/classroom/:classId" element={<LiveClassroomMonitor classId={1} userId={1} />} />
           <Route path="/tutorial/user" element={<UserTutorial />} />
