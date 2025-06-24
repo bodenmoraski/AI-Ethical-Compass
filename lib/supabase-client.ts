@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Client-side Supabase configuration (browser only)
 // Access environment variables through Vite's import.meta.env
@@ -14,19 +14,28 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+// Singleton pattern to prevent multiple instances
+let supabaseInstance: SupabaseClient | null = null;
+
+const getSupabaseClient = (): SupabaseClient => {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    });
+    console.log('Supabase client initialized successfully');
+  }
+  return supabaseInstance;
+};
+
 // Create Supabase client for browser authentication
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-});
+export const supabase = getSupabaseClient();
 
 export default supabase;
 
 if (!supabase) {
   console.warn('Supabase client not available');
-} else {
-  console.log('Supabase client initialized successfully');
 } 

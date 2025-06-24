@@ -42,8 +42,22 @@ const authenticateUser = async (req: VercelRequest) => {
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('No authorization token provided');
   }
-  // In a real implementation, verify the JWT token here
-  return authHeader.substring(7); // Return user ID
+  
+  const token = authHeader.substring(7);
+  
+  try {
+    // Verify the JWT token and extract user ID
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      throw new Error('Invalid or expired token');
+    }
+    
+    return user.id; // Return the actual user ID, not the JWT token
+  } catch (error) {
+    console.error('Authentication error:', error);
+    throw new Error('Authentication failed');
+  }
 };
 
 // Real-time activity handlers
@@ -114,7 +128,7 @@ const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) 
       if (error) throw error;
 
       // Also create a real-time activity for engagement updates
-      if (validatedData.engagement_score < 30) {
+      if (validatedData.engagement_score && validatedData.engagement_score < 30) {
         await supabase
           .from('realtime_activities')
           .insert({
@@ -143,7 +157,7 @@ const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) 
         .from('student_engagement')
         .select(`
           *,
-          user_profiles(first_name, last_name)
+          users(id, email, name, first_name, last_name, username)
         `)
         .eq('class_id', classId)
         .order('last_active', { ascending: false });

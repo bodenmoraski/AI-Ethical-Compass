@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../../../lib/supabase-client';
 import { apiRequest } from './queryClient';
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const [needsProfileSetup, setNeedsProfileSetup] = useState(false);
 
-  const fetchUserProfile = async (email: string): Promise<UserProfile | null> => {
+  const fetchUserProfile = useCallback(async (email: string): Promise<UserProfile | null> => {
     try {
       const response = await apiRequest('GET', `/api/user-profile?email=${encodeURIComponent(email)}`);
       const profile = await response.json();
@@ -57,15 +57,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log('User profile not found, needs setup');
       return null;
     }
-  };
+  }, []);
 
-  const refreshUserProfile = async () => {
+  const refreshUserProfile = useCallback(async () => {
     if (user?.email) {
       const profile = await fetchUserProfile(user.email);
       setUserProfile(profile);
       setNeedsProfileSetup(!profile);
     }
-  };
+  }, [user?.email, fetchUserProfile]);
 
   useEffect(() => {
     if (!supabase) {
@@ -74,106 +74,62 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return;
     }
 
+    let isMounted = true;
+
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!isMounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user?.email) {
         const profile = await fetchUserProfile(session.user.email);
-        setUserProfile(profile);
-        setNeedsProfileSetup(!profile);
+        if (isMounted) {
+          setUserProfile(profile);
+          setNeedsProfileSetup(!profile);
+        }
       }
       
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user?.email) {
         const profile = await fetchUserProfile(session.user.email);
-        setUserProfile(profile);
-        setNeedsProfileSetup(!profile);
+        if (isMounted) {
+          setUserProfile(profile);
+          setNeedsProfileSetup(!profile);
+        }
       } else {
-        setUserProfile(null);
-        setNeedsProfileSetup(false);
+        if (isMounted) {
+          setUserProfile(null);
+          setNeedsProfileSetup(false);
+        }
       }
       
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [fetchUserProfile]);
 
-  const signUp = async (email: string, password: string, metadata?: { username: string; institutionName?: string | null; institutionType?: string | null }) => {
-    if (!supabase) {
-      return { error: new Error('Supabase client not available') as AuthError };
-    }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: metadata ? {
-          username: metadata.username,
-          institution_name: metadata.institutionName,
-          institution_type: metadata.institutionType,
-        } : undefined,
-      },
-    });
-
-    return { error };
-  };
-
-  const signIn = async (email: string, password: string) => {
-    if (!supabase) {
-      return { error: new Error('Supabase client not available') as AuthError };
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    return { error };
-  };
-
-  const signOut = async () => {
-    if (!supabase) {
-      return { error: new Error('Supabase client not available') as AuthError };
-    }
-
-    const { error } = await supabase.auth.signOut();
-    
-    // Clear profile state on sign out
-    setUserProfile(null);
-    setNeedsProfileSetup(false);
-    
-    return { error };
-  };
-
-  const signInWithGoogle = async () => {
-    if (!supabase) {
-      return { error: new Error('Supabase client not available') as AuthError };
-    }
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-
-    return { error };
-  };
-
-  const createUserProfile = async (username: string, institution?: string) => {
+  const createUserProfile = useCallback(async (username: string, institution?: string) => {
     if (!user?.email) {
       return { error: new Error('No user email available') };
     }
@@ -194,9 +150,72 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error('Failed to create user profile:', error);
       return { error: error as Error };
     }
-  };
+  }, [user?.email]);
 
-  const value = {
+  const signUp = useCallback(async (email: string, password: string, metadata?: { username: string; institutionName?: string | null; institutionType?: string | null }) => {
+    if (!supabase) {
+      return { error: new Error('Supabase client not available') as AuthError };
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: metadata ? {
+          username: metadata.username,
+          institution_name: metadata.institutionName,
+          institution_type: metadata.institutionType,
+        } : undefined,
+      },
+    });
+
+    return { error };
+  }, []);
+
+  const signIn = useCallback(async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: new Error('Supabase client not available') as AuthError };
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    return { error };
+  }, []);
+
+  const signOut = useCallback(async () => {
+    if (!supabase) {
+      return { error: new Error('Supabase client not available') as AuthError };
+    }
+
+    const { error } = await supabase.auth.signOut();
+    
+    // Clear profile state on sign out
+    setUserProfile(null);
+    setNeedsProfileSetup(false);
+    
+    return { error };
+  }, []);
+
+  const signInWithGoogle = useCallback(async () => {
+    if (!supabase) {
+      return { error: new Error('Supabase client not available') as AuthError };
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    return { error };
+  }, []);
+
+  const value = useMemo(() => ({
     user,
     userProfile,
     session,
@@ -208,7 +227,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signInWithGoogle,
     createUserProfile,
     refreshUserProfile,
-  };
+  }), [
+    user,
+    userProfile,
+    session,
+    loading,
+    needsProfileSetup,
+    signUp,
+    signIn,
+    signOut,
+    signInWithGoogle,
+    createUserProfile,
+    refreshUserProfile,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }; 

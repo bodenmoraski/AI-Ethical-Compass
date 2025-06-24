@@ -84,8 +84,16 @@ Focus on:
       throw new Error('No response from OpenAI');
     }
 
+    // Clean the response to remove markdown formatting
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
     // Parse JSON response
-    const analysis = JSON.parse(response);
+    const analysis = JSON.parse(cleanedResponse);
     
     // Validate and normalize the response
     return {
@@ -205,7 +213,15 @@ Actions:
       throw new Error('No response from OpenAI');
     }
 
-    const moderation = JSON.parse(response);
+    // Clean the response to remove markdown formatting
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
+    const moderation = JSON.parse(cleanedResponse);
     
     return {
       is_appropriate: Boolean(moderation.is_appropriate),
@@ -301,7 +317,15 @@ Check for:
       throw new Error('No response from OpenAI');
     }
 
-    const moderation = JSON.parse(response);
+    // Clean the response to remove markdown formatting
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
+    const moderation = JSON.parse(cleanedResponse);
     
     return {
       is_appropriate: Boolean(moderation.is_appropriate),

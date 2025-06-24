@@ -29,7 +29,15 @@ const AssignmentSchema = z.object({
   instructions: z.string().optional(),
   assignment_type: z.enum(['scenario', 'custom', 'discussion']).default('scenario'),
   scenario_ids: z.array(z.number()).optional(),
-  due_date: z.string().datetime().optional(),
+  due_date: z.string().optional().refine((val) => {
+    if (!val) return true; // Allow empty string
+    try {
+      new Date(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, { message: "Invalid date format" }),
   points_possible: z.number().int().min(0).max(1000).default(100),
   rubric: z.record(z.any()).optional(),
   allow_late_submissions: z.boolean().default(true),
@@ -43,24 +51,48 @@ const TeacherAccessSchema = z.object({
   request_reason: z.string().min(10).max(1000)
 });
 
-// Auth helper - simplified for demo purposes
+// Auth helper - proper JWT verification
 const authenticateUser = async (req: VercelRequest) => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('No authorization token provided');
   }
   
-  // For demo purposes, we'll extract user ID from the token
-  // In production, you'd verify the JWT token properly
   const token = authHeader.substring(7);
   
-  // Simple check - in production, verify the actual JWT
   if (!token || token === 'null' || token === 'undefined') {
     throw new Error('Invalid authorization token');
   }
   
-  // For now, return a mock user ID - in production, decode the JWT
-  return 1; // Mock teacher user ID
+  try {
+    // Verify the JWT token with Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    
+    if (error || !user) {
+      throw new Error('Invalid or expired token');
+    }
+    
+    // Get the user's profile from our users table
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
+      .select('id, role')
+      .eq('email', user.email)
+      .single();
+    
+    if (profileError || !userProfile) {
+      throw new Error('User profile not found');
+    }
+    
+    // Check if user has teacher role
+    if (userProfile.role !== 'teacher') {
+      throw new Error('Teacher access required');
+    }
+    
+    return userProfile.id;
+  } catch (error) {
+    console.error('Authentication error:', error);
+    throw new Error('Authentication failed');
+  }
 };
 
 // Generate unique class code
@@ -325,7 +357,7 @@ const handleStudents = async (req: VercelRequest, res: VercelResponse) => {
         .from('class_enrollments')
         .select(`
           *,
-          users(id, email, first_name, last_name)
+          users(id, email, name, first_name, last_name, username)
         `)
         .eq('class_id', classId)
         .eq('status', 'active');

@@ -4,15 +4,15 @@
 -- Create realtime_activities table
 CREATE TABLE IF NOT EXISTS realtime_activities (
     id SERIAL PRIMARY KEY,
-    type VARCHAR(20) NOT NULL CHECK (type IN ('discussion', 'submission', 'engagement', 'notification')),
+    type TEXT NOT NULL CHECK (type IN ('discussion', 'submission', 'engagement', 'notification')),
     class_id INTEGER NOT NULL REFERENCES classes(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL,
-    title VARCHAR(200) NOT NULL,
+    user_id TEXT NOT NULL,
+    title TEXT NOT NULL,
     description TEXT,
-    priority VARCHAR(10) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
-    data JSONB DEFAULT '{}',
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by UUID NOT NULL,
+    priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
+    data JSONB,
+    timestamp TIMESTAMPTZ DEFAULT NOW(),
+    created_by TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../lib/auth';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -7,8 +7,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { useToast } from '../hooks/use-toast';
 import AuthModal from '../components/AuthModal';
 import TeacherAccessModal from '../components/TeacherAccessModal';
+import LiveClassroomMonitor from '../components/teacher/LiveClassroomMonitor';
+import AssignmentManager from '../components/teacher/AssignmentManager';
+import StudentManager from '../components/teacher/StudentManager';
 import { 
   Users, 
   BookOpen, 
@@ -23,8 +32,10 @@ import {
   Plus,
   Eye,
   Edit,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
+import { supabase } from '../../../lib/supabase-client';
 
 
 interface TeacherDashboardData {
@@ -38,6 +49,8 @@ interface TeacherDashboardData {
     semester: string;
     schoolYear: string;
     isActive: boolean;
+    subject: string;
+    grade_level: string;
   }>;
   overallStats: {
     totalStudents: number;
@@ -77,6 +90,97 @@ export default function TeacherDashboard() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [teacherAccessModalOpen, setTeacherAccessModalOpen] = useState(false);
 
+  // Debounced loading state to prevent flickering
+  const [debouncedLoading, setDebouncedLoading] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLoading(loading);
+    }, 300); // 300ms delay to prevent flickering
+    
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  // Class creation state
+  const [createClassModalOpen, setCreateClassModalOpen] = useState(false);
+  const [creatingClass, setCreatingClass] = useState(false);
+  const [classFormData, setClassFormData] = useState({
+    name: '',
+    subject: '',
+    grade_level: '',
+    description: '',
+    school_year: new Date().getFullYear().toString(),
+    semester: 'Fall'
+  });
+
+  const { toast } = useToast();
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      // Get user's access token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('No authentication token available');
+      }
+
+      // Fetch real teacher data
+      const response = await fetch('/api/teacher?action=classes', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch teacher data');
+      }
+
+      const data = await response.json();
+      
+      // Transform API data to match our interface
+      const transformedData: TeacherDashboardData = {
+        classes: data.classes?.map((cls: any) => ({
+          id: cls.id,
+          name: cls.name,
+          description: cls.description || '',
+          studentCount: cls.student_count || 0,
+          assignmentCount: cls.assignment_count || 0,
+          classCode: cls.class_code,
+          semester: cls.semester || 'Fall',
+          schoolYear: cls.school_year || new Date().getFullYear().toString(),
+          isActive: cls.is_active !== false,
+          subject: cls.subject || '',
+          grade_level: cls.grade_level || ''
+        })) || [],
+        overallStats: {
+          totalStudents: data.classes?.reduce((sum: number, cls: any) => sum + (cls.student_count || 0), 0) || 0,
+          totalClasses: data.classes?.length || 0,
+          totalAssignments: data.classes?.reduce((sum: number, cls: any) => sum + (cls.assignment_count || 0), 0) || 0,
+          averageEngagement: 0.78, // TODO: Calculate from real data
+          pendingGrades: 0, // TODO: Calculate from real data
+          flaggedContent: 0, // TODO: Calculate from real data
+        },
+        recentActivity: [
+          {
+            type: 'info',
+            message: 'Welcome to your teacher dashboard!',
+            timestamp: 'Just now'
+          }
+        ],
+        upcomingDeadlines: []
+      };
+      
+      setDashboardData(transformedData);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Redirect teachers from /teacher to /teacher/dashboard
   useEffect(() => {
     if (user && userProfile?.role === 'teacher' && location.pathname === '/teacher') {
@@ -88,85 +192,67 @@ export default function TeacherDashboard() {
     if (user && userProfile?.role === 'teacher') {
       fetchDashboardData();
     }
-  }, [user, userProfile]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // Mock data for demonstration
-      const mockDashboardData: TeacherDashboardData = {
-        classes: [
-          {
-            id: 1,
-            name: 'Ethics in AI',
-            description: 'Introduction to ethical considerations in AI',
-            studentCount: 25,
-            assignmentCount: 5,
-            classCode: 'ETHICS2024',
-            semester: 'Fall',
-            schoolYear: '2024',
-            isActive: true,
-          },
-          {
-            id: 2,
-            name: 'Advanced Ethics',
-            description: 'Advanced ethical concepts and applications',
-            studentCount: 18,
-            assignmentCount: 3,
-            classCode: 'ADVETH2024',
-            semester: 'Fall',
-            schoolYear: '2024',
-            isActive: true,
-          },
-        ],
-        overallStats: {
-          totalStudents: 43,
-          totalClasses: 2,
-          totalAssignments: 8,
-          averageEngagement: 0.78,
-          pendingGrades: 12,
-          flaggedContent: 3,
-        },
-        recentActivity: [
-          {
-            type: 'submission',
-            message: 'New assignment submission from John Doe',
-            timestamp: '2 hours ago',
-            classId: 1,
-            studentId: 2,
-          },
-          {
-            type: 'discussion',
-            message: 'Discussion flagged for review in Ethics 101',
-            timestamp: '4 hours ago',
-            classId: 1,
-          },
-        ],
-        upcomingDeadlines: [
-          {
-            assignmentId: 1,
-            title: 'AI Ethics Analysis',
-            dueDate: '2024-10-20T23:59:59Z',
-            className: 'Ethics in AI',
-            submissionCount: 18,
-            totalStudents: 25,
-          },
-        ],
-      };
-      
-      setDashboardData(mockDashboardData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, userProfile, fetchDashboardData]);
 
   const handleCreateClass = () => {
-    // Navigate to class creation form
-    console.log('Create new class');
+    setCreateClassModalOpen(true);
   };
+
+  const createClass = useCallback(async () => {
+    try {
+      setCreatingClass(true);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('No authentication token available');
+      }
+
+      const response = await fetch('/api/teacher?action=classes', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(classFormData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create class');
+      }
+
+      const newClass = await response.json();
+      
+      toast({
+        title: "Class Created Successfully!",
+        description: `"${classFormData.name}" has been created with code: ${newClass.class_code}`,
+      });
+
+      // Reset form and close modal
+      setClassFormData({
+        name: '',
+        subject: '',
+        grade_level: '',
+        description: '',
+        school_year: new Date().getFullYear().toString(),
+        semester: 'Fall'
+      });
+      setCreateClassModalOpen(false);
+      
+      // Refresh dashboard data
+      await fetchDashboardData();
+      
+    } catch (err) {
+      console.error('Error creating class:', err);
+      toast({
+        title: "Error Creating Class",
+        description: err instanceof Error ? err.message : 'Unknown error occurred',
+        variant: "destructive"
+      });
+    } finally {
+      setCreatingClass(false);
+    }
+  }, [classFormData, fetchDashboardData, toast]);
 
   const handleViewClass = (classId: number) => {
     setSelectedClassId(classId);
@@ -317,7 +403,7 @@ export default function TeacherDashboard() {
     );
   }
 
-  if (loading) {
+  if (debouncedLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
@@ -583,27 +669,170 @@ export default function TeacherDashboard() {
         </TabsContent>
 
         <TabsContent value="classes" className="mt-6">
-          <div className="text-center py-8">
-            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium">Class Management</h3>
-            <p className="text-gray-600">Detailed class management features coming soon</p>
+          <div className="space-y-6">
+            {/* Class Management Header */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Class Management</h3>
+                <p className="text-gray-600">Manage your classes, view student enrollments, and track assignments</p>
+              </div>
+              <Button onClick={handleCreateClass} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create New Class
+              </Button>
+            </div>
+
+            {/* Classes Grid */}
+            {classes.length === 0 ? (
+              <Card>
+                <CardContent className="pt-12 pb-12">
+                  <div className="text-center">
+                    <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No classes yet</h3>
+                    <p className="text-gray-600 mb-6">
+                      Create your first class to get started with managing students and assignments.
+                    </p>
+                    <Button onClick={handleCreateClass} className="flex items-center gap-2 mx-auto">
+                      <Plus className="h-4 w-4" />
+                      Create Your First Class
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {classes.map((cls) => (
+                    <Card key={cls.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg">{cls.name}</CardTitle>
+                            <CardDescription className="mt-1">
+                              {cls.subject} • {cls.grade_level}
+                            </CardDescription>
+                          </div>
+                          <Badge variant={cls.isActive ? "default" : "secondary"}>
+                            {cls.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {cls.description || "No description provided"}
+                          </p>
+                          
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">
+                              <Users className="inline h-4 w-4 mr-1" />
+                              {cls.studentCount} students
+                            </span>
+                            <span className="text-gray-600">
+                              <FileText className="inline h-4 w-4 mr-1" />
+                              {cls.assignmentCount} assignments
+                            </span>
+                          </div>
+                          
+                          <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="text-xs text-gray-500 mb-1">Class Code</div>
+                            <div className="font-mono text-sm font-semibold text-gray-900">
+                              {cls.classCode}
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="flex-1"
+                              onClick={() => handleViewClass(cls.id)}
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Student Management for Selected Class */}
+                {selectedClassId && (
+                  <div className="mt-8">
+                    <StudentManager 
+                      classId={selectedClassId} 
+                      onRefresh={fetchDashboardData}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6">
-          <div className="text-center py-8">
-            <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium">Student Analytics</h3>
-            <p className="text-gray-600">Comprehensive analytics dashboard coming soon</p>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Student Analytics & Live Monitoring</h3>
+                <p className="text-gray-600">Track student engagement and monitor classroom activity in real-time</p>
+              </div>
+            </div>
+
+            {/* Real-time Classroom Monitor */}
+            {classes.length > 0 ? (
+              <LiveClassroomMonitor 
+                classId={classes[0].id} 
+                userId={Number(user?.id) || 0}
+              />
+            ) : (
+              <Card>
+                <CardContent className="pt-12 pb-12">
+                  <div className="text-center">
+                    <BarChart3 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No classes to monitor</h3>
+                    <p className="text-gray-600 mb-6">
+                      Create a class first to start monitoring student activity and engagement.
+                    </p>
+                    <Button onClick={handleCreateClass} className="flex items-center gap-2 mx-auto">
+                      <Plus className="h-4 w-4" />
+                      Create Your First Class
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
         <TabsContent value="assignments" className="mt-6">
-          <div className="text-center py-8">
-            <FileText className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium">Assignment Manager</h3>
-            <p className="text-gray-600">Assignment creation and management tools coming soon</p>
-          </div>
+          {classes.length > 0 ? (
+            <AssignmentManager 
+              classId={classes[0].id} 
+              onRefresh={fetchDashboardData}
+            />
+          ) : (
+            <Card>
+              <CardContent className="pt-12 pb-12">
+                <div className="text-center">
+                  <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No classes to manage assignments for</h3>
+                  <p className="text-gray-600 mb-6">
+                    Create a class first to start creating and managing assignments.
+                  </p>
+                  <Button onClick={handleCreateClass} className="flex items-center gap-2 mx-auto">
+                    <Plus className="h-4 w-4" />
+                    Create Your First Class
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="moderation" className="mt-6">
@@ -626,6 +855,129 @@ export default function TeacherDashboard() {
         isOpen={teacherAccessModalOpen}
         onClose={() => setTeacherAccessModalOpen(false)}
       />
+
+      {/* Create Class Modal */}
+      <Dialog open={createClassModalOpen} onOpenChange={setCreateClassModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New Class</DialogTitle>
+            <DialogDescription>
+              Set up a new class for your students. You'll get a unique class code to share with them.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Class Name *</Label>
+              <Input
+                id="name"
+                value={classFormData.name}
+                onChange={(e) => setClassFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Ethics in AI, Computer Science 101"
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="subject">Subject *</Label>
+              <Input
+                id="subject"
+                value={classFormData.subject}
+                onChange={(e) => setClassFormData(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder="e.g., Computer Science, Ethics, Philosophy"
+              />
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="grade_level">Grade Level *</Label>
+              <Select 
+                value={classFormData.grade_level} 
+                onValueChange={(value) => setClassFormData(prev => ({ ...prev, grade_level: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select grade level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Elementary">Elementary (K-5)</SelectItem>
+                  <SelectItem value="Middle School">Middle School (6-8)</SelectItem>
+                  <SelectItem value="High School">High School (9-12)</SelectItem>
+                  <SelectItem value="Undergraduate">Undergraduate</SelectItem>
+                  <SelectItem value="Graduate">Graduate</SelectItem>
+                  <SelectItem value="Professional">Professional Development</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={classFormData.description}
+                onChange={(e) => setClassFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of the class content and objectives"
+                rows={3}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="school_year">School Year</Label>
+                <Input
+                  id="school_year"
+                  type="number"
+                  value={classFormData.school_year}
+                  onChange={(e) => setClassFormData(prev => ({ ...prev, school_year: e.target.value }))}
+                  min={2020}
+                  max={2030}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="semester">Semester</Label>
+                <Select 
+                  value={classFormData.semester} 
+                  onValueChange={(value) => setClassFormData(prev => ({ ...prev, semester: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Fall">Fall</SelectItem>
+                    <SelectItem value="Spring">Spring</SelectItem>
+                    <SelectItem value="Summer">Summer</SelectItem>
+                    <SelectItem value="Winter">Winter</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setCreateClassModalOpen(false)}
+              disabled={creatingClass}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={createClass}
+              disabled={creatingClass || !classFormData.name || !classFormData.subject || !classFormData.grade_level}
+            >
+              {creatingClass ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Class
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 
