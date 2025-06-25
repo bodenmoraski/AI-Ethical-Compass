@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
 import { Search, Filter, ExternalLink, BookOpen, School, Microscope, Code, Lightbulb, Shield, Globe, Users, TrendingUp, Mail, Plus, ChevronLeft, ChevronRight, X, Clock, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ResourceRecommender from '@/components/ResourceRecommender';
 
 // Type definitions
 interface ResourceData {
@@ -1538,6 +1539,20 @@ Best regards,
     navigate('/contact');
   };
 
+  const handleRecommenderFilters = (filters: { category?: string; difficulty?: string; tags?: string[] }) => {
+    if (filters.category) {
+      handleCategoryChange(filters.category);
+    }
+    // Since this page doesn't have difficulty/tag filtering UI yet, 
+    // we could add a search for the tags to help users find relevant resources
+    if (filters.tags && filters.tags.length > 0) {
+      // Use the first tag as a search query to help find related resources
+      const searchTerm = filters.tags[0];
+      setSearchQuery(searchTerm);
+      setCurrentPage(1);
+    }
+  };
+
   // Inline autocomplete suggestion (top suggestion that starts with the input)
   const inlineSuggestion = useMemo(() => {
     if (!searchQuery.trim() || searchQuery.length < 1) return "";
@@ -1571,12 +1586,6 @@ Best regards,
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-4">
-              <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 text-sm font-medium">
-                📚 Comprehensive Resource Library
-              </Badge>
-            </div>
-            
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-4">
               <span className="block">Educational</span>
               <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -1653,6 +1662,14 @@ Best regards,
                 </span>
               </div>
             </div>
+
+            {/* Resource Recommender - Prominently placed after search */}
+            <div className="mt-8 max-w-2xl mx-auto">
+              <ResourceRecommender 
+                resources={resources}
+                onApplyFilters={handleRecommenderFilters}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -1706,49 +1723,49 @@ Best regards,
       {/* Resources Grid */}
       <div className="relative py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {currentResources.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                <Search className="h-12 w-12 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {debouncedSearchQuery ? "No resources found" : "No resources in this category"}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {debouncedSearchQuery 
-                  ? `No resources match "${debouncedSearchQuery}". Try different keywords or browse all resources.`
-                  : "Try selecting a different category or browse all resources."
-                }
-              </p>
-              <Button 
-                onClick={clearSearch}
-                variant="outline"
-                className="mr-2"
-              >
-                Clear Search
-              </Button>
-              {selectedCategory !== "all" && (
-                <Button 
-                  onClick={() => handleCategoryChange("all")}
-                  variant="outline"
-                >
-                  Show All Resources
-                </Button>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="mb-8">
-                <p className="text-gray-600">
-                  Showing {currentResources.length} of {sortedResources.length} resources
-                  {debouncedSearchQuery && ` matching "${debouncedSearchQuery}"`}
-                </p>
-              </div>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {currentResources.map((resource, index) => {
-                  const IconComponent = resource.icon;
-                  return (
+              {currentResources.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Search className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {debouncedSearchQuery ? "No resources found" : "No resources in this category"}
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    {debouncedSearchQuery 
+                      ? `No resources match "${debouncedSearchQuery}". Try different keywords or browse all resources.`
+                      : "Try selecting a different category or browse all resources."
+                    }
+                  </p>
+                  <Button 
+                    onClick={clearSearch}
+                    variant="outline"
+                    className="mr-2"
+                  >
+                    Clear Search
+                  </Button>
+                  {selectedCategory !== "all" && (
+                    <Button 
+                      onClick={() => handleCategoryChange("all")}
+                      variant="outline"
+                    >
+                      Show All Resources
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <p className="text-gray-600">
+                      Showing {currentResources.length} of {sortedResources.length} resources
+                      {debouncedSearchQuery && ` matching "${debouncedSearchQuery}"`}
+                    </p>
+                  </div>
+                  
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {currentResources.map((resource, index) => {
+                      const IconComponent = resource.icon;
+                      return (
               <a
                 key={index}
                 href={resource.link}
@@ -1756,83 +1773,83 @@ Best regards,
                 rel="noopener noreferrer"
                 className="group"
               >
-                      <Card className="h-full hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 overflow-hidden">
-                        <CardContent className="p-6">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-                              <IconComponent className="h-6 w-6 text-blue-600" />
-                            </div>
-                            <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                        <Card className="h-full hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 overflow-hidden">
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                                <IconComponent className="h-6 w-6 text-blue-600" />
                     </div>
-                          
-                          <div className="space-y-3">
+                              <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                      </div>
+                            
+                            <div className="space-y-3">
                     <div>
-                              <Badge 
-                                variant="secondary" 
-                                className="text-xs mb-2"
-                                style={{ 
-                                  backgroundColor: categories.find(c => c.key === resource.categoryKey)?.color.split(' ')[0] + '20',
-                                  color: categories.find(c => c.key === resource.categoryKey)?.color.split(' ')[1]
-                                }}
-                              >
+                                <Badge 
+                                  variant="secondary" 
+                                  className="text-xs mb-2"
+                                  style={{ 
+                                    backgroundColor: categories.find(c => c.key === resource.categoryKey)?.color.split(' ')[0] + '20',
+                                    color: categories.find(c => c.key === resource.categoryKey)?.color.split(' ')[1]
+                                  }}
+                                >
                         {resource.category}
-                              </Badge>
-                              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                                {debouncedSearchQuery ? (
-                                  <span dangerouslySetInnerHTML={{ 
-                                    __html: highlightText(resource.title, debouncedSearchQuery) 
-                                  }} />
-                                ) : (
-                                  resource.title
-                                )}
-                              </h3>
-                            </div>
-                            
-                            <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                              {debouncedSearchQuery ? (
-                                <span dangerouslySetInnerHTML={{ 
-                                  __html: highlightText(resource.description, debouncedSearchQuery) 
-                                }} />
-                              ) : (
-                                resource.description
-                              )}
-                            </p>
-                            
-                            <div className="flex flex-wrap gap-1">
-                              {resource.tags.map((tag, tagIndex) => (
-                                <Badge key={tagIndex} variant="outline" className="text-xs">
+                                </Badge>
+                                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                                   {debouncedSearchQuery ? (
                                     <span dangerouslySetInnerHTML={{ 
-                                      __html: highlightText(tag, debouncedSearchQuery) 
+                                      __html: highlightText(resource.title, debouncedSearchQuery) 
                                     }} />
                                   ) : (
-                                    tag
+                                    resource.title
                                   )}
-                                </Badge>
-                              ))}
-                            </div>
-                            
-                            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                              <div className="flex items-center gap-4 text-xs text-gray-500">
-                                <span className="flex items-center gap-1">
-                                  <TrendingUp className="h-3 w-3" />
-                                  {resource.difficulty}
-                                </span>
-                                <span>{resource.lastUpdated}</span>
+                      </h3>
+                    </div>
+                              
+                              <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                                {debouncedSearchQuery ? (
+                                  <span dangerouslySetInnerHTML={{ 
+                                    __html: highlightText(resource.description, debouncedSearchQuery) 
+                                  }} />
+                                ) : (
+                                  resource.description
+                                )}
+                              </p>
+                              
+                              <div className="flex flex-wrap gap-1">
+                                {resource.tags.map((tag, tagIndex) => (
+                                  <Badge key={tagIndex} variant="outline" className="text-xs">
+                                    {debouncedSearchQuery ? (
+                                      <span dangerouslySetInnerHTML={{ 
+                                        __html: highlightText(tag, debouncedSearchQuery) 
+                                      }} />
+                                    ) : (
+                                      tag
+                                    )}
+                                  </Badge>
+                                ))}
                               </div>
-                              <span className="text-blue-600 text-sm font-medium group-hover:underline">
-                                Visit Resource
+                              
+                              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                  <span className="flex items-center gap-1">
+                                    <TrendingUp className="h-3 w-3" />
+                                    {resource.difficulty}
                     </span>
+                                  <span>{resource.lastUpdated}</span>
                   </div>
+                                <span className="text-blue-600 text-sm font-medium group-hover:underline">
+                                  Visit Resource
+                      </span>
                 </div>
-                        </CardContent>
-                      </Card>
-              </a>
-                  );
-                })}
-          </div>
-            </>
-          )}
+                  </div>
+                          </CardContent>
+                        </Card>
+                </a>
+                    );
+                  })}
+            </div>
+              </>
+            )}
         </div>
       </div>
 
@@ -1896,7 +1913,7 @@ Best regards,
                       </Button>
                     </>
                   )}
-                </div>
+                  </div>
                 
                 <Button
                   variant="outline"
@@ -1937,16 +1954,16 @@ Best regards,
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-blue-600"
+                className="border-white text-blue-600 bg-white hover:bg-blue-50 hover:text-blue-700"
                 onClick={handleContactUs}
               >
                 <Mail className="h-5 w-5 mr-2" />
                 Contact Us
               </Button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
       {/* Suggest Resource Modal */}
       {showSuggestModal && (
@@ -1968,7 +1985,7 @@ Best regards,
               >
                 ✕
               </Button>
-            </div>
+          </div>
             
             <form onSubmit={handleSuggestResource} className="space-y-6">
               <div>
@@ -1983,7 +2000,7 @@ Best regards,
                   required
                   className="w-full"
                 />
-              </div>
+        </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1997,7 +2014,7 @@ Best regards,
                   required
                   className="w-full"
                 />
-              </div>
+      </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

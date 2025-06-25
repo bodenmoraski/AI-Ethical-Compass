@@ -29,6 +29,65 @@ declare global {
   var mockSupabaseClient: any;
 }
 
+// Mock resources for ResourceRecommender tests
+export const mockResources = [
+  {
+    key: 'k12-curriculum',
+    title: 'K-12 AI Curriculum',
+    description: 'Comprehensive AI curriculum for K-12 education',
+    category: 'Curriculum',
+    categoryKey: 'curriculum',
+    tags: ['K-12', 'Curriculum', 'AI Literacy'],
+    difficulty: 'Beginner',
+    lastUpdated: '2024',
+    link: 'https://example.com/k12-curriculum'
+  },
+  {
+    key: 'ai-teaching-guide',
+    title: 'AI Teaching Guide',
+    description: 'Beginner-friendly guide for teaching AI concepts',
+    category: 'Guidelines',
+    categoryKey: 'guidelines',
+    tags: ['Teaching', 'AI Literacy', 'Beginner'],
+    difficulty: 'Beginner',
+    lastUpdated: '2024',
+    link: 'https://example.com/teaching-guide'
+  },
+  {
+    key: 'ml-educators',
+    title: 'ML for Educators',
+    description: 'Machine learning resources specifically for educators',
+    category: 'Courses',
+    categoryKey: 'courses',
+    tags: ['Machine Learning', 'Higher Education', 'Professional Development'],
+    difficulty: 'Intermediate',
+    lastUpdated: '2025',
+    link: 'https://example.com/ml-educators'
+  },
+  {
+    key: 'advanced-ai-course',
+    title: 'Advanced AI Implementation',
+    description: 'Advanced course on AI implementation in educational settings',
+    category: 'Courses',
+    categoryKey: 'courses',
+    tags: ['Advanced', 'Implementation', 'Higher Education'],
+    difficulty: 'Advanced',
+    lastUpdated: '2025',
+    link: 'https://example.com/advanced-ai'
+  },
+  {
+    key: 'middle-school-ai',
+    title: 'Middle School AI Ethics',
+    description: 'AI ethics curriculum designed for middle school students',
+    category: 'Curriculum',
+    categoryKey: 'curriculum',
+    tags: ['6-8', 'Middle School', 'Ethics', 'AI Literacy'],
+    difficulty: 'Intermediate',
+    lastUpdated: '2024',
+    link: 'https://example.com/middle-school-ai'
+  }
+];
+
 global.mockUser = {
   id: 1,
   email: 'teacher@example.com',
