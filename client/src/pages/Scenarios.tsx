@@ -1,18 +1,15 @@
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { type Scenario } from "@shared/schema";
-import ScenarioNav from "@/components/ScenarioNav";
-import ScenarioView from "@/components/ScenarioView";
-import { Card } from "@/components/ui/card";
-import scenariosData from "../../../shared/scenarios.json";
+import React, { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { Card } from '../components/ui/card';
+import ScenarioNav from '../components/ScenarioNav';
+import ScenarioView from '../components/ScenarioView';
+import { type Scenario } from '@shared/schema';
 
-// Helper to extract SDG number from tag
+// Helper to normalize SDG numbers from various formats
 const getNormalizedSdgNumber = (tag: string): string => {
-  // If it's already just a number as string, return it
-  if (/^\d+$/.test(tag)) return tag;
-  // If it's in the format "Quality Education (SDG 4)", extract the number
-  const match = tag.match(/SDG\s*(\d+)/i);
+  // Extract number from formats like "SDG 4", "Quality Education (SDG 4)", "4", etc.
+  const match = tag.match(/(\d+)/);
   return match ? match[1] : tag;
 };
 
@@ -141,13 +138,17 @@ const Scenarios = () => {
   const navigate = useNavigate();
   const scenarioId = params.id ? parseInt(params.id) : null;
   
-  console.log("Initial scenariosData:", scenariosData);
-  
   const { data: scenarios = [], isLoading, error } = useQuery<Scenario[]>({
     queryKey: ["scenarios"],
     queryFn: async () => {
-      console.log("Starting to transform scenarios");
-      const result = transformScenarios(scenariosData);
+      console.log("Fetching scenarios from API");
+      const response = await fetch('/api/scenarios');
+      if (!response.ok) {
+        throw new Error('Failed to fetch scenarios');
+      }
+      const data = await response.json();
+      console.log("Raw API response:", data);
+      const result = transformScenarios(data);
       console.log("Transformation complete:", result);
       return result;
     },

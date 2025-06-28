@@ -1,17 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
-import type { Scenario } from "@shared/schema";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useParams, Link } from 'react-router-dom';
+import { cn } from '../lib/utils';
+import { type Scenario } from '@shared/schema';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import scenariosData from "../../../shared/scenarios.json";
 
-// Helper to extract SDG number from tag
+// Helper to normalize SDG numbers from various formats
 const getNormalizedSdgNumber = (tag: string): string => {
-  // If it's already just a number as string, return it
-  if (/^\d+$/.test(tag)) return tag;
-  // If it's in the format "Quality Education (SDG 4)", extract the number
-  const match = tag.match(/SDG\s*(\d+)/i);
+  // Extract number from formats like "SDG 4", "Quality Education (SDG 4)", "4", etc.
+  const match = tag.match(/(\d+)/);
   return match ? match[1] : tag;
 };
 
@@ -44,33 +43,13 @@ const getRelevance = (sdgNumber: string, scenarioTitle: string) => {
     }
   };
 
-  // If the SDG number doesn't exist in our map, return a generic message
-  if (!relevanceMap[sdgNumber]) {
-    return `This scenario relates to Sustainable Development Goal ${sdgNumber} and its impact on education.`;
-  }
-
-  // If we have a specific message for this scenario, use it
-  if (relevanceMap[sdgNumber][scenarioTitle]) {
-    return relevanceMap[sdgNumber][scenarioTitle];
-  }
-
-  // Otherwise, use the default message for this SDG
-  return relevanceMap[sdgNumber].default;
+  return relevanceMap[sdgNumber]?.[scenarioTitle] || relevanceMap[sdgNumber].default;
 };
 
 // Transform the raw data to match the Scenario type
 const transformScenarios = (data: any[]): Scenario[] => {
-  if (!Array.isArray(data)) {
-    console.error("Invalid data format:", data);
-    return [];
-  }
-
-  return data.map(scenario => {
-    if (!scenario || !scenario.sdgTags) {
-      console.error("Invalid scenario format:", scenario);
-      return null;
-    }
-
+  console.log("Raw scenarios data:", data);
+  const transformed = data.map(scenario => {
     const sdgDetails = scenario.sdgTags.map((tag: string) => {
       const normalizedTag = getNormalizedSdgNumber(tag);
       const sdgDescriptions: Record<string, { goal: string; description: string; icon: string }> = {
@@ -127,10 +106,7 @@ const transformScenarios = (data: any[]): Scenario[] => {
       };
 
       const description = sdgDescriptions[normalizedTag];
-      if (!description) {
-        console.warn(`No description found for SDG ${normalizedTag}`);
-        return null;
-      }
+      if (!description) return null;
 
       return {
         goal: description.goal,
@@ -153,23 +129,42 @@ const transformScenarios = (data: any[]): Scenario[] => {
       })),
       order: scenario.id
     };
-  }).filter(Boolean);
+  });
+  console.log("Transformed scenarios:", transformed);
+  return transformed;
 };
 
 interface ScenarioNavProps {
   className?: string;
 }
 
-const ScenarioNav = ({ className = "" }: ScenarioNavProps) => {
+const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
   const params = useParams();
   const currentScenarioId = params.id ? parseInt(params.id) : null;
-  
-  const { data: scenarios = [] } = useQuery<Scenario[]>({
+
+  const { data: scenarios = [], isLoading } = useQuery<Scenario[]>({
     queryKey: ["scenarios"],
     queryFn: async () => {
-      return transformScenarios(scenariosData);
+      const response = await fetch('/api/scenarios');
+      if (!response.ok) {
+        throw new Error('Failed to fetch scenarios');
+      }
+      const data = await response.json();
+      return transformScenarios(data);
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className={cn("w-80 bg-white rounded-lg shadow-sm border p-4", className)}>
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+        </div>
+      </div>
+    );
+  }
 
   // Simple progress tracking, will be replaced with actual progress data
   const completedScenarios = 1;
@@ -178,42 +173,65 @@ const ScenarioNav = ({ className = "" }: ScenarioNavProps) => {
     : 0;
 
   return (
-    <nav className={`lg:w-72 flex-shrink-0 ${className}`} aria-label="Scenarios">
-      <Card className="shadow-lg">
-        <CardHeader className="p-6 bg-white rounded-t-lg border-b border-neutral-100">
-          <div className="flex items-center gap-3">
-            <span className="material-icons text-2xl text-primary-600">menu_book</span>
-            <div>
-              <h2 className="text-xl font-bold text-neutral-900">AI Ethics Scenarios</h2>
-              <p className="text-sm text-neutral-600 mt-1">Explore ethical dilemmas in AI use</p>
-            </div>
-          </div>
-        </CardHeader>
-        <div className="divide-y divide-neutral-100">
-          {scenarios.map((scenario) => (
-            <Link
-              key={scenario.id}
-              to={`/scenarios/${scenario.id}`}
-              className={`block px-6 py-4 transition-all duration-200 ${
-                currentScenarioId === scenario.id
-                  ? "bg-primary-50 hover:bg-primary-100 text-primary-900 border-l-4 border-primary-600"
-                  : "hover:bg-neutral-50 text-neutral-700 border-l-4 border-transparent hover:border-neutral-300"
-              } focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
-              aria-current={currentScenarioId === scenario.id ? "page" : undefined}
-            >
-              <div className="flex items-start gap-3">
-                <Badge 
-                  variant={currentScenarioId === scenario.id ? "default" : "outline"}
-                  className="mt-1"
-                >
-                  {scenario.order}
-                </Badge>
-                <span className="font-medium">{scenario.title}</span>
+    <nav className={cn("w-80 bg-white rounded-lg shadow-sm border", className)}>
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-semibold text-gray-900">Scenarios</h2>
+        <p className="text-sm text-gray-600 mt-1">
+          {scenarios.length} ethical dilemmas to explore
+        </p>
+      </div>
+      
+      <div className="max-h-96 overflow-y-auto">
+        {scenarios.map((scenario) => (
+          <Link
+            key={scenario.id}
+            to={`/scenarios/${scenario.id}`}
+            className={cn(
+              "block p-4 border-b last:border-b-0 transition-colors",
+              currentScenarioId === scenario.id
+                ? "bg-blue-50 border-l-4 border-l-blue-500"
+                : "hover:bg-gray-50"
+            )}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-gray-900 truncate">
+                  {scenario.title}
+                </h3>
+                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                  {scenario.description}
+                </p>
+                
+                {/* SDG Tags */}
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {scenario.sdgDetails?.slice(0, 2).map((sdg: any, index: number) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      <span className="material-icons text-xs mr-1">
+                        {sdg.icon}
+                      </span>
+                      SDG {sdg.goal.match(/\d+/)?.[0]}
+                    </span>
+                  ))}
+                  {scenario.sdgDetails && scenario.sdgDetails.length > 2 && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                      +{scenario.sdgDetails.length - 2}
+                    </span>
+                  )}
+                </div>
               </div>
-            </Link>
-          ))}
-        </div>
-      </Card>
+              
+              {currentScenarioId === scenario.id && (
+                <div className="ml-2 flex-shrink-0">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                </div>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
       
       <Card className="mt-6 shadow-lg">
         <CardContent className="p-6">

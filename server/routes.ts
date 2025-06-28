@@ -167,27 +167,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to retrieve replies" });
     }
   });
-  
-  // Update user progress
-  app.post("/api/progress", async (req: Request, res: Response) => {
-    try {
-      // Simple validation
-      const schema = z.object({
-        userId: z.number().nullable().optional(),
-        scenarioId: z.number(),
-        completed: z.boolean().default(true)
-      });
-      
-      const progressData = schema.parse(req.body);
-      const progress = await storage.updateUserProgress(progressData);
-      res.json(progress);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid progress data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to update progress" });
-    }
-  });
 
   // Create HTTP server
   const httpServer = createServer(app);

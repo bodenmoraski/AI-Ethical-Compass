@@ -18,10 +18,24 @@ export async function submitPerspective(scenarioId: number, content: string, aut
 }
 
 export async function updateProgress(scenarioId: number, completed: boolean = true): Promise<void> {
-  // Progress tracking is disabled for now
-  // This can be enabled later when user authentication is implemented
-  console.log(`Progress would be updated for scenario ${scenarioId}: completed=${completed}`);
-  return Promise.resolve();
+  try {
+    const response = await fetch('/api/user-progress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        scenarioId,
+        completed,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to update progress:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error updating progress:', error);
+  }
 }
 
 export const getRelativeTimeString = (date: Date | string | number): string => {
