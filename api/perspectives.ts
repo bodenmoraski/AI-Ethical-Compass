@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient, type Perspective } from '../lib/supabase-server.js';
 import { analyzePerspective, moderatePerspective } from '../lib/ai-analysis.js';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('=== PERSPECTIVES DB API CALLED ===');
@@ -355,16 +357,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       // Verify scenario exists and get title for moderation
-      const { data: scenarioCheck, error: scenarioError } = await supabase
-        .from('scenarios')
-        .select('id, title')
-        .eq('id', scenarioId)
-        .single();
-      
-      if (scenarioError || !scenarioCheck) {
-        console.error('Scenario check error:', scenarioError);
-        return res.status(400).json({ 
-          message: `Scenario with ID ${scenarioId} does not exist or is not active` 
+      // Since scenarios are stored in static JSON, load them from the file
+      let scenarioCheck;
+      try {
+        const scenariosPath = path.join(process.cwd(), 'shared', 'scenarios.json');
+        const scenariosData = JSON.parse(fs.readFileSync(scenariosPath, 'utf8'));
+        scenarioCheck = scenariosData.find((s: any) => s.id === parseInt(scenarioId));
+        
+        if (!scenarioCheck) {
+          console.error(`Scenario ${scenarioId} not found in scenarios.json`);
+          return res.status(400).json({ 
+            message: `Scenario with ID ${scenarioId} does not exist` 
+          });
+        }
+      } catch (fileError) {
+        console.error('Error reading scenarios.json:', fileError);
+        return res.status(500).json({ 
+          message: 'Error loading scenarios data' 
         });
       }
       
@@ -374,9 +383,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log(`Moderating perspective for scenario: ${scenarioCheck.title}`);
       const moderation = await moderatePerspective(content.trim(), scenarioCheck.title);
       
+      console.log('Moderation result:', {
+        action: moderation.moderation_action,
+        is_appropriate: moderation.is_appropriate,
+        is_on_topic: moderation.is_on_topic,
+        issues: moderation.issues,
+        suggestions: moderation.suggestions
+      });
+      
       let moderationStatus = 'approved';
       
       if (moderation.moderation_action === 'reject') {
+        console.log('Moderation rejected the content, returning 400');
         return res.status(400).json({
           message: 'Perspective was rejected by moderation',
           issues: moderation.issues,
@@ -386,6 +404,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       } else if (moderation.moderation_action === 'flag') {
         moderationStatus = 'flagged';
       }
+      
+      console.log('Preparing to insert perspective with data:', {
+        scenario_id: scenarioId,
+        author_name: authorName.trim(),
+        content_length: content.trim().length,
+        user_id: userId || null,
+        moderation_status: moderationStatus
+      });
       
       // Insert the perspective
       const { data: perspective, error: insertError } = await supabase
@@ -401,10 +427,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
       
       if (insertError) {
-        console.error('Insert error:', insertError);
+        console.error('Database insert error details:', {
+          error: insertError,
+          code: insertError.code,
+          message: insertError.message,
+          details: insertError.details,
+          hint: insertError.hint
+        });
         return res.status(500).json({
           message: 'Failed to create perspective',
-          error: insertError.message
+          error: insertError.message,
+          details: insertError.details
         });
       }
       

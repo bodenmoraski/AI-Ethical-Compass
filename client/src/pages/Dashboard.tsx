@@ -3,8 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Button } from '../components/ui/button';
 import { useAuth } from '../lib/auth';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { 
   MessageSquare, 
   Heart, 
@@ -13,7 +15,11 @@ import {
   Book, 
   Award,
   Calendar,
-  User
+  User,
+  FileText,
+  Clock,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 
 interface DashboardData {
@@ -68,13 +74,21 @@ interface DashboardData {
 export default function Dashboard() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [assignmentStats, setAssignmentStats] = useState({
+    total: 0,
+    completed: 0,
+    submitted: 0,
+    overdue: 0
+  });
 
   useEffect(() => {
     if (user) {
       fetchDashboardData();
+      fetchAssignmentStats();
     }
   }, [user]);
 
@@ -95,6 +109,30 @@ export default function Dashboard() {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAssignmentStats = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`/api/user-dashboard?action=assignments&userEmail=${encodeURIComponent(user.email || user.id)}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const assignments = data.assignments || [];
+        
+        setAssignmentStats({
+          total: assignments.length,
+          completed: assignments.filter((a: any) => a.submission?.status === 'graded').length,
+          submitted: assignments.filter((a: any) => a.submission?.status === 'submitted').length,
+          overdue: assignments.filter((a: any) => 
+            a.due_date && new Date(a.due_date) < new Date() && !a.submission
+          ).length
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching assignment stats:', error);
     }
   };
 
@@ -225,6 +263,66 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Assignments Overview */}
+      {assignmentStats.total > 0 && (
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Recent Assignments
+                </CardTitle>
+                <CardDescription>
+                  Your latest assignments and submission status
+                </CardDescription>
+              </div>
+              <Button onClick={() => navigate('/assignments')} variant="outline">
+                View All Assignments
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {assignmentStats.total}
+                </div>
+                <div className="text-sm text-gray-600">Total</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">
+                  {assignmentStats.completed}
+                </div>
+                <div className="text-sm text-gray-600">Completed</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {assignmentStats.submitted}
+                </div>
+                <div className="text-sm text-gray-600">Submitted</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-600">
+                  {assignmentStats.overdue}
+                </div>
+                <div className="text-sm text-gray-600">Overdue</div>
+              </div>
+            </div>
+            {assignmentStats.overdue > 0 && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-2 text-red-700">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    You have {assignmentStats.overdue} overdue assignment{assignmentStats.overdue > 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="perspectives" className="space-y-6">

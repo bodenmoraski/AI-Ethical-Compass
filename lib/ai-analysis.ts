@@ -117,6 +117,20 @@ Focus on:
 }
 
 export async function moderatePerspective(content: string, scenarioTitle: string): Promise<PerspectiveModerationResult> {
+  // Simple dev bypass - just add {DEVYES} anywhere in your text
+  if (content.includes('{DEVYES}')) {
+    console.log('🚀 DEV: Auto-approved with {DEVYES} bypass');
+    return {
+      is_appropriate: true,
+      is_on_topic: true,
+      quality_score: 0.9,
+      issues: [],
+      suggestions: ['Auto-approved for development testing.'],
+      moderation_action: 'approve',
+      confidence_score: 1.0
+    };
+  }
+  
   // Secret testing bypasses for development
   if (content.includes('__DEV_APPROVE__')) {
     console.log('🧪 DEV: Using secret approve bypass');

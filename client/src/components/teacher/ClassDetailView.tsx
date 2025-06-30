@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -7,6 +7,8 @@ import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Skeleton } from '../ui/skeleton';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
+import AssignmentManager from './AssignmentManager';
 import { 
   Users, 
   BookOpen, 
@@ -20,6 +22,7 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
+import { supabase } from '../../../../lib/supabase-client';
 
 interface ClassDetailViewProps {
   classId: string;
@@ -82,6 +85,16 @@ interface AnalyticsData {
 const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [studentSearchQuery, setStudentSearchQuery] = useState('');
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
+
+  useEffect(() => {
+    async function getToken() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setAccessToken(session?.access_token || null);
+    }
+    getToken();
+  }, []);
 
   // Fetch class data
   const {
@@ -89,18 +102,57 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     isLoading: classLoading,
     error: classError,
   } = useQuery<ClassData>({
-    queryKey: ['class', classId],
+    queryKey: ['class', classId, accessToken],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?action=classes&classId=${classId}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Class not found');
-        }
-        throw new Error('Failed to fetch class');
+      if (!accessToken) {
+        throw new Error('No authentication token available');
       }
-      const result = await response.json();
-      return result.data;
+      
+      try {
+        const response = await fetch(`/api/teacher?action=classes&classId=${classId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Class not found');
+          }
+          if (response.status === 403) {
+            throw new Error('Access denied - teacher role required');
+          }
+          if (response.status === 500) {
+            const errorData = await response.text();
+            console.error('Server error:', errorData);
+            throw new Error('Server error - please check your teacher access');
+          }
+          throw new Error(`HTTP ${response.status}: Failed to fetch class`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.success || !result.data) {
+          throw new Error('Invalid response format');
+        }
+        
+        return result.data;
+      } catch (error) {
+        console.error('Error fetching class:', error);
+        throw error;
+      }
     },
+    enabled: !!accessToken,
+    retry: (failureCount, error) => {
+      // Don't retry on authentication or permission errors
+      if (error.message.includes('Access denied') || 
+          error.message.includes('teacher role required') ||
+          error.message.includes('Class not found')) {
+        return false;
+      }
+      return failureCount < 2;
+    }
   });
 
   // Fetch students
@@ -108,13 +160,32 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     data: studentsData,
     isLoading: studentsLoading,
   } = useQuery<{ data: Student[]; total: number }>({
-    queryKey: ['class-students', classId],
+    queryKey: ['class-students', classId, accessToken],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?action=students&classId=${classId}`);
-      if (!response.ok) throw new Error('Failed to fetch students');
-      return response.json();
+      if (!accessToken) {
+        throw new Error('No authentication token available');
+      }
+      
+      try {
+        const response = await fetch(`/api/teacher?action=students&classId=${classId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch students: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        return result.success ? result : { data: [], total: 0 };
+      } catch (error) {
+        console.error('Error fetching students:', error);
+        return { data: [], total: 0 }; // Return empty data instead of throwing
+      }
     },
-    enabled: !!classData,
+    enabled: !!classData && !!accessToken,
   });
 
   // Fetch assignments
@@ -122,13 +193,32 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     data: assignmentsData,
     isLoading: assignmentsLoading,
   } = useQuery<{ data: Assignment[]; total: number }>({
-    queryKey: ['class-assignments', classId],
+    queryKey: ['class-assignments', classId, accessToken],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher?action=assignments&classId=${classId}`);
-      if (!response.ok) throw new Error('Failed to fetch assignments');
-      return response.json();
+      if (!accessToken) {
+        throw new Error('No authentication token available');
+      }
+      
+      try {
+        const response = await fetch(`/api/teacher?action=assignments&classId=${classId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch assignments: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        return result.success ? result : { data: [], total: 0 };
+      } catch (error) {
+        console.error('Error fetching assignments:', error);
+        return { data: [], total: 0 }; // Return empty data instead of throwing
+      }
     },
-    enabled: !!classData,
+    enabled: !!classData && !!accessToken,
   });
 
   // Fetch analytics
@@ -136,13 +226,42 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     data: analyticsData,
     isLoading: analyticsLoading,
   } = useQuery<{ data: AnalyticsData }>({
-    queryKey: ['class-analytics', classId],
+    queryKey: ['class-analytics', classId, accessToken],
     queryFn: async () => {
-              const response = await fetch(`/api/teacher-analytics?endpoint=analytics&classId=${classId}&type=summary`);
-      if (!response.ok) throw new Error('Failed to fetch analytics');
-      return response.json();
+      if (!accessToken) {
+        throw new Error('No authentication token available');
+      }
+      
+      try {
+        const response = await fetch(`/api/teacher-analytics?endpoint=analytics&classId=${classId}&type=summary`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch analytics: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        return result.success ? result : { 
+          data: { 
+            engagement_trends: [], 
+            completion_rates: { total: 0, by_assignment: [] } 
+          } 
+        };
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+        return { 
+          data: { 
+            engagement_trends: [], 
+            completion_rates: { total: 0, by_assignment: [] } 
+          } 
+        }; // Return empty data instead of throwing
+      }
     },
-    enabled: !!classData && activeTab === 'analytics',
+    enabled: !!classData && activeTab === 'analytics' && !!accessToken,
   });
 
   // Filter students based on search query
@@ -157,6 +276,12 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
       )
     );
   }, [studentsData?.data, studentSearchQuery]);
+
+  // Handle assignment refresh
+  const handleAssignmentRefresh = () => {
+    // This will be called when assignments are created/updated/deleted
+    // The queries will automatically refetch due to their keys
+  };
 
   if (classLoading) {
     return (
@@ -290,7 +415,10 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full justify-start">
+                <Button 
+                  className="w-full justify-start"
+                  onClick={() => setAssignmentModalOpen(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Assignment
                 </Button>
@@ -371,51 +499,10 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
         </TabsContent>
 
         <TabsContent value="assignments" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Assignments</h3>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Assignment
-            </Button>
-          </div>
-
-          <Card>
-            <CardContent className="p-6">
-              {assignmentsLoading ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-5 w-48" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {assignmentsData?.data.map((assignment) => (
-                    <div key={assignment.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1">
-                          <h4 className="font-medium">{assignment.title}</h4>
-                          <p className="text-sm text-muted-foreground">{assignment.description}</p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>Due: {new Date(assignment.due_date).toLocaleDateString()}</span>
-                            <span>{assignment.points_possible} points</span>
-                            <span>{assignment.submission_count} submissions</span>
-                            <span>{assignment.graded_count} graded</span>
-                          </div>
-                        </div>
-                        <Badge variant={assignment.is_published ? 'default' : 'secondary'}>
-                          {assignment.is_published ? 'Published' : 'Draft'}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <AssignmentManager 
+            classId={parseInt(classId)} 
+            onRefresh={handleAssignmentRefresh}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
@@ -457,7 +544,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
                     </div>
                     <p className="text-sm text-muted-foreground">Overall completion rate</p>
                     <div className="space-y-2">
-                      {analyticsData?.data.completion_rates.by_assignment.map((item, index) => (
+                      {(analyticsData?.data?.completion_rates?.by_assignment || []).map((item, index) => (
                         <div key={index} className="flex justify-between">
                           <span className="text-sm">Assignment {item.assignment_id}</span>
                           <span className="text-sm font-medium">{item.completion_rate}%</span>
@@ -471,6 +558,24 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Assignment Manager Modal */}
+      <Dialog open={assignmentModalOpen} onOpenChange={setAssignmentModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Assignment Manager</DialogTitle>
+            <DialogDescription>
+              Create and manage assignments for {classData?.name}
+            </DialogDescription>
+          </DialogHeader>
+          {assignmentModalOpen && (
+            <AssignmentManager 
+              classId={parseInt(classId)} 
+              onRefresh={handleAssignmentRefresh}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Card } from '../components/ui/card';
 import ScenarioNav from '../components/ScenarioNav';
 import ScenarioView from '../components/ScenarioView';
 import { type Scenario } from '@shared/schema';
+import scenariosData from '../../../shared/scenarios.json';
 
 // Helper to normalize SDG numbers from various formats
 const getNormalizedSdgNumber = (tag: string): string => {
@@ -39,17 +39,52 @@ const getRelevance = (sdgNumber: string, scenarioTitle: string) => {
     },
     "9": {
       "default": "This scenario explores how AI innovation in education can be balanced with responsible development and inclusive access."
+    },
+    "11": {
+      "default": "This scenario examines how AI technologies impact sustainable communities and urban development in educational contexts."
+    },
+    "5": {
+      "default": "This scenario explores how AI implementation affects gender equality and empowerment in educational settings."
+    },
+    "1": {
+      "default": "This scenario examines how AI technologies impact poverty reduction and access to educational resources."
+    },
+    "3": {
+      "default": "This scenario explores how AI implementation affects health and well-being in educational environments."
+    },
+    "8": {
+      "default": "This scenario examines how AI technologies impact economic growth and decent work opportunities in education."
+    },
+    "13": {
+      "default": "This scenario explores how AI implementation relates to climate action and environmental sustainability in education."
     }
   };
 
-  return relevanceMap[sdgNumber]?.[scenarioTitle] || relevanceMap[sdgNumber].default;
+  // Safely access the relevance map with fallback
+  const sdgMap = relevanceMap[sdgNumber];
+  if (!sdgMap) {
+    return `This scenario examines how AI implementation relates to SDG ${sdgNumber} principles in educational contexts.`;
+  }
+  
+  return sdgMap[scenarioTitle] || sdgMap.default;
 };
 
 // Transform the raw data to match the Scenario type
 const transformScenarios = (data: any[]): Scenario[] => {
   console.log("Raw scenarios data:", data);
+  
+  if (!Array.isArray(data)) {
+    console.warn("Data is not an array:", data);
+    return [];
+  }
+  
   const transformed = data.map(scenario => {
-    const sdgDetails = scenario.sdgTags.map((tag: string) => {
+    // Ensure scenario has required properties with fallbacks
+    const sdgTags = scenario.sdgTags || scenario.sdg_tags || [];
+    const options = scenario.options || [];
+    const resources = scenario.resources || scenario.relatedResources || [];
+    
+    const sdgDetails = (Array.isArray(sdgTags) ? sdgTags : []).map((tag: string) => {
       const normalizedTag = getNormalizedSdgNumber(tag);
       const sdgDescriptions: Record<string, { goal: string; description: string; icon: string }> = {
         "1": {
@@ -110,25 +145,28 @@ const transformScenarios = (data: any[]): Scenario[] => {
       return {
         goal: description.goal,
         description: description.description,
-        relevance: getRelevance(normalizedTag, scenario.title),
+        relevance: getRelevance(normalizedTag, scenario.title || ''),
         icon: description.icon
       };
     }).filter(Boolean);
 
     return {
       ...scenario,
-      options: scenario.options.map((opt: any) => opt.text),
-      aiUseAnswer: scenario.description,
+      options: (Array.isArray(options) ? options : []).map((opt: any) => 
+        typeof opt === 'string' ? opt : opt?.text || opt
+      ),
+      aiUseAnswer: scenario.description || scenario.aiUseAnswer || '',
       sdgDetails,
-      relatedResources: scenario.resources.map((res: any) => ({
-        title: res.title,
-        source: res.type,
-        type: res.type,
-        link: res.url
+      relatedResources: (Array.isArray(resources) ? resources : []).map((res: any) => ({
+        title: res.title || res.name || 'Resource',
+        source: res.type || res.source || 'Unknown',
+        type: res.type || res.source || 'link',
+        link: res.url || res.link || '#'
       })),
-      order: scenario.id
+      order: scenario.id || scenario.order || 0
     };
   });
+  
   console.log("Transformed scenarios:", transformed);
   return transformed;
 };
@@ -138,51 +176,22 @@ const Scenarios = () => {
   const navigate = useNavigate();
   const scenarioId = params.id ? parseInt(params.id) : null;
   
-  const { data: scenarios = [], isLoading, error } = useQuery<Scenario[]>({
-    queryKey: ["scenarios"],
-    queryFn: async () => {
-      console.log("Fetching scenarios from API");
-      const response = await fetch('/api/scenarios');
-      if (!response.ok) {
-        throw new Error('Failed to fetch scenarios');
-      }
-      const data = await response.json();
-      console.log("Raw API response:", data);
-      const result = transformScenarios(data);
-      console.log("Transformation complete:", result);
-      return result;
-    },
-  });
+  // Use static scenarios data directly
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Current scenarios:", scenarios);
-    console.log("Is loading:", isLoading);
-    if (error) console.error("Error:", error);
-    
+    // Transform the imported scenarios data
+    const transformedScenarios = transformScenarios(scenariosData);
+    setScenarios(transformedScenarios);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId && scenarios.length > 0) {
       navigate(`/scenarios/${scenarios[0].id}`);
     }
-  }, [scenarioId, scenarios, navigate, isLoading, error]);
-
-  if (error instanceof Error) {
-    return (
-      <div className="flex-1 flex justify-center items-center min-h-[calc(100vh-4rem)]">
-        <Card className="p-8 max-w-md w-full text-center">
-          <div className="text-red-500 mb-4">
-            <span className="material-icons text-4xl">error_outline</span>
-          </div>
-          <h2 className="text-xl font-semibold text-neutral-900 mb-2">Error Loading Scenarios</h2>
-          <p className="text-neutral-600">{error.message}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </Card>
-      </div>
-    );
-  }
+  }, [scenarioId, scenarios, navigate]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -197,9 +206,13 @@ const Scenarios = () => {
       
       {/* Main content */}
       <div className="flex flex-col lg:flex-row gap-8">
-        <ScenarioNav className="lg:sticky lg:top-8 lg:self-start" />
+        {/* Navigation Sidebar - Now visible on all screen sizes */}
+        <div className="lg:w-80 lg:flex-shrink-0">
+          <ScenarioNav className="lg:sticky lg:top-8" />
+        </div>
         
-        <div className="flex-1">
+        {/* Scenario Content */}
+        <div className="flex-1 lg:min-w-0">
           {isLoading ? (
             <Card className="p-8 text-center">
               <div className="flex flex-col items-center gap-4">

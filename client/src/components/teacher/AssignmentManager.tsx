@@ -19,6 +19,7 @@ import {
   Loader2,
   CheckCircle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Assignment {
   id: number;
@@ -60,6 +61,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
   });
 
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchAssignments = async () => {
     try {
@@ -102,7 +104,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
         throw new Error('No authentication token available');
       }
 
-      // Format the due date properly
+      // Format the due date properly - send null instead of empty string
       const assignmentData = {
         ...formData,
         class_id: classId,
@@ -162,7 +164,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
         throw new Error('No authentication token available');
       }
 
-      // Format the due date properly
+      // Format the due date properly - send null instead of empty string
       const assignmentData = {
         ...formData,
         due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null
@@ -369,6 +371,13 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                       disabled={deleting}
                     >
                       <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/teacher/assignment/${assignment.id}/grading`)}
+                    >
+                      Grade Submissions
                     </Button>
                   </div>
                 </div>

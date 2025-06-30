@@ -1,17 +1,17 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { type Scenario } from '@shared/schema';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import scenariosData from '../../../shared/scenarios.json';
 
-// Helper to normalize SDG numbers from various formats
+// Utility to normalize SDG tag to a number
 const getNormalizedSdgNumber = (tag: string): string => {
-  // Extract number from formats like "SDG 4", "Quality Education (SDG 4)", "4", etc.
-  const match = tag.match(/(\d+)/);
-  return match ? match[1] : tag;
+  // Extract number from various SDG formats (e.g., "SDG4", "4", "Goal 4")
+  const match = tag.match(/\d+/);
+  return match ? match[0] : tag;
 };
 
 // Helper to get scenario-specific relevance
@@ -40,17 +40,52 @@ const getRelevance = (sdgNumber: string, scenarioTitle: string) => {
     },
     "9": {
       "default": "This scenario explores how AI innovation in education can be balanced with responsible development and inclusive access."
+    },
+    "11": {
+      "default": "This scenario examines how AI technologies impact sustainable communities and urban development in educational contexts."
+    },
+    "5": {
+      "default": "This scenario explores how AI implementation affects gender equality and empowerment in educational settings."
+    },
+    "1": {
+      "default": "This scenario examines how AI technologies impact poverty reduction and access to educational resources."
+    },
+    "3": {
+      "default": "This scenario explores how AI implementation affects health and well-being in educational environments."
+    },
+    "8": {
+      "default": "This scenario examines how AI technologies impact economic growth and decent work opportunities in education."
+    },
+    "13": {
+      "default": "This scenario explores how AI implementation relates to climate action and environmental sustainability in education."
     }
   };
 
-  return relevanceMap[sdgNumber]?.[scenarioTitle] || relevanceMap[sdgNumber].default;
+  // Safely access the relevance map with fallback
+  const sdgMap = relevanceMap[sdgNumber];
+  if (!sdgMap) {
+    return `This scenario examines how AI implementation relates to SDG ${sdgNumber} principles in educational contexts.`;
+  }
+  
+  return sdgMap[scenarioTitle] || sdgMap.default;
 };
 
 // Transform the raw data to match the Scenario type
 const transformScenarios = (data: any[]): Scenario[] => {
   console.log("Raw scenarios data:", data);
-  const transformed = data.map(scenario => {
-    const sdgDetails = scenario.sdgTags.map((tag: string) => {
+  
+  if (!Array.isArray(data)) {
+    console.warn("Data is not an array:", data);
+    return [];
+  }
+  
+  const transformed = data.map((scenario: any) => {
+    // Ensure scenario has required properties with fallbacks
+    const sdgTags = scenario.sdgTags || scenario.sdg_tags || [];
+    const options = scenario.options || [];
+    const resources = scenario.resources || scenario.relatedResources || [];
+    
+    const sdgDetails = (Array.isArray(sdgTags) ? sdgTags : []).map((tag: string) => {
       const normalizedTag = getNormalizedSdgNumber(tag);
       const sdgDescriptions: Record<string, { goal: string; description: string; icon: string }> = {
         "1": {
@@ -111,25 +146,28 @@ const transformScenarios = (data: any[]): Scenario[] => {
       return {
         goal: description.goal,
         description: description.description,
-        relevance: getRelevance(normalizedTag, scenario.title),
+        relevance: getRelevance(normalizedTag, scenario.title || ''),
         icon: description.icon
       };
     }).filter(Boolean);
 
     return {
       ...scenario,
-      options: scenario.options.map((opt: any) => opt.text),
-      aiUseAnswer: scenario.description,
+      options: (Array.isArray(options) ? options : []).map((opt: any) => 
+        typeof opt === 'string' ? opt : opt?.text || opt
+      ),
+      aiUseAnswer: scenario.description || scenario.aiUseAnswer || '',
       sdgDetails,
-      relatedResources: scenario.resources.map((res: any) => ({
-        title: res.title,
-        source: res.type,
-        type: res.type,
-        link: res.url
+      relatedResources: (Array.isArray(resources) ? resources : []).map((res: any) => ({
+        title: res.title || res.name || 'Resource',
+        source: res.type || res.source || 'Unknown',
+        type: res.type || res.source || 'link',
+        link: res.url || res.link || '#'
       })),
-      order: scenario.id
+      order: scenario.id || scenario.order || 0
     };
   });
+  
   console.log("Transformed scenarios:", transformed);
   return transformed;
 };
@@ -142,29 +180,15 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
   const params = useParams();
   const currentScenarioId = params.id ? parseInt(params.id) : null;
 
-  const { data: scenarios = [], isLoading } = useQuery<Scenario[]>({
-    queryKey: ["scenarios"],
-    queryFn: async () => {
-      const response = await fetch('/api/scenarios');
-      if (!response.ok) {
-        throw new Error('Failed to fetch scenarios');
-      }
-      const data = await response.json();
-      return transformScenarios(data);
-    },
-  });
+  // Use static scenarios data with memoization
+  const scenarios = useMemo(() => {
+    console.log("ScenarioNav: Processing scenarios data", scenariosData);
+    const result = transformScenarios(scenariosData);
+    console.log("ScenarioNav: Transformed scenarios result", result);
+    return result;
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div className={cn("w-80 bg-white rounded-lg shadow-sm border p-4", className)}>
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-        </div>
-      </div>
-    );
-  }
+  console.log("ScenarioNav: Final scenarios for rendering", scenarios);
 
   // Simple progress tracking, will be replaced with actual progress data
   const completedScenarios = 1;
@@ -173,7 +197,7 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
     : 0;
 
   return (
-    <nav className={cn("w-80 bg-white rounded-lg shadow-sm border", className)}>
+    <nav className={cn("w-full bg-white rounded-lg shadow-sm border", className)}>
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold text-gray-900">Scenarios</h2>
         <p className="text-sm text-gray-600 mt-1">
@@ -181,7 +205,7 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
         </p>
       </div>
       
-      <div className="max-h-96 overflow-y-auto">
+      <div className="max-h-96 lg:max-h-[500px] overflow-y-auto">
         {scenarios.map((scenario) => (
           <Link
             key={scenario.id}
@@ -199,7 +223,7 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
                   {scenario.title}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                  {scenario.description}
+                  {scenario.description?.substring(0, 100)}...
                 </p>
                 
                 {/* SDG Tags */}
@@ -225,7 +249,7 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
               
               {currentScenarioId === scenario.id && (
                 <div className="ml-2 flex-shrink-0">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                 </div>
               )}
             </div>
@@ -233,27 +257,26 @@ const ScenarioNav: React.FC<ScenarioNavProps> = ({ className }) => {
         ))}
       </div>
       
-      <Card className="mt-6 shadow-lg">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="material-icons text-primary-600">trending_up</span>
-            <h2 className="text-lg font-semibold text-neutral-900">Your Progress</h2>
-          </div>
-          <Progress 
-            value={progressPercentage} 
-            className="h-3 bg-neutral-100" 
-            aria-label={`${progressPercentage}% complete`} 
-          />
-          <div className="flex items-center justify-between mt-3">
-            <p className="text-sm text-neutral-600">
-              {completedScenarios} of {scenarios.length} completed
-            </p>
-            <span className="text-sm font-medium text-primary-600">
-              {progressPercentage}%
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Progress Card */}
+      <div className="p-4 border-t bg-gray-50">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="material-icons text-blue-600 text-sm">trending_up</span>
+          <h3 className="text-sm font-semibold text-gray-900">Your Progress</h3>
+        </div>
+        <Progress 
+          value={progressPercentage} 
+          className="h-2 bg-gray-200" 
+          aria-label={`${progressPercentage}% complete`} 
+        />
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-xs text-gray-600">
+            {completedScenarios} of {scenarios.length} completed
+          </p>
+          <span className="text-xs font-medium text-blue-600">
+            {progressPercentage}%
+          </span>
+        </div>
+      </div>
     </nav>
   );
 };

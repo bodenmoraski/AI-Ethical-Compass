@@ -29,8 +29,8 @@ const AssignmentSchema = z.object({
   instructions: z.string().optional(),
   assignment_type: z.enum(['scenario', 'custom', 'discussion']).default('scenario'),
   scenario_ids: z.array(z.number()).optional(),
-  due_date: z.string().optional().refine((val) => {
-    if (!val) return true; // Allow empty string
+  due_date: z.string().nullable().optional().refine((val) => {
+    if (!val || val === null) return true; // Allow empty string or null
     try {
       new Date(val);
       return true;
@@ -111,25 +111,65 @@ const handleTeacherClasses = async (req: VercelRequest, res: VercelResponse) => 
 
   switch (req.method) {
     case 'GET': {
-      const { data: classes, error } = await supabase
-        .from('classes')
-        .select(`
-          *,
-          class_enrollments(count),
-          assignments(count)
-        `)
-        .eq('teacher_id', userId)
-        .order('created_at', { ascending: false });
+      const { classId } = req.query;
+      
+      if (classId) {
+        // Get a specific class
+        const { data: classData, error } = await supabase
+          .from('classes')
+          .select(`
+            *,
+            class_enrollments(count),
+            assignments(count)
+          `)
+          .eq('id', classId)
+          .eq('teacher_id', userId)
+          .single();
 
-      if (error) throw error;
+        if (error) {
+          if (error.code === 'PGRST116') {
+            throw new Error('Class not found');
+          }
+          throw error;
+        }
 
-      const classesWithCounts = classes?.map(cls => ({
-        ...cls,
-        student_count: cls.class_enrollments?.length || 0,
-        assignment_count: cls.assignments?.length || 0
-      })) || [];
+        // Calculate real completion rate
+        let completionRate = 0;
+        if (classData.assignments?.length > 0 && classData.class_enrollments?.length > 0) {
+          // This would need actual submission data - for now, return 0 if no data
+          completionRate = 0;
+        }
 
-      return res.json({ success: true, classes: classesWithCounts });
+        const classWithCounts = {
+          ...classData,
+          student_count: classData.class_enrollments?.length || 0,
+          assignment_count: classData.assignments?.length || 0,
+          completion_rate: completionRate
+        };
+
+        return res.json({ success: true, data: classWithCounts });
+      } else {
+        // Get all classes
+        const { data: classes, error } = await supabase
+          .from('classes')
+          .select(`
+            *,
+            class_enrollments(count),
+            assignments(count)
+          `)
+          .eq('teacher_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const classesWithCounts = classes?.map(cls => ({
+          ...cls,
+          student_count: cls.class_enrollments?.length || 0,
+          assignment_count: cls.assignments?.length || 0
+        })) || [];
+
+        return res.json({ success: true, classes: classesWithCounts });
+      }
     }
 
     case 'POST': {
@@ -549,6 +589,156 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
   }
 };
 
+// Grading endpoints
+const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
+  const userId = await authenticateUser(req);
+  const { assignmentId, submissionId } = req.query;
+
+  switch (req.method) {
+    case 'GET': {
+      // List all submissions for an assignment
+      if (req.query.action === 'assignment-submissions') {
+        if (!assignmentId) throw new Error('Assignment ID required');
+        // Verify teacher owns the assignment
+        const { data: assignment, error: assignmentError } = await supabase
+          .from('assignments')
+          .select('id, class_id')
+          .eq('id', assignmentId)
+          .single();
+        if (assignmentError || !assignment) throw new Error('Assignment not found');
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
+          .select('teacher_id')
+          .eq('id', assignment.class_id)
+          .single();
+        if (classError || !classData || classData.teacher_id !== userId) throw new Error('Access denied');
+        // Get all submissions
+        const { data: submissions, error } = await supabase
+          .from('assignment_submissions')
+          .select(`
+            *,
+            users(id, email, first_name, last_name, username)
+          `)
+          .eq('assignment_id', assignmentId);
+        if (error) throw error;
+        return res.json({ success: true, submissions });
+      }
+      // Get a specific submission
+      if (req.query.action === 'submission-detail') {
+        if (!submissionId) throw new Error('Submission ID required');
+        const { data: submission, error } = await supabase
+          .from('assignment_submissions')
+          .select(`
+            *,
+            users(id, email, first_name, last_name, username)
+          `)
+          .eq('id', submissionId)
+          .single();
+        if (error || !submission) throw new Error('Submission not found');
+        // Verify teacher owns the assignment
+        const { data: assignment, error: assignmentError } = await supabase
+          .from('assignments')
+          .select('id, class_id')
+          .eq('id', submission.assignment_id)
+          .single();
+        if (assignmentError || !assignment) throw new Error('Assignment not found');
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
+          .select('teacher_id')
+          .eq('id', assignment.class_id)
+          .single();
+        if (classError || !classData || classData.teacher_id !== userId) throw new Error('Access denied');
+        return res.json({ success: true, submission });
+      }
+      throw new Error('Invalid grading GET action');
+    }
+    case 'POST': {
+      // Grade a submission
+      if (req.query.action === 'grade-submission') {
+        const { submissionId, score, feedback } = req.body;
+        if (!submissionId || typeof score !== 'number') throw new Error('Submission ID and score required');
+        // Get submission and verify teacher owns it
+        const { data: submission, error } = await supabase
+          .from('assignment_submissions')
+          .select('*')
+          .eq('id', submissionId)
+          .single();
+        if (error || !submission) throw new Error('Submission not found');
+        const { data: assignment, error: assignmentError } = await supabase
+          .from('assignments')
+          .select('id, class_id, points_possible')
+          .eq('id', submission.assignment_id)
+          .single();
+        if (assignmentError || !assignment) throw new Error('Assignment not found');
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
+          .select('teacher_id')
+          .eq('id', assignment.class_id)
+          .single();
+        if (classError || !classData || classData.teacher_id !== userId) throw new Error('Access denied');
+        if (score < 0 || score > assignment.points_possible) throw new Error('Score out of range');
+        // Update submission
+        const { data: updated, error: updateError } = await supabase
+          .from('assignment_submissions')
+          .update({
+            manual_score: score,
+            final_score: score,
+            feedback: feedback || null,
+            status: 'graded',
+            graded_at: new Date().toISOString(),
+            graded_by: userId
+          })
+          .eq('id', submissionId)
+          .select()
+          .single();
+        if (updateError) throw updateError;
+        return res.json({ success: true, submission: updated });
+      }
+      throw new Error('Invalid grading POST action');
+    }
+    case 'PUT': {
+      // Update feedback
+      if (req.query.action === 'update-feedback') {
+        const { submissionId, feedback } = req.body;
+        if (!submissionId || typeof feedback !== 'string') throw new Error('Submission ID and feedback required');
+        // Get submission and verify teacher owns it
+        const { data: submission, error } = await supabase
+          .from('assignment_submissions')
+          .select('*')
+          .eq('id', submissionId)
+          .single();
+        if (error || !submission) throw new Error('Submission not found');
+        const { data: assignment, error: assignmentError } = await supabase
+          .from('assignments')
+          .select('id, class_id')
+          .eq('id', submission.assignment_id)
+          .single();
+        if (assignmentError || !assignment) throw new Error('Assignment not found');
+        const { data: classData, error: classError } = await supabase
+          .from('classes')
+          .select('teacher_id')
+          .eq('id', assignment.class_id)
+          .single();
+        if (classError || !classData || classData.teacher_id !== userId) throw new Error('Access denied');
+        // Update feedback
+        const { data: updated, error: updateError } = await supabase
+          .from('assignment_submissions')
+          .update({
+            feedback
+          })
+          .eq('id', submissionId)
+          .select()
+          .single();
+        if (updateError) throw updateError;
+        return res.json({ success: true, submission: updated });
+      }
+      throw new Error('Invalid grading PUT action');
+    }
+    default:
+      throw new Error(`Method ${req.method} not allowed`);
+  }
+};
+
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -572,6 +762,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await handleStudents(req, res);
       case 'access':
         return await handleTeacherAccess(req, res);
+      case 'assignment-submissions':
+      case 'submission-detail':
+      case 'grade-submission':
+      case 'update-feedback':
+        return await handleGrading(req, res);
       default:
         throw new Error('Invalid action parameter');
     }

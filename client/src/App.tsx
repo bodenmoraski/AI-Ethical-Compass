@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -27,7 +27,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import NotFound from "@/pages/NotFound";
 import AuthCallback from "@/pages/AuthCallback";
 import { AuthProvider, useAuth } from "@/lib/auth";
-import UserProfileSetup from "@/components/UserProfileSetup";
+import StudentAssignments from "@/pages/StudentAssignments";
+import AssignmentGrading from "@/pages/AssignmentGrading";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,19 +73,6 @@ function AppContent() {
     );
   }
 
-  // Show profile setup if user is logged in but needs to complete profile
-  if (user && needsProfileSetup) {
-    return (
-      <>
-        <UserProfileSetup 
-          email={user.email!} 
-          onProfileComplete={handleProfileComplete}
-        />
-        <Toaster />
-      </>
-    );
-  }
-
   // Normal app flow
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
@@ -98,9 +86,10 @@ function AppContent() {
           <Route path="/user-scenarios" element={<UserScenarios />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/assignments" element={<StudentAssignments />} />
           <Route path="/teacher" element={<TeacherDashboard />} />
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-          <Route path="/teacher/class/:classId" element={<ClassDetailView classId="1" />} />
+          <Route path="/teacher/class/:classId" element={<ClassDetailPage />} />
           <Route path="/teacher/classroom/:classId" element={<LiveClassroomMonitor classId={1} userId={1} />} />
           <Route path="/tutorial/user" element={<UserTutorial />} />
           <Route path="/tutorial/teacher" element={<TeacherTutorial />} />
@@ -108,6 +97,7 @@ function AppContent() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/teacher/assignment/:assignmentId/grading" element={<AssignmentGrading />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
@@ -120,6 +110,12 @@ function AppContent() {
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeProvider>
   );
+}
+
+// Create a wrapper component for ClassDetailView that gets the classId from URL params
+function ClassDetailPage() {
+  const { classId } = useParams<{ classId: string }>();
+  return <ClassDetailView classId={classId!} />;
 }
 
 function App() {

@@ -86,7 +86,6 @@ export default function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [teacherAccessModalOpen, setTeacherAccessModalOpen] = useState(false);
 
@@ -255,8 +254,7 @@ export default function TeacherDashboard() {
   }, [classFormData, fetchDashboardData, toast]);
 
   const handleViewClass = (classId: number) => {
-    setSelectedClassId(classId);
-    setSelectedTab('class-details');
+    navigate(`/teacher/class/${classId}`);
   };
 
   if (!user || userProfile?.role !== 'teacher') {
@@ -760,16 +758,6 @@ export default function TeacherDashboard() {
                     </Card>
                   ))}
                 </div>
-
-                {/* Student Management for Selected Class */}
-                {selectedClassId && (
-                  <div className="mt-8">
-                    <StudentManager 
-                      classId={selectedClassId} 
-                      onRefresh={fetchDashboardData}
-                    />
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -812,10 +800,34 @@ export default function TeacherDashboard() {
 
         <TabsContent value="assignments" className="mt-6">
           {classes.length > 0 ? (
-            <AssignmentManager 
-              classId={classes[0].id} 
-              onRefresh={fetchDashboardData}
-            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Assignment Management</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Managing assignments for: <span className="font-medium">{classes[0].name}</span>
+                    {classes.length > 1 && (
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                        +{classes.length - 1} more class{classes.length > 2 ? 'es' : ''}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {classes.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedTab('classes')}
+                  >
+                    Switch Class
+                  </Button>
+                )}
+              </div>
+              <AssignmentManager 
+                classId={classes[0].id} 
+                onRefresh={fetchDashboardData}
+              />
+            </div>
           ) : (
             <Card>
               <CardContent className="pt-12 pb-12">
@@ -829,7 +841,7 @@ export default function TeacherDashboard() {
                     <Plus className="h-4 w-4" />
                     Create Your First Class
                   </Button>
-          </div>
+                </div>
               </CardContent>
             </Card>
           )}
