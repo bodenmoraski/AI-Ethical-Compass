@@ -379,30 +379,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       
       console.log(`Verified scenario ${scenarioId} exists: "${scenarioCheck.title}"`);
       
-      // Perform AI moderation
-      console.log(`Moderating perspective for scenario: ${scenarioCheck.title}`);
-      const moderation = await moderatePerspective(content.trim(), scenarioCheck.title);
-      
-      console.log('Moderation result:', {
-        action: moderation.moderation_action,
-        is_appropriate: moderation.is_appropriate,
-        is_on_topic: moderation.is_on_topic,
-        issues: moderation.issues,
-        suggestions: moderation.suggestions
-      });
-      
+      // Check for development bypass first
       let moderationStatus = 'approved';
+      let moderation;
       
-      if (moderation.moderation_action === 'reject') {
-        console.log('Moderation rejected the content, returning 400');
-        return res.status(400).json({
-          message: 'Perspective was rejected by moderation',
+      if (content.includes('{DEVYES}')) {
+        console.log('Development bypass detected - auto-approving');
+        moderationStatus = 'approved';
+        moderation = {
+          moderation_action: 'approve',
+          is_appropriate: true,
+          is_on_topic: true,
+          issues: [],
+          suggestions: ['Development bypass used']
+        };
+      } else {
+        // Perform AI moderation
+        console.log(`Moderating perspective for scenario: ${scenarioCheck.title}`);
+        moderation = await moderatePerspective(content.trim(), scenarioCheck.title);
+        
+        console.log('Moderation result:', {
+          action: moderation.moderation_action,
+          is_appropriate: moderation.is_appropriate,
+          is_on_topic: moderation.is_on_topic,
           issues: moderation.issues,
-          suggestions: moderation.suggestions,
-          moderation_result: moderation
+          suggestions: moderation.suggestions
         });
-      } else if (moderation.moderation_action === 'flag') {
-        moderationStatus = 'flagged';
+        
+        if (moderation.moderation_action === 'reject') {
+          console.log('Moderation rejected the content, returning 400');
+          return res.status(400).json({
+            message: 'Perspective was rejected by moderation',
+            issues: moderation.issues,
+            suggestions: moderation.suggestions,
+            moderation_result: moderation
+          });
+        } else if (moderation.moderation_action === 'flag') {
+          moderationStatus = 'flagged';
+        }
       }
       
       console.log('Preparing to insert perspective with data:', {

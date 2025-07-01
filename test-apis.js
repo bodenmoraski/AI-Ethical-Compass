@@ -87,7 +87,7 @@ const makeRequest = async (endpoint, options = {}) => {
 const testPlatformStats = async () => {
   log('\n📊 Testing Platform Stats API...', 'bold');
   
-  const response = await makeRequest('/api/platform-stats');
+  const response = await makeRequest('/api/platform?type=stats');
   
   if (response.ok && response.data.success) {
     logSuccess('Platform stats API working');
@@ -222,7 +222,7 @@ const testUserAPIs = async () => {
   
   const endpoints = [
     '/api/perspectives',
-    '/api/scenarios',
+    '/api/platform?type=scenarios',
     '/api/leaderboard',
     '/api/achievements',
     '/api/user-dashboard',
@@ -250,14 +250,13 @@ const testAPICount = async () => {
     '/api/teacher',
     '/api/teacher-analytics', 
     '/api/perspectives',
-    '/api/platform-stats',
+    '/api/platform',
     '/api/perspective-rankings',
     '/api/leaderboard',
     '/api/user-scenarios',
     '/api/achievements',
     '/api/user-dashboard',
     '/api/user-profile',
-    '/api/scenarios',
     '/api/progress'
   ];
 
@@ -314,7 +313,7 @@ const testDatabaseConnectivity = async () => {
   log('\n🗄️  Testing Database Connectivity...', 'bold');
   
   // Test an endpoint that requires database access
-  const response = await makeRequest('/api/platform-stats');
+  const response = await makeRequest('/api/platform?type=stats');
   
   if (response.ok && response.data?.success) {
     logSuccess('Database connectivity working');

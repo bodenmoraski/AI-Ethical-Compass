@@ -77,7 +77,7 @@ const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/platform-stats');
+        const response = await fetch('/api/platform?type=stats');
         const data = await response.json();
         
         if (data.success) {
