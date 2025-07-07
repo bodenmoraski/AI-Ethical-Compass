@@ -41,6 +41,28 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Helper function to get the correct base URL for redirects
+const getBaseUrl = (): string => {
+  // Check for environment variable override first
+  const envUrl = import.meta.env.VITE_APP_URL || import.meta.env.VITE_SITE_URL;
+  if (envUrl) {
+    return envUrl;
+  }
+
+  // In production, use the Vercel URL or auto-detect
+  if (typeof window !== 'undefined') {
+    // Check if we're on localhost (development)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // Use production URL for email redirects even during development
+      return 'https://ai-ethical-compass-build.vercel.app';
+    }
+    // Use the current origin if we're already on production
+    return window.location.origin;
+  }
+  // Fallback for SSR or when window is not available
+  return 'https://ai-ethical-compass-build.vercel.app';
+};
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -161,7 +183,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${getBaseUrl()}/auth/callback`,
         data: metadata ? {
           username: metadata.username,
           institution_name: metadata.institutionName,
@@ -208,7 +230,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${getBaseUrl()}/auth/callback`,
       },
     });
 
