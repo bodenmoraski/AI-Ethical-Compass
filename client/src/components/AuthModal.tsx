@@ -47,9 +47,28 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const { signUp, signIn, signInWithGoogle } = useAuth();
   const { toast } = useToast();
+
+  const validatePassword = (value: string) => {
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    if (value.length > 72) {
+      return 'Password must be less than 72 characters';
+    }
+    return '';
+  };
+
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,19 +77,59 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
     try {
       if (mode === 'register') {
+        // Validate all fields before submitting
+        const emailValidation = validateEmail(email);
+        const passwordValidation = validatePassword(password);
+        const usernameValidation = validateUsername(username);
+
+        if (emailValidation) {
+          setError(emailValidation);
+          setLoading(false);
+          return;
+        }
+
+        if (passwordValidation) {
+          setError(passwordValidation);
+          setLoading(false);
+          return;
+        }
+
+        if (usernameValidation) {
+          setError(usernameValidation);
+          setLoading(false);
+          return;
+        }
+
         if (password !== confirmPassword) {
           setError('Passwords do not match');
           setLoading(false);
           return;
         }
 
-        const { error } = await signUp(email, password, {
-          username,
-          institutionName: institutionName || null,
+        console.log('Attempting sign up with:', {
+          email: email.trim(),
+          passwordLength: password.length,
+          username: username.trim(),
+          institutionName: institutionName.trim() || null,
+          institutionType: institutionType || null,
+        });
+
+        const { error } = await signUp(email.trim(), password, {
+          username: username.trim(),
+          institutionName: institutionName.trim() || null,
           institutionType: institutionType || null,
         });
         if (error) {
-          setError(error.message);
+          // Handle specific Supabase errors
+          if (error.message.includes('Invalid login credentials')) {
+            setError('Invalid email or password format');
+          } else if (error.message.includes('User already registered')) {
+            setError('An account with this email already exists');
+          } else if (error.message.includes('Password should be at least 6 characters')) {
+            setError('Password must be at least 6 characters long');
+          } else {
+            setError(error.message);
+          }
         } else {
           toast({
             title: "Check your email",
@@ -91,7 +150,8 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         }
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      console.error('Auth error:', err);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -122,6 +182,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setInstitutionName('');
     setInstitutionType('');
     setUsernameError('');
+    setPasswordError('');
     setError(null);
     setLoading(false);
   };
@@ -133,20 +194,29 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   const validateUsername = (value: string) => {
     if (value.length < 3) {
-      return "Username must be at least 3 characters";
+      return 'Username must be at least 3 characters long';
     }
     if (value.length > 30) {
-      return "Username must be 30 characters or less";
+      return 'Username must be less than 30 characters';
     }
     if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-      return "Username can only contain letters, numbers, and underscores";
+      return 'Username can only contain letters, numbers, and underscores';
     }
-    return "";
+    return '';
   };
 
   const handleUsernameChange = (value: string) => {
     setUsername(value);
-    setUsernameError(validateUsername(value));
+    const error = validateUsername(value);
+    setUsernameError(error);
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (mode === 'register') {
+      const error = validatePassword(value);
+      setPasswordError(error);
+    }
   };
 
   return (
@@ -187,7 +257,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     id="signin-password"
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Enter your password"
                     required
                   />
@@ -325,8 +395,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder="Create a password"
+                    className={passwordError ? "border-red-500" : ""}
                     required
                   />
                   <Button
@@ -339,6 +410,12 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
+                {passwordError && (
+                  <p className="text-sm text-red-600">{passwordError}</p>
+                )}
+                <p className="text-xs text-gray-600">
+                  Must be at least 6 characters long
+                </p>
               </div>
 
               {/* Confirm Password */}
@@ -374,7 +451,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={loading || !!usernameError || !username.trim()}
+                disabled={loading || !!usernameError || !!passwordError || !username.trim() || !email.trim() || !password.trim()}
               >
                 {loading ? "Creating account..." : "Create Account"}
               </Button>
