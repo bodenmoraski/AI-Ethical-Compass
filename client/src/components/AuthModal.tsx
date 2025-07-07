@@ -138,9 +138,39 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           onClose();
         }
       } else {
-        const { error } = await signIn(email, password);
+        // Validate login inputs
+        const emailValidation = validateEmail(email);
+        if (emailValidation) {
+          setError(emailValidation);
+          setLoading(false);
+          return;
+        }
+
+        if (!password.trim()) {
+          setError('Password is required');
+          setLoading(false);
+          return;
+        }
+
+        console.log('Attempting sign in with:', {
+          email: email.trim(),
+          passwordLength: password.length,
+        });
+
+        const { error } = await signIn(email.trim(), password);
         if (error) {
-          setError(error.message);
+          console.error('Sign in error:', error);
+          
+          // Handle specific sign-in errors
+          if (error.message.includes('Invalid login credentials') || error.message.includes('Email not confirmed')) {
+            setError('Invalid email or password. Please check your credentials or confirm your email.');
+          } else if (error.message.includes('Email not confirmed')) {
+            setError('Please check your email and click the confirmation link before signing in.');
+          } else if (error.message.includes('Too many requests')) {
+            setError('Too many login attempts. Please wait a moment before trying again.');
+          } else {
+            setError(`Sign in failed: ${error.message}`);
+          }
         } else {
           toast({
             title: "Welcome back!",
@@ -229,7 +259,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="signin" className="w-full">
+        <Tabs 
+          value={mode === 'login' ? 'signin' : 'signup'} 
+          onValueChange={(value) => {
+            const newMode = value === 'signin' ? 'login' : 'register';
+            setMode(newMode);
+            resetForm();
+          }}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
