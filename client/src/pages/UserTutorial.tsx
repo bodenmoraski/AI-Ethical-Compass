@@ -18,7 +18,7 @@ export default function UserTutorial() {
       title: "Create Your Profile",
       description: "Set up your profile with your educational background and interests to get personalized recommendations.",
       details: [
-        "Click the Login button in the top navigation",
+        "Click the Sign In button in the top navigation",
         "Choose your preferred authentication method",
         "Complete your profile with educational information",
         "Select your areas of interest in AI ethics"

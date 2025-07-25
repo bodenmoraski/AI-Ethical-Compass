@@ -163,13 +163,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.error('Error fetching user perspectives:', perspectivesError);
       }
       
-      // Skip user_likes for now due to table structure issues
-      const likedPerspectives = [];
-      const likedError = null;
+      // Get user's liked perspectives
+      const { data: likedPerspectives, error: likedError } = await supabase
+        .from('user_likes')
+        .select(`
+          perspective_id,
+          created_at,
+          perspectives (
+            id,
+            content,
+            scenario_id,
+            author_name,
+            likes,
+            scenarios (
+              id,
+              title
+            )
+          )
+        `)
+        .eq('user_id', effectiveUserId)
+        .order('created_at', { ascending: false });
       
-      // Skip scenario progress for now due to table structure issues  
-      const scenarioProgress: any[] = [];
-      const progressError = null;
+      if (likedError) {
+        console.error('Error fetching user likes:', likedError);
+      }
+      
+      // Get user's scenario progress
+      const { data: scenarioProgress, error: progressError } = await supabase
+        .from('user_scenario_progress')
+        .select(`
+          scenario_id,
+          completed_at,
+          perspectives_submitted,
+          scenarios (
+            id,
+            title
+          )
+        `)
+        .eq('user_id', effectiveUserId)
+        .order('completed_at', { ascending: false });
+      
+      if (progressError) {
+        console.error('Error fetching scenario progress:', progressError);
+      }
       
       // Calculate statistics
       const stats = {
@@ -197,7 +233,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user_id: effectiveUserId,
         statistics: stats,
         submitted_perspectives: userPerspectives || [],
-        liked_perspectives: [],
+        liked_perspectives: likedPerspectives || [],
         scenario_progress: scenarioProgress || [],
         sdg_impact: sdgImpact,
         last_updated: new Date().toISOString()

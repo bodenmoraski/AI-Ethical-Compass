@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Progress } from './ui/progress';
-import { Button } from './ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { supabase } from '../../../../lib/supabase-client';
 import { 
   BarChart3, 
   Users, 
@@ -63,69 +64,47 @@ export const AssignmentAnalytics: React.FC<AssignmentAnalyticsProps> = ({
   const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      // Mock data - replace with actual API call
-      const mockStats: AssignmentStats = {
-        totalStudents: 25,
-        submittedCount: 18,
-        gradedCount: 15,
-        overdueCount: 3,
-        averageScore: 82.5,
-        completionRate: 72,
-        averageTimeSpent: 45,
-        submissionTrend: [
-          { date: '2024-01-15', count: 5 },
-          { date: '2024-01-16', count: 8 },
-          { date: '2024-01-17', count: 3 },
-          { date: '2024-01-18', count: 2 },
-        ]
-      };
+      // Get authentication token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.error('No authentication token available');
+        return;
+      }
 
-      const mockProgress: StudentProgress[] = [
-        {
-          id: '1',
-          name: 'Alice Johnson',
-          email: 'alice@example.com',
-          status: 'graded',
-          submittedAt: '2024-01-16T10:30:00Z',
-          gradedAt: '2024-01-17T14:20:00Z',
-          score: 95,
-          timeSpent: 60,
-          feedback: 'Excellent analysis of ethical implications.'
-        },
-        {
-          id: '2',
-          name: 'Bob Smith',
-          email: 'bob@example.com',
-          status: 'submitted',
-          submittedAt: '2024-01-17T16:45:00Z',
-          timeSpent: 45
-        },
-        {
-          id: '3',
-          name: 'Carol Davis',
-          email: 'carol@example.com',
-          status: 'overdue',
-          timeSpent: 30
-        },
-        {
-          id: '4',
-          name: 'David Wilson',
-          email: 'david@example.com',
-          status: 'in_progress',
-          timeSpent: 20
-        },
-        {
-          id: '5',
-          name: 'Eva Brown',
-          email: 'eva@example.com',
-          status: 'not_started'
+      // Fetch real analytics data from API
+      const response = await fetch(`/api/teacher?action=assignment-analytics&assignmentId=${assignmentId}`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
         }
-      ];
+      });
 
-      setStats(mockStats);
-      setStudentProgress(mockProgress);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch analytics: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setStats(data.stats);
+        setStudentProgress(data.studentProgress);
+      } else {
+        throw new Error(data.error || 'Failed to fetch analytics');
+      }
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      // Set empty data on error
+      setStats({
+        totalStudents: 0,
+        submittedCount: 0,
+        gradedCount: 0,
+        overdueCount: 0,
+        averageScore: 0,
+        completionRate: 0,
+        averageTimeSpent: 0,
+        submissionTrend: []
+      });
+      setStudentProgress([]);
     } finally {
       setLoading(false);
     }

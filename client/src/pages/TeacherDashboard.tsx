@@ -124,23 +124,45 @@ export default function TeacherDashboard() {
         throw new Error('No authentication token available');
       }
 
-      // Fetch real teacher data
-      const response = await fetch('/api/teacher?action=classes', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
+      const authHeaders = {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Fetch classes data
+      const classesResponse = await fetch('/api/teacher?action=classes', {
+        headers: authHeaders
       });
 
-      if (!response.ok) {
+      if (!classesResponse.ok) {
         throw new Error('Failed to fetch teacher data');
       }
 
-      const data = await response.json();
+      const classesData = await classesResponse.json();
+
+      // Fetch stats data
+      const statsResponse = await fetch('/api/teacher?action=stats', {
+        headers: authHeaders
+      });
+
+      let statsData = {
+        averageEngagement: 0,
+        pendingGrades: 0,
+        flaggedContent: 0
+      };
+
+      if (statsResponse.ok) {
+        const statsResult = await statsResponse.json();
+        if (statsResult.success) {
+          statsData = statsResult.stats;
+        }
+      } else {
+        console.warn('Failed to fetch stats data, using defaults');
+      }
       
       // Transform API data to match our interface
       const transformedData: TeacherDashboardData = {
-        classes: data.classes?.map((cls: any) => ({
+        classes: classesData.classes?.map((cls: any) => ({
           id: cls.id,
           name: cls.name,
           description: cls.description || '',
@@ -154,12 +176,12 @@ export default function TeacherDashboard() {
           grade_level: cls.grade_level || ''
         })) || [],
         overallStats: {
-          totalStudents: data.classes?.reduce((sum: number, cls: any) => sum + (cls.student_count || 0), 0) || 0,
-          totalClasses: data.classes?.length || 0,
-          totalAssignments: data.classes?.reduce((sum: number, cls: any) => sum + (cls.assignment_count || 0), 0) || 0,
-          averageEngagement: 0.78, // TODO: Calculate from real data
-          pendingGrades: 0, // TODO: Calculate from real data
-          flaggedContent: 0, // TODO: Calculate from real data
+          totalStudents: classesData.classes?.reduce((sum: number, cls: any) => sum + (cls.student_count || 0), 0) || 0,
+          totalClasses: classesData.classes?.length || 0,
+          totalAssignments: classesData.classes?.reduce((sum: number, cls: any) => sum + (cls.assignment_count || 0), 0) || 0,
+          averageEngagement: statsData.averageEngagement,
+          pendingGrades: statsData.pendingGrades,
+          flaggedContent: statsData.flaggedContent,
         },
         recentActivity: [
           {

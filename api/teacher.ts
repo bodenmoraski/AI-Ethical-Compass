@@ -136,8 +136,18 @@ const handleTeacherClasses = async (req: VercelRequest, res: VercelResponse) => 
         // Calculate real completion rate
         let completionRate = 0;
         if (classData.assignments?.length > 0 && classData.class_enrollments?.length > 0) {
-          // This would need actual submission data - for now, return 0 if no data
-          completionRate = 0;
+          // Get actual submission data
+          const { data: submissions, error: submissionError } = await supabase
+            .from('assignment_submissions')
+            .select('id, assignment_id, student_id')
+            .in('assignment_id', classData.assignments.map((a: any) => a.id))
+            .eq('status', 'completed');
+          
+          if (!submissionError && submissions) {
+            const totalExpectedSubmissions = classData.assignments.length * classData.class_enrollments.length;
+            const actualSubmissions = submissions.length;
+            completionRate = totalExpectedSubmissions > 0 ? Math.round((actualSubmissions / totalExpectedSubmissions) * 100) : 0;
+          }
         }
 
         const classWithCounts = {
@@ -739,6 +749,274 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
   }
 };
 
+// Assignment Analytics endpoint
+const handleAssignmentAnalytics = async (req: VercelRequest, res: VercelResponse) => {
+  const userId = await authenticateUser(req);
+  
+  if (req.method !== 'GET') {
+    throw new Error(`Method ${req.method} not allowed`);
+  }
+  
+  const { assignmentId } = req.query;
+  
+  if (!assignmentId) {
+    throw new Error('Assignment ID is required');
+  }
+  
+  try {
+    // Verify the assignment belongs to the teacher
+    const { data: assignment, error: assignmentError } = await supabase
+      .from('assignments')
+      .select('id, class_id, title, points_possible')
+      .eq('id', assignmentId)
+      .single();
+    
+    if (assignmentError || !assignment) {
+      throw new Error('Assignment not found');
+    }
+    
+    // Verify the teacher owns the class
+    const { data: classData, error: classError } = await supabase
+      .from('classes')
+      .select('teacher_id')
+      .eq('id', assignment.class_id)
+      .single();
+    
+    if (classError || !classData || classData.teacher_id !== userId) {
+      throw new Error('Access denied');
+    }
+    
+    // Get assignment submissions with user data
+    const { data: submissions, error: submissionsError } = await supabase
+      .from('assignment_submissions')
+      .select(`
+        *,
+        users(id, first_name, last_name, email)
+      `)
+      .eq('assignment_id', assignmentId);
+    
+    if (submissionsError) {
+      console.error('Error fetching submissions:', submissionsError);
+      throw submissionsError;
+    }
+    
+    // Get class enrollment count
+    const { data: enrollments, error: enrollmentsError } = await supabase
+      .from('class_enrollments')
+      .select('student_id')
+      .eq('class_id', assignment.class_id)
+      .eq('status', 'active');
+    
+    if (enrollmentsError) {
+      console.error('Error fetching enrollments:', enrollmentsError);
+    }
+    
+    const totalStudents = enrollments?.length || 0;
+    const submittedCount = submissions?.length || 0;
+    const gradedCount = submissions?.filter(s => s.status === 'graded').length || 0;
+    const overdueCount = submissions?.filter(s => s.is_late).length || 0;
+    
+    // Calculate average score
+    const gradedSubmissions = submissions?.filter(s => s.final_score !== null) || [];
+    const averageScore = gradedSubmissions.length > 0 
+      ? gradedSubmissions.reduce((sum, s) => sum + (s.final_score || 0), 0) / gradedSubmissions.length
+      : 0;
+    
+    // Calculate completion rate
+    const completionRate = totalStudents > 0 ? (submittedCount / totalStudents) * 100 : 0;
+    
+    // Calculate submission trend (last 7 days)
+    const now = new Date();
+    const submissionTrend = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      const daySubmissions = submissions?.filter(s => 
+        s.submitted_at && s.submitted_at.startsWith(dateStr)
+      ).length || 0;
+      
+      submissionTrend.push({
+        date: dateStr,
+        count: daySubmissions
+      });
+    }
+    
+    // Prepare student progress data
+    const studentProgress = submissions?.map(submission => {
+      const user = submission.users as any;
+      return {
+        id: submission.student_id.toString(),
+        name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Unknown',
+        email: user?.email || 'unknown@example.com',
+        status: submission.status,
+        submittedAt: submission.submitted_at,
+        gradedAt: submission.graded_at,
+        score: submission.final_score,
+        feedback: submission.feedback
+      };
+    }) || [];
+    
+    // Add students who haven't submitted yet
+    const submittedStudentIds = new Set(submissions?.map(s => s.student_id) || []);
+    const { data: allStudents, error: studentsError } = await supabase
+      .from('class_enrollments')
+      .select(`
+        student_id,
+        users(id, first_name, last_name, email)
+      `)
+      .eq('class_id', assignment.class_id)
+      .eq('status', 'active');
+    
+    if (!studentsError && allStudents) {
+      allStudents.forEach(enrollment => {
+        if (!submittedStudentIds.has(enrollment.student_id)) {
+          const user = enrollment.users as any;
+          studentProgress.push({
+            id: enrollment.student_id.toString(),
+            name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Unknown',
+            email: user?.email || 'unknown@example.com',
+            status: 'not_started',
+            submittedAt: null,
+            gradedAt: null,
+            score: null,
+            feedback: null
+          });
+        }
+      });
+    }
+    
+    const stats = {
+      totalStudents,
+      submittedCount,
+      gradedCount,
+      overdueCount,
+      averageScore: Math.round(averageScore * 100) / 100,
+      completionRate: Math.round(completionRate * 100) / 100,
+      averageTimeSpent: 45, // TODO: Calculate from engagement data
+      submissionTrend
+    };
+    
+    return res.json({
+      success: true,
+      stats,
+      studentProgress
+    });
+    
+  } catch (error) {
+    console.error('Error fetching assignment analytics:', error);
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch analytics'
+    });
+  }
+};
+
+// Stats endpoint
+const handleStats = async (req: VercelRequest, res: VercelResponse) => {
+  const userId = await authenticateUser(req);
+
+  if (req.method !== 'GET') {
+    throw new Error(`Method ${req.method} not allowed`);
+  }
+
+  try {
+    // Get teacher's classes
+    const { data: classes, error: classesError } = await supabase
+      .from('classes')
+      .select('id')
+      .eq('teacher_id', userId);
+
+    if (classesError) throw classesError;
+
+    const classIds = classes?.map(cls => cls.id) || [];
+    
+    if (classIds.length === 0) {
+      return res.json({
+        success: true,
+        stats: {
+          averageEngagement: 0,
+          pendingGrades: 0,
+          flaggedContent: 0
+        }
+      });
+    }
+
+    // Calculate average engagement from student_engagement table
+    const { data: engagementData, error: engagementError } = await supabase
+      .from('student_engagement')
+      .select('engagement_score')
+      .in('class_id', classIds)
+      .not('engagement_score', 'is', null);
+
+    if (engagementError) {
+      console.error('Error fetching engagement data:', engagementError);
+    }
+
+    const averageEngagement = engagementData && engagementData.length > 0
+      ? engagementData.reduce((sum, item) => sum + (item.engagement_score || 0), 0) / engagementData.length
+      : 0;
+
+    // Calculate pending grades from assignment_submissions table
+    // First get all assignment IDs for the teacher's classes
+    const { data: assignmentsData, error: assignmentsError } = await supabase
+      .from('assignments')
+      .select('id')
+      .in('class_id', classIds);
+
+    if (assignmentsError) {
+      console.error('Error fetching assignments data:', assignmentsError);
+    }
+
+    const assignmentIds = assignmentsData?.map(a => a.id) || [];
+    
+    let pendingGrades = 0;
+    if (assignmentIds.length > 0) {
+      const { data: submissionsData, error: submissionsError } = await supabase
+        .from('assignment_submissions')
+        .select('id')
+        .eq('status', 'submitted')
+        .in('assignment_id', assignmentIds);
+
+      if (submissionsError) {
+        console.error('Error fetching submissions data:', submissionsError);
+      }
+
+      pendingGrades = submissionsData?.length || 0;
+    }
+
+    // Calculate flagged content from moderation_queue table
+    const { data: flaggedData, error: flaggedError } = await supabase
+      .from('moderation_queue')
+      .select('id')
+      .eq('status', 'pending')
+      .in('class_id', classIds);
+
+    if (flaggedError) {
+      console.error('Error fetching flagged content:', flaggedError);
+    }
+
+    const flaggedContent = flaggedData?.length || 0;
+
+    return res.json({
+      success: true,
+      stats: {
+        averageEngagement: Math.round(averageEngagement * 100) / 100, // Round to 2 decimal places
+        pendingGrades,
+        flaggedContent
+      }
+    });
+
+  } catch (error) {
+    console.error('Error calculating stats:', error);
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to calculate stats'
+    });
+  }
+};
+
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -762,6 +1040,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await handleStudents(req, res);
       case 'access':
         return await handleTeacherAccess(req, res);
+      case 'stats':
+        return await handleStats(req, res);
+      case 'assignment-analytics':
+        return await handleAssignmentAnalytics(req, res);
       case 'assignment-submissions':
       case 'submission-detail':
       case 'grade-submission':

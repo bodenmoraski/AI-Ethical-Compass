@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Button } from '../ui/button';
@@ -23,6 +23,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { supabase } from '../../../../lib/supabase-client';
+import StudentEnrollmentModal from './StudentEnrollmentModal';
 
 interface ClassDetailViewProps {
   classId: string;
@@ -87,6 +88,8 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   const [studentSearchQuery, setStudentSearchQuery] = useState('');
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
+  const [enrollmentModalOpen, setEnrollmentModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     async function getToken() {
@@ -283,6 +286,16 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     // The queries will automatically refetch due to their keys
   };
 
+  // Handle student enrollment success
+  const handleStudentEnrollmentSuccess = () => {
+    // Refresh students data after successful enrollment
+    if (classData) {
+      // Refetch students and class data
+      queryClient.invalidateQueries({ queryKey: ['class', classId, accessToken] });
+      queryClient.invalidateQueries({ queryKey: ['students', classId, accessToken] });
+    }
+  };
+
   if (classLoading) {
     return (
       <div className="space-y-6" data-testid="class-detail-loading">
@@ -422,11 +435,22 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
                   <Plus className="h-4 w-4 mr-2" />
                   Create Assignment
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => setEnrollmentModalOpen(true)}
+                >
                   <Users className="h-4 w-4 mr-2" />
                   Add Students
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    // Switch to analytics tab
+                    (document.querySelector('[data-value="analytics"]') as HTMLElement)?.click();
+                  }}
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Full Analytics
                 </Button>
@@ -448,7 +472,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
                 />
               </div>
             </div>
-            <Button>
+            <Button onClick={() => setEnrollmentModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Student
             </Button>
@@ -576,6 +600,14 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Student Enrollment Modal */}
+      <StudentEnrollmentModal
+        isOpen={enrollmentModalOpen}
+        onClose={() => setEnrollmentModalOpen(false)}
+        classId={parseInt(classId)}
+        onSuccess={handleStudentEnrollmentSuccess}
+      />
     </div>
   );
 };

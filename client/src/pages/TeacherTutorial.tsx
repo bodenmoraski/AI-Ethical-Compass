@@ -18,8 +18,8 @@ export default function TeacherTutorial() {
       title: "Create Your First Class",
       description: "Set up classes to organize your students and manage their AI ethics learning journey.",
       details: [
-        "Access the Teacher Dashboard from the main navigation",
-        "Click 'Create New Class' to start",
+        "Sign in and click your profile icon, then select 'Dashboard'",
+        "Click 'Create Class' to start",
         "Enter class name, description, and grade level",
         "Generate a unique class code for student enrollment",
         "Customize class settings and privacy options"

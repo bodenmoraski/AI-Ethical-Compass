@@ -14,6 +14,7 @@ import SdgDetails from './SdgDetails';
 import RelatedResources from './RelatedResources';
 import { type Scenario, type Perspective } from '@shared/schema';
 import { submitPerspective, updateProgress } from '../lib/scenarios';
+import { Checkbox } from './ui/checkbox';
 import scenariosData from '../../../shared/scenarios.json';
 
 // Static scenarios data - no more API calls needed
@@ -70,6 +71,7 @@ const ScenarioView = () => {
   const [assignmentMode, setAssignmentMode] = useState(false);
   const [assignmentId, setAssignmentId] = useState<number | null>(null);
   const [showScenarioReference, setShowScenarioReference] = useState(false);
+  const [submitAnonymously, setSubmitAnonymously] = useState(false);
 
   // Get current scenario
   const currentScenario = scenarios.find(s => s.id === scenarioId);
@@ -105,6 +107,16 @@ const ScenarioView = () => {
       setAssignmentId(parseInt(assignmentParam));
     }
   }, []);
+
+  // Reset form state when scenario changes
+  useEffect(() => {
+    setCurrentStep(1);
+    setSelectedOption('');
+    setEthicsRatings({});
+    setPerspective('');
+    setSubmitAnonymously(false);
+    setIsSubmitting(false);
+  }, [scenarioId]);
 
 
 
@@ -158,9 +170,9 @@ const ScenarioView = () => {
         return await submitPerspective(
           scenarioId,
           content,
-          userProfile?.username || user?.email?.split('@')[0] || 'Anonymous User',
-          user?.id,
-          user?.email,
+          submitAnonymously ? 'Anonymous User' : (userProfile?.username || user?.email?.split('@')[0] || 'Anonymous User'),
+          submitAnonymously ? undefined : user?.id,
+          submitAnonymously ? undefined : user?.email,
           currentResolution?.id || null
         );
       }
@@ -177,7 +189,9 @@ const ScenarioView = () => {
         setCurrentStep(5);
         toast({
           title: "Perspective Shared!",
-          description: "Thank you for sharing your thoughtful perspective.",
+          description: submitAnonymously 
+            ? "Thank you for sharing your thoughtful perspective anonymously."
+            : "Thank you for sharing your thoughtful perspective.",
         });
         queryClient.invalidateQueries({ queryKey: ["/api/perspective-rankings", scenarioId] });
       }
@@ -575,11 +589,21 @@ const ScenarioView = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-                <span className="material-icons text-blue-600">info</span>
-                <p className="text-blue-800">
-                  Take your time to understand the scenario. Consider the stakeholders, technology involved, and potential implications.
-                </p>
+              <div className="relative p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm">
+                <div className="absolute -top-2 -left-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="material-icons text-white text-lg">lightbulb</span>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="material-icons text-white">psychology</span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-blue-900 mb-2">💡 Analysis Tips</h4>
+                    <p className="text-blue-800 leading-relaxed">
+                      Take your time to understand the scenario. Consider the <strong>stakeholders</strong>, <strong>technology involved</strong>, and potential <strong>implications</strong>. Think about different perspectives and ethical frameworks.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -642,13 +666,31 @@ const ScenarioView = () => {
 
               {/* Show the resolution/outcome */}
               {currentResolution && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-                  <div className="flex items-start gap-3">
-                    <span className="material-icons text-blue-600 mt-1">info</span>
-                    <div>
-                      <h4 className="font-medium text-blue-900 mb-2">Outcome: {currentResolution.title}</h4>
-                      <p className="text-blue-800 text-sm">{currentResolution.description}</p>
+                <div className="relative mb-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 border border-indigo-200/60 rounded-2xl p-6 shadow-xl shadow-indigo-100/50">
+                  {/* Subtle accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 rounded-t-2xl"></div>
+                  
+                  {/* Main content */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <span className="material-icons text-white text-2xl">policy</span>
                     </div>
+                    <div className="flex-1">
+                      <h4 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        📋 Outcome: {currentResolution.title}
+                      </h4>
+                      <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-white/50 shadow-sm">
+                        <p className="text-slate-700 leading-relaxed text-lg">{currentResolution.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom emphasis */}
+                  <div className="mt-5 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                    <p className="text-indigo-700 text-sm font-medium text-center flex items-center justify-center gap-2">
+                      <span className="material-icons text-lg">lightbulb</span>
+                      <span>Base your analysis on this specific outcome</span>
+                    </p>
                   </div>
                 </div>
               )}
@@ -700,13 +742,31 @@ const ScenarioView = () => {
 
               {/* Show the resolution/outcome */}
               {currentResolution && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-                  <div className="flex items-start gap-3">
-                    <span className="material-icons text-blue-600 mt-1">info</span>
-                    <div>
-                      <h4 className="font-medium text-blue-900 mb-2">Outcome: {currentResolution.title}</h4>
-                      <p className="text-blue-800 text-sm">{currentResolution.description}</p>
+                <div className="relative mb-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 border border-indigo-200/60 rounded-2xl p-6 shadow-xl shadow-indigo-100/50">
+                  {/* Subtle accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 rounded-t-2xl"></div>
+                  
+                  {/* Main content */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                      <span className="material-icons text-white text-2xl">policy</span>
                     </div>
+                    <div className="flex-1">
+                      <h4 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        📋 Outcome: {currentResolution.title}
+                      </h4>
+                      <div className="bg-white/80 backdrop-blur-sm p-5 rounded-xl border border-white/50 shadow-sm">
+                        <p className="text-slate-700 leading-relaxed text-lg">{currentResolution.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Bottom emphasis */}
+                  <div className="mt-5 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                    <p className="text-indigo-700 text-sm font-medium text-center flex items-center justify-center gap-2">
+                      <span className="material-icons text-lg">lightbulb</span>
+                      <span>Base your analysis on this specific outcome</span>
+                    </p>
                   </div>
                 </div>
               )}
@@ -732,6 +792,27 @@ const ScenarioView = () => {
                     Minimum 50 characters required
                   </span>
                 </div>
+
+                {/* Anonymous submission option - only for non-assignment mode */}
+                {!assignmentMode && (
+                  <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                    <Checkbox
+                      id="anonymous-submit"
+                      checked={submitAnonymously}
+                      onCheckedChange={(checked) => setSubmitAnonymously(checked === true)}
+                    />
+                    <label
+                      htmlFor="anonymous-submit"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Submit anonymously
+                    </label>
+                    <div className="ml-2 text-xs text-gray-500">
+                      <span className="material-icons text-sm mr-1">info</span>
+                      Your perspective will be shown as "Anonymous User"
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 bg-yellow-50 rounded-lg">
