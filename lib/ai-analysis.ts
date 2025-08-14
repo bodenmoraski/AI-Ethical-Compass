@@ -116,7 +116,7 @@ Focus on:
   }
 }
 
-export async function moderatePerspective(content: string, scenarioTitle: string): Promise<PerspectiveModerationResult> {
+export async function moderatePerspective(content: string, scenarioTitle: string, scenarioDescription: string = ''): Promise<PerspectiveModerationResult> {
   // Simple dev bypass - just add {DEVYES} anywhere in your text
   if (content.includes('{DEVYES}')) {
     console.log('🚀 DEV: Auto-approved with {DEVYES} bypass');
@@ -178,32 +178,37 @@ export async function moderatePerspective(content: string, scenarioTitle: string
 
   try {
     const prompt = `
-Moderate this user-submitted perspective for an ethical discussion platform:
+Moderate this user-submitted perspective for an educational ethics platform.
 
-Scenario: "${scenarioTitle}"
-Perspective: "${content}"
+Scenario Title: "${scenarioTitle}"
+Scenario Description: "${scenarioDescription}"
 
-Please provide a JSON response with:
-1. is_appropriate (boolean - is this suitable for an educational ethics platform?)
-2. is_on_topic (boolean - does this directly address the ethical scenario?)
-3. quality_score (0.0-1.0, where 1 is highest quality ethical reasoning)
-4. issues (array of any problems found)
-5. suggestions (array of improvement suggestions)
-6. moderation_action ("approve", "flag", or "reject")
-7. confidence_score (0.0-1.0, how confident you are in this assessment)
+User Perspective: "${content}"
 
-Check for:
-- Appropriate content (no hate speech, violence, explicit content, harassment)
-- On-topic discussion (addresses the ethical dilemma presented)
-- Constructive contribution (adds value to the discussion)
-- Respectful tone (civil discourse)
-- Ethical reasoning (attempts to engage with moral principles)
+Provide ONLY JSON with:
+1. is_appropriate (boolean)
+2. is_on_topic (boolean)
+3. quality_score (0.0-1.0)
+4. issues (array of strings)
+5. suggestions (array of strings)
+6. moderation_action ("approve" | "flag" | "reject")
+7. confidence_score (0.0-1.0)
+
+Strict relevance policy:
+- On-topic requires explicit linkage to the scenario's specific details (at least two concrete, scenario-specific elements from the title/description).
+- If the perspective is generic, unrelated, or could apply to many unrelated topics (even if it sounds sophisticated), set is_on_topic=false and moderation_action="reject".
+- Do not give benefit of the doubt on relevance. Favor rejection for off-topic content.
+
+Also check:
+- Appropriate content (no hate/harassment/explicit violence)
+- Constructive contribution and respectful tone
+- Evidence of ethical reasoning
 - Spam or low-effort content
 
-Actions:
-- "approve": High quality, appropriate, on-topic
-- "flag": Borderline content that needs human review
-- "reject": Clearly inappropriate or off-topic
+Action guidance:
+- "approve": Appropriate AND clearly on-topic
+- "flag": Appropriate but borderline or low confidence
+- "reject": Inappropriate OR off-topic
 `;
 
     const completion = await openai.chat.completions.create({
@@ -211,7 +216,7 @@ Actions:
       messages: [
         {
           role: "system",
-          content: "You are a content moderator for an educational ethics platform. Be thorough but fair in your assessment. Err on the side of allowing thoughtful discourse while protecting against harmful content. Always respond with valid JSON."
+          content: "You are a content moderator for an educational ethics platform. Be strict about topical relevance: reject sophisticated-sounding but off-topic content. Always respond with valid JSON and no code fences."
         },
         {
           role: "user",

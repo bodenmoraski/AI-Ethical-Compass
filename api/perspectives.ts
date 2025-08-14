@@ -328,6 +328,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Processing POST request...');
       
       const supabase = getSupabaseClient();
+
+      // Simple keyword-based relevance guard (deterministic safety net)
+      const STOPWORDS = new Set([
+        'the','a','an','and','or','but','if','then','else','for','of','on','in','to','from','by','with','is','are','was','were','be','been','being','it','its','as','at','that','this','these','those','about','into','over','under','after','before','while','during','do','does','did','doing','have','has','had','having','i','you','he','she','they','we','them','us','our','your','his','her','their','my','mine','yours','theirs','me'
+      ]);
+      const normalize = (s: string) => s
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const extractKeywords = (title: string, description: string, maxKeywords: number = 25): string[] => {
+        const tokens = (normalize(title) + ' ' + normalize(description))
+          .split(' ')
+          .filter(t => t.length >= 4 && !STOPWORDS.has(t));
+        const unique: string[] = [];
+        const seen = new Set<string>();
+        for (const t of tokens) {
+          if (!seen.has(t)) {
+            unique.push(t);
+            seen.add(t);
+          }
+          if (unique.length >= maxKeywords) break;
+        }
+        return unique;
+      };
+      const countKeywordMatches = (text: string, keywords: string[]): number => {
+        const ntext = normalize(text);
+        let count = 0;
+        for (const kw of keywords) {
+          if (ntext.includes(kw)) count++;
+        }
+        return count;
+      };
       
       // Basic validation
       const { scenarioId, content, authorName, userId, userEmail } = req.body;
@@ -356,7 +389,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       
-      // Verify scenario exists and get title for moderation
+      // Verify scenario exists and get title/description for moderation
       // Since scenarios are stored in static JSON, load them from the file
       let scenarioCheck;
       try {
@@ -378,6 +411,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       console.log(`Verified scenario ${scenarioId} exists: "${scenarioCheck.title}"`);
+
+      // Deterministic off-topic rejection if user content does not reference scenario at all
+      const scenarioKeywords = extractKeywords(scenarioCheck.title || '', scenarioCheck.description || '');
+      const keywordMatches = countKeywordMatches(content, scenarioKeywords);
+      if (keywordMatches < 2) {
+        return res.status(400).json({
+          message: 'Perspective appears off-topic for this scenario',
+          issues: ['Insufficient references to scenario details'],
+          suggestions: [
+            'Reference at least two concrete details from the scenario (e.g., key terms, stakeholders, constraints).',
+            'Explain how your points relate to the ethical dilemma described in the scenario.'
+          ],
+          moderation_result: {
+            is_appropriate: true,
+            is_on_topic: false,
+            quality_score: 0.4,
+            issues: ['Insufficient scenario linkage'],
+            suggestions: ['Ground your analysis in the scenario context.'],
+            moderation_action: 'reject',
+            confidence_score: 0.9
+          }
+        });
+      }
       
       // Check for development bypass first
       let moderationStatus = 'approved';
@@ -394,9 +450,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           suggestions: ['Development bypass used']
         };
       } else {
-        // Perform AI moderation
+        // Perform AI moderation (include scenario description for relevance checks)
         console.log(`Moderating perspective for scenario: ${scenarioCheck.title}`);
-        moderation = await moderatePerspective(content.trim(), scenarioCheck.title);
+        moderation = await moderatePerspective(
+          content.trim(), 
+          scenarioCheck.title,
+          (scenarioCheck.description || '').toString().slice(0, 1200)
+        );
         
         console.log('Moderation result:', {
           action: moderation.moderation_action,
@@ -406,6 +466,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           suggestions: moderation.suggestions
         });
         
+        // Server-side safety net: if model marked off-topic in any case, convert to reject
+        if (moderation.is_on_topic === false) {
+          console.log('Safety net: Off-topic content converted to reject');
+          return res.status(400).json({
+            message: 'Perspective was rejected as off-topic',
+            issues: [...(moderation.issues || []), 'Off-topic: does not reference the specific scenario details'],
+            suggestions: [
+              'Explicitly reference details from the scenario (names, constraints, stakeholders) to demonstrate relevance.',
+              'Explain how your argument applies to the ethical dilemma described in the scenario.'
+            ],
+            moderation_result: { ...moderation, moderation_action: 'reject' }
+          });
+        }
+
         if (moderation.moderation_action === 'reject') {
           console.log('Moderation rejected the content, returning 400');
           return res.status(400).json({
