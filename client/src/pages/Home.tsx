@@ -131,21 +131,20 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="border-b border-neutral-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="text-center">
             <div className="flex justify-center mb-6">
-              <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 text-sm font-medium">
+              <Badge className="bg-blue-600 text-white px-4 py-2 text-sm font-medium">
                 🏆 Featured Project - ISTE+ASCD AI Innovator Challenge 2025
               </Badge>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6">
           <span className="block">{t('home.title')}</span>
-              <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="block text-blue-700">
                 {t('home.subtitle')}
               </span>
         </h1>
@@ -157,33 +156,28 @@ const Home = () => {
             
             {/* CTA Buttons */}
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/scenarios")}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-          >
-                <span className="material-icons mr-2">rocket_launch</span>
-            {t('home.buttons.exploreScenarios')}
-          </Button>
-          
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/teacher")}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-          >
-                <span className="material-icons mr-2">school</span>
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/scenarios")}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 text-lg"
+              >
+                {t('home.buttons.exploreScenarios')}
+              </Button>
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/teacher")}
+                className="bg-blue-50 hover:bg-blue-100 text-blue-700 px-8 py-4 text-lg"
+              >
                 Teacher Dashboard
-          </Button>
-          
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => navigate("/about")}
-                className="border-2 border-blue-300 hover:border-blue-500 text-blue-700 hover:text-blue-800 font-bold px-8 py-4 text-lg transition-all duration-300"
-          >
-                <span className="material-icons mr-2">info</span>
-            {t('home.buttons.learnMore')}
-          </Button>
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                onClick={() => navigate("/about")}
+                className="border-2 border-neutral-300 hover:border-neutral-500 text-neutral-700 hover:text-neutral-900 px-8 py-4 text-lg"
+              >
+                {t('home.buttons.learnMore')}
+              </Button>
             </div>
           </div>
         </div>
@@ -200,27 +194,27 @@ const Home = () => {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg">
+                <div className="bg-blue-600 text-white rounded-2xl p-6">
                   <div className="text-3xl font-bold mb-2">{stats.totalUsers.toLocaleString()}</div>
-                  <div className="text-blue-100 font-medium">Active Users</div>
+                  <div className="text-blue-50 font-medium">Active Users</div>
                 </div>
               </div>
               <div className="text-center">
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
+                <div className="bg-blue-700 text-white rounded-2xl p-6">
                   <div className="text-3xl font-bold mb-2">{stats.perspectivesShared.toLocaleString()}</div>
-                  <div className="text-indigo-100 font-medium">Perspectives Shared</div>
+                  <div className="text-blue-50 font-medium">Perspectives Shared</div>
                 </div>
               </div>
               <div className="text-center">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
+                <div className="bg-blue-800 text-white rounded-2xl p-6">
                   <div className="text-3xl font-bold mb-2">{stats.scenariosAnalyzed.toLocaleString()}</div>
-                  <div className="text-purple-100 font-medium">Scenarios Analyzed</div>
+                  <div className="text-blue-50 font-medium">Scenarios Analyzed</div>
             </div>
           </div>
               <div className="text-center">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
+                <div className="bg-blue-900 text-white rounded-2xl p-6">
                   <div className="text-3xl font-bold mb-2">{stats.countriesReached}</div>
-                  <div className="text-green-100 font-medium">Countries Reached</div>
+                  <div className="text-blue-50 font-medium">Countries Reached</div>
                 </div>
               </div>
             </div>
@@ -247,7 +241,7 @@ const Home = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">AI-Powered Analysis</h3>
                 <p className="text-gray-600 mb-4">
-                  Advanced GPT-4 integration provides real-time perspective analysis, bias detection, 
+                  Advanced LLM integration provides real-time perspective analysis, bias detection, 
                   quality scoring, and ethical framework identification.
                 </p>
                 <div className="flex flex-wrap gap-2">

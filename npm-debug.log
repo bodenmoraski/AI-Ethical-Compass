@@ -1,0 +1,48 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/bin/node',
+1 verbose cli   '/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/bin/npm',
+1 verbose cli   'run',
+1 verbose cli   'build' ]
+2 info using npm@3.10.10
+3 info using node@v6.13.1
+4 verbose run-script [ 'prebuild', 'build', 'postbuild' ]
+5 info lifecycle rest-express@1.0.0~prebuild: rest-express@1.0.0
+6 silly lifecycle rest-express@1.0.0~prebuild: no script for prebuild, continuing
+7 info lifecycle rest-express@1.0.0~build: rest-express@1.0.0
+8 verbose lifecycle rest-express@1.0.0~build: unsafe-perm in lifecycle true
+9 verbose lifecycle rest-express@1.0.0~build: PATH: /Users/morabp27/Documents/Anaconda_Downlead/anaconda3/lib/node_modules/npm/bin/node-gyp-bin:/Users/morabp27/Downloads/EthicalAI-1/node_modules/.bin:/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/bin:/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/condabin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
+10 verbose lifecycle rest-express@1.0.0~build: CWD: /Users/morabp27/Downloads/EthicalAI-1
+11 silly lifecycle rest-express@1.0.0~build: Args: [ '-c', 'vite build' ]
+12 silly lifecycle rest-express@1.0.0~build: Returned: code: 1  signal: null
+13 info lifecycle rest-express@1.0.0~build: Failed to exec build script
+14 verbose stack Error: rest-express@1.0.0 build: `vite build`
+14 verbose stack Exit status 1
+14 verbose stack     at EventEmitter.<anonymous> (/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/lib/node_modules/npm/lib/utils/lifecycle.js:255:16)
+14 verbose stack     at emitTwo (events.js:106:13)
+14 verbose stack     at EventEmitter.emit (events.js:191:7)
+14 verbose stack     at ChildProcess.<anonymous> (/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/lib/node_modules/npm/lib/utils/spawn.js:40:14)
+14 verbose stack     at emitTwo (events.js:106:13)
+14 verbose stack     at ChildProcess.emit (events.js:191:7)
+14 verbose stack     at maybeClose (internal/child_process.js:920:16)
+14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:230:5)
+15 verbose pkgid rest-express@1.0.0
+16 verbose cwd /Users/morabp27/Downloads/EthicalAI-1
+17 error Darwin 23.2.0
+18 error argv "/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/bin/node" "/Users/morabp27/Documents/Anaconda_Downlead/anaconda3/bin/npm" "run" "build"
+19 error node v6.13.1
+20 error npm  v3.10.10
+21 error code ELIFECYCLE
+22 error rest-express@1.0.0 build: `vite build`
+22 error Exit status 1
+23 error Failed at the rest-express@1.0.0 build script 'vite build'.
+23 error Make sure you have the latest version of node.js and npm installed.
+23 error If you do, this is most likely a problem with the rest-express package,
+23 error not with npm itself.
+23 error Tell the author that this fails on your system:
+23 error     vite build
+23 error You can get information on how to open an issue for this project with:
+23 error     npm bugs rest-express
+23 error Or if that isn't available, you can get their info via:
+23 error     npm owner ls rest-express
+23 error There is likely additional logging output above.
+24 verbose exit [ 1, true ]
