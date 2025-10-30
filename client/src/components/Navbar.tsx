@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "@/components/theme-provider";
 import { LanguageSelector } from "./LanguageSelector";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import UserMenu from "./UserMenu";
 
 export const Navbar = () => {
   const location = useLocation();
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { user, loading } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -31,7 +33,7 @@ export const Navbar = () => {
                     : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
                 }
               >
-                Scenarios
+                {t('navigation.scenarios')}
               </NavLink>
               <NavLink 
                 to="/user-scenarios"
@@ -41,7 +43,7 @@ export const Navbar = () => {
                     : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
                 }
               >
-                Community
+                {t('navigation.community')}
               </NavLink>
               <NavLink 
                 to="/leaderboard"
@@ -51,7 +53,7 @@ export const Navbar = () => {
                     : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
                 }
               >
-                Leaderboard
+                {t('navigation.leaderboard')}
               </NavLink>
               <NavLink 
                 to="/about"
@@ -61,7 +63,7 @@ export const Navbar = () => {
                     : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
                 }
               >
-                About
+                {t('navigation.about')}
               </NavLink>
               <NavLink 
                 to="/resources"
@@ -71,7 +73,7 @@ export const Navbar = () => {
                     : "border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 px-1 py-4 text-sm font-medium transition-colors"
                 }
               >
-                Resources
+                {t('navigation.resources')}
               </NavLink>
             </nav>
           </div>
@@ -90,7 +92,7 @@ export const Navbar = () => {
                 className="bg-indigo-600 hover:bg-indigo-700"
               >
                 <span className="material-icons mr-1 text-sm">person</span>
-                Sign In
+                {t('auth.signIn')}
               </Button>
             )}
             

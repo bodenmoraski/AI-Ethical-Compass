@@ -1,4 +1,231 @@
 {
+  "navigation": {
+    "home": "Accueil",
+    "scenarios": "Scénarios",
+    "community": "Communauté",
+    "leaderboard": "Classement",
+    "about": "À Propos",
+    "resources": "Ressources",
+    "dashboard": "Tableau de Bord",
+    "assignments": "Devoirs",
+    "teacher": "Enseignant",
+    "teacherDashboard": "Tableau de Bord Enseignant",
+    "tutorial": "Tutoriel",
+    "userTutorial": "Tutoriel Utilisateur",
+    "teacherTutorial": "Tutoriel Enseignant"
+  },
+  "common": {
+    "buttons": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "submit": "Soumettre",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "back": "Retour",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "signIn": "Se Connecter",
+      "signUp": "S'Inscrire",
+      "signOut": "Se Déconnecter",
+      "logout": "Déconnexion",
+      "login": "Connexion",
+      "create": "Créer",
+      "update": "Mettre à Jour",
+      "view": "Voir",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "search": "Rechercher",
+      "filter": "Filtrer",
+      "sort": "Trier",
+      "reset": "Réinitialiser",
+      "apply": "Appliquer",
+      "learnMore": "En Savoir Plus",
+      "getStarted": "Commencer",
+      "continue": "Continuer"
+    },
+    "actions": {
+      "loading": "Chargement...",
+      "saving": "Enregistrement...",
+      "deleting": "Suppression...",
+      "submitting": "Soumission...",
+      "processing": "Traitement..."
+    },
+    "status": {
+      "success": "Succès",
+      "error": "Erreur",
+      "warning": "Avertissement",
+      "info": "Information",
+      "pending": "En Attente",
+      "completed": "Terminé",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "labels": {
+      "email": "E-mail",
+      "password": "Mot de Passe",
+      "username": "Nom d'Utilisateur",
+      "name": "Nom",
+      "firstName": "Prénom",
+      "lastName": "Nom de Famille",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "État",
+      "country": "Pays",
+      "zipCode": "Code Postal",
+      "date": "Date",
+      "time": "Heure",
+      "description": "Description",
+      "title": "Titre",
+      "category": "Catégorie",
+      "tags": "Étiquettes",
+      "language": "Langue",
+      "theme": "Thème"
+    }
+  },
+  "auth": {
+    "login": "Connexion",
+    "signUp": "S'Inscrire",
+    "signIn": "Se Connecter",
+    "signOut": "Se Déconnecter",
+    "logout": "Déconnexion",
+    "forgotPassword": "Mot de Passe Oublié?",
+    "resetPassword": "Réinitialiser le Mot de Passe",
+    "createAccount": "Créer un Compte",
+    "haveAccount": "Vous avez déjà un compte?",
+    "noAccount": "Vous n'avez pas de compte?",
+    "rememberMe": "Se souvenir de moi",
+    "or": "ou",
+    "continueWith": "Continuer avec",
+    "emailAddress": "Adresse E-mail",
+    "yourPassword": "Votre Mot de Passe",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "enterEmail": "Entrez votre e-mail",
+    "enterPassword": "Entrez votre mot de passe"
+  },
+  "footer": {
+    "sections": {
+      "about": "À Propos",
+      "legal": "Légal",
+      "contact": "Contact"
+    },
+    "links": {
+      "ourMission": "Notre Mission",
+      "resources": "Ressources",
+      "termsOfService": "Conditions d'Utilisation",
+      "privacyPolicy": "Politique de Confidentialité",
+      "getInTouch": "Nous Contacter"
+    },
+    "copyright": "© {{year}} AI Ethical Compass. Tous droits réservés."
+  },
+  "scenarios": {
+    "title": "Scénarios",
+    "allScenarios": "Tous les Scénarios",
+    "createNew": "Créer un Nouveau Scénario",
+    "difficulty": "Difficulté",
+    "level": {
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    },
+    "viewScenario": "Voir le Scénario",
+    "exploreScenario": "Explorer le Scénario",
+    "submitPerspective": "Soumettre une Perspective",
+    "perspectives": "Perspectives",
+    "yourPerspective": "Votre Perspective",
+    "sharePerspective": "Partagez Votre Perspective"
+  },
+  "teacher": {
+    "dashboard": {
+      "title": "Tableau de Bord Enseignant",
+      "welcome": "Bienvenue, {{name}}",
+      "overview": "Aperçu",
+      "classes": "Classes",
+      "students": "Étudiants",
+      "assignments": "Devoirs",
+      "grading": "Notation",
+      "analytics": "Analyses",
+      "settings": "Paramètres"
+    },
+    "classes": {
+      "title": "Classes",
+      "create": "Créer une Classe",
+      "edit": "Modifier la Classe",
+      "delete": "Supprimer la Classe",
+      "viewDetails": "Voir les Détails",
+      "className": "Nom de la Classe",
+      "classCode": "Code de Classe",
+      "students": "Étudiants",
+      "noClasses": "Aucune classe pour le moment. Créez votre première classe pour commencer."
+    },
+    "assignments": {
+      "title": "Devoirs",
+      "create": "Créer un Devoir",
+      "edit": "Modifier le Devoir",
+      "delete": "Supprimer le Devoir",
+      "assignmentName": "Nom du Devoir",
+      "dueDate": "Date d'Échéance",
+      "points": "Points",
+      "submissions": "Soumissions",
+      "graded": "Notés",
+      "pending": "En Attente"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Tableau de Bord Étudiant",
+      "welcome": "Bienvenue, {{name}}",
+      "myProgress": "Ma Progression",
+      "assignments": "Mes Devoirs",
+      "recentActivity": "Activité Récente",
+      "achievements": "Réalisations"
+    },
+    "assignments": {
+      "title": "Mes Devoirs",
+      "due": "Échéance",
+      "submitted": "Soumis",
+      "graded": "Notés",
+      "overdue": "En Retard",
+      "submit": "Soumettre le Devoir",
+      "viewFeedback": "Voir les Commentaires"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "Ce champ est obligatoire",
+      "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "invalidFormat": "Format invalide",
+      "tooShort": "Trop court",
+      "tooLong": "Trop long"
+    },
+    "placeholders": {
+      "enterEmail": "Entrez votre e-mail",
+      "enterPassword": "Entrez votre mot de passe",
+      "enterName": "Entrez votre nom",
+      "searchPlaceholder": "Rechercher...",
+      "selectOption": "Sélectionnez une option"
+    }
+  },
+  "errors": {
+    "api": {
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
+      "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+      "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+      "forbidden": "Accès interdit.",
+      "notFound": "Ressource non trouvée.",
+      "badRequest": "Requête incorrecte. Veuillez vérifier votre saisie.",
+      "timeout": "Délai d'attente dépassé. Veuillez réessayer."
+    },
+    "generic": {
+      "somethingWrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
+      "tryAgain": "Veuillez réessayer",
+      "contactSupport": "Si le problème persiste, veuillez contacter le support."
+    }
+  },
   "about": {
     "title": "Façonner l'Avenir de l'IA dans l'Éducation",
     "subtitle": "AI Ethical Compass permet aux étudiants et aux éducateurs de naviguer dans le paysage éthique complexe de l'intelligence artificielle dans l'éducation.",
@@ -71,59 +298,20 @@
       "description": "Explorez notre collection de ressources sur la mise en œuvre éthique de l'IA dans l'éducation, des directives complètes aux outils pratiques et aux études de cas réels."
     },
     "categories": {
-      "all": "Tous",
-      "guidelines": "Directives",
-      "research": "Recherche",
-      "tools": "Outils",
-      "examples": "Exemples",
-      "coursesTutorials": "Cours & Tutoriels"
+      "all": "Toutes les Ressources",
+      "guidelines": "Directives et Politiques",
+      "research": "Recherche et Études",
+      "tools": "Outils et Plateformes",
+      "courses": "Cours et Tutoriels",
+      "caseStudies": "Études de Cas",
+      "frameworks": "Cadres Éthiques",
+      "communities": "Communautés",
+      "assessment": "Outils d'Évaluation"
     },
-    "learnMore": "En savoir plus",
-    "items": {
-      "unescoGuidelines": {
-        "title": "Directives de l'UNESCO sur l'éthique de l'IA",
-        "description": "Le premier instrument normatif mondial sur l'éthique de l'intelligence artificielle, fournissant des cadres complets pour la mise en œuvre éducative.",
-        "link": "https://www.unesco.org/fr/artificial-intelligence/recommendation-ethics"
-      },
-      "ai4k12Guidelines": {
-        "title": "Directives AI4K12",
-        "description": "Directives complètes pour l'enseignement des concepts de l'IA dans l'éducation K-12, développées par CSTA & AAAI.",
-        "link": "https://ai4k12.org/"
-      },
-      "isteResearch": {
-        "title": "Recherche ISTE sur l'IA dans l'éducation",
-        "description": "Dernières recherches et directives pour les éducateurs sur la mise en œuvre responsable de l'IA dans les milieux éducatifs.",
-        "link": "https://www.iste.org/areas-of-focus/AI-in-education"
-      },
-      "elementsOfAiCourse": {
-        "title": "Cours Elements of AI",
-        "description": "Cours en ligne gratuit couvrant les bases de l'IA et l'éthique, parfait pour les éducateurs et les étudiants.",
-        "link": "https://www.elementsofai.com/fr/"
-      },
-      "aif360Toolkit": {
-        "title": "Boîte à outils AI Fairness 360",
-        "description": "Boîte à outils open-source pour aider à détecter et atténuer les biais discriminatoires dans les systèmes d'IA.",
-        "link": "https://github.com/Trusted-AI/AIF360"
-      },
-      "algorithmicJusticeLeague": {
-        "title": "Ligue pour la Justice Algorithmique",
-        "description": "Outils et ressources pour identifier et traiter les biais algorithmiques dans les systèmes d'IA.",
-        "link": "https://www.ajl.org/"
-      },
-      "digitalEquity": {
-        "title": "Équité Numérique dans l'Éducation",
-        "description": "Ressources pour relever les défis de l'équité numérique dans les environnements éducatifs améliorés par l'IA.",
-        "link": "https://www.iste.org/areas-of-focus/digital-equity"
-      },
-      "euGuidelines": {
-        "title": "Directives éthiques de l'UE pour une IA digne de confiance",
-        "description": "Directives de l'Union européenne pour parvenir à une intelligence artificielle digne de confiance.",
-        "link": "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
-      }
-    },
+    "learnMore": "En Savoir Plus",
     "cta": {
       "title": "Pour les Éducateurs",
-      "description": "Vous cherchez à intégrer l'éthique de l'IA dans votre programme ? Ces ressources peuvent vous aider à créer des leçons engageantes et à favoriser des discussions significatives sur le rôle de l'IA dans l'éducation.",
+      "description": "Vous cherchez à intégrer l'éthique de l'IA dans votre programme? Ces ressources peuvent vous aider à créer des leçons engageantes et à favoriser des discussions significatives sur le rôle de l'IA dans l'éducation.",
       "prompts": {
         "title": "Sujets de Discussion",
         "description": "Utilisez nos scénarios comme points de départ pour les discussions en classe sur l'éthique de l'IA."
@@ -181,4 +369,4 @@
     "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
     "backToHome": "Retour à l'Accueil"
   }
-} 
+}

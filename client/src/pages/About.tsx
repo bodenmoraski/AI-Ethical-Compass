@@ -49,7 +49,7 @@ export default function About() {
                 className="border-2 border-emerald-300 hover:border-emerald-500 text-emerald-700 hover:text-emerald-800 font-bold px-8 py-4 text-lg transition-all duration-300"
               >
                 <span className="material-icons mr-2">help</span>
-                How to Use
+                {t('navigation.userTutorial')}
                 </Button>
             </div>
           </div>
@@ -62,7 +62,7 @@ export default function About() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('about.mission.title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Empowering the next generation with critical thinking skills for the AI era
+              {t('about.subtitle')}
             </p>
           </div>
           
@@ -116,7 +116,7 @@ export default function About() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('about.themes.title')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Addressing critical themes in AI ethics education
+              {t('about.subtitle')}
             </p>
           </div>
 
@@ -244,9 +244,9 @@ export default function About() {
       <div className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Learn How to Use the Platform</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('navigation.tutorial')}</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive guides to help you get the most out of AI Ethical Compass
+              {t('about.subtitle')}
             </p>
           </div>
           

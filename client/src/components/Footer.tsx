@@ -1,13 +1,16 @@
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const Footer = () => {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-white border-t border-neutral-200 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-sm font-semibold text-neutral-900 tracking-wider uppercase">
-              About
+              {t('footer.sections.about')}
             </h3>
             <ul className="mt-4 space-y-4">
               <li>
@@ -15,7 +18,7 @@ export const Footer = () => {
                   to="/about"
                   className="text-base text-neutral-500 hover:text-neutral-900"
                 >
-                  Our Mission
+                  {t('footer.links.ourMission')}
                 </NavLink>
               </li>
               <li>
@@ -23,14 +26,14 @@ export const Footer = () => {
                   to="/resources"
                   className="text-base text-neutral-500 hover:text-neutral-900"
                 >
-                  Resources
+                  {t('footer.links.resources')}
                 </NavLink>
               </li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-neutral-900 tracking-wider uppercase">
-              Legal
+              {t('footer.sections.legal')}
             </h3>
             <ul className="mt-4 space-y-4">
               <li>
@@ -38,7 +41,7 @@ export const Footer = () => {
                   to="/terms"
                   className="text-base text-neutral-500 hover:text-neutral-900"
                 >
-                  Terms of Service
+                  {t('footer.links.termsOfService')}
                 </NavLink>
               </li>
               <li>
@@ -46,14 +49,14 @@ export const Footer = () => {
                   to="/privacy"
                   className="text-base text-neutral-500 hover:text-neutral-900"
                 >
-                  Privacy Policy
+                  {t('footer.links.privacyPolicy')}
                 </NavLink>
               </li>
             </ul>
           </div>
           <div>
             <h3 className="text-sm font-semibold text-neutral-900 tracking-wider uppercase">
-              Contact
+              {t('footer.sections.contact')}
             </h3>
             <ul className="mt-4 space-y-4">
               <li>
@@ -61,7 +64,7 @@ export const Footer = () => {
                   to="/contact"
                   className="text-base text-neutral-500 hover:text-neutral-900"
                 >
-                  Get in Touch
+                  {t('footer.links.getInTouch')}
                 </NavLink>
               </li>
             </ul>
@@ -69,7 +72,7 @@ export const Footer = () => {
         </div>
         <div className="mt-8 border-t border-neutral-200 pt-8">
           <p className="text-base text-neutral-500 text-center">
-            © {new Date().getFullYear()} AI Ethical Compass. All rights reserved.
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/card';
 import ScenarioNav from '../components/ScenarioNav';
 import ScenarioView from '../components/ScenarioView';

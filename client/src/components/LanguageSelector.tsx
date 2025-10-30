@@ -16,6 +16,7 @@ const languages = [
   { code: 'de', name: 'German', nativeName: 'Deutsch' },
   { code: 'zh', name: 'Chinese', nativeName: '中文' },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano' },
 ];
 
 export function LanguageSelector() {
