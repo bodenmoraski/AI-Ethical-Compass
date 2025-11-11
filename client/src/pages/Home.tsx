@@ -150,8 +150,8 @@ const Home = () => {
         </h1>
             
             <p className="mt-6 max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
-              The world's most advanced platform for developing critical thinking about AI ethics in education. 
-              Powered by artificial intelligence, driven by community wisdom, with comprehensive teacher tools for classroom management.
+              An interactive platform for developing critical thinking about AI ethics in education. 
+              Real-world scenarios, teacher tools for classroom management, and community-driven discussions.
             </p>
             
             {/* CTA Buttons */}
@@ -226,9 +226,9 @@ const Home = () => {
       <div className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Complete Educational AI Ethics Platform</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Educational AI Ethics Platform</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Advanced student engagement tools with comprehensive teacher dashboard for complete classroom management
+              Student engagement tools with teacher dashboard for classroom management
             </p>
           </div>
           
@@ -241,7 +241,7 @@ const Home = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">AI-Powered Analysis</h3>
                 <p className="text-gray-600 mb-4">
-                  Advanced LLM integration provides real-time perspective analysis, bias detection, 
+                  AI-powered perspective analysis including bias detection, 
                   quality scoring, and ethical framework identification.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -258,15 +258,15 @@ const Home = () => {
                 <div className="bg-gradient-to-br from-purple-500 to-pink-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="material-icons text-white text-2xl">trending_up</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Smart Ranking Algorithms</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Flexible Discussion Sorting</h3>
                 <p className="text-gray-600 mb-4">
-                  Seven sophisticated ranking methods including smart ranking that combines quality, 
-                  reputation, engagement, and recency for optimal content discovery.
+                  Multiple ways to organize perspectives including by quality scores, 
+                  engagement metrics, and recency for effective content discovery.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="text-xs">Smart Ranking</Badge>
                   <Badge variant="secondary" className="text-xs">Quality-Based</Badge>
-                  <Badge variant="secondary" className="text-xs">Reputation System</Badge>
+                  <Badge variant="secondary" className="text-xs">Engagement Sorting</Badge>
+                  <Badge variant="secondary" className="text-xs">Time-Based</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -277,9 +277,9 @@ const Home = () => {
                 <div className="bg-gradient-to-br from-green-500 to-emerald-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                   <span className="material-icons text-white text-2xl">emoji_events</span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Advanced Gamification</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Achievement System</h3>
                 <p className="text-gray-600 mb-4">
-                  Six-tier achievement system with leaderboards that reward thoughtful contribution 
+                  Multi-tier achievements and leaderboards that reward thoughtful contribution 
                   over quantity, fostering meaningful engagement.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -352,61 +352,14 @@ const Home = () => {
         </div>
             </div>
 
-      {/* SDG Impact Section */}
-      <div className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">UN Sustainable Development Goals</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Aligned with global education and equity objectives
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50">
-              <CardContent className="p-8">
-                <div className="flex items-center mb-6">
-                  <div className="bg-blue-600 p-4 rounded-2xl">
-                    <span className="material-icons text-white text-3xl">school</span>
-                  </div>
-                  <div className="ml-6">
-                    <h3 className="text-2xl font-bold text-gray-900">SDG 4: Quality Education</h3>
-                    <Badge className="mt-2 bg-blue-600 text-white">Primary Focus</Badge>
-                  </div>
-                </div>
-                <p className="text-gray-700 text-lg leading-relaxed">
-                  {t('home.sdg.qualityEducation.description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-50 to-pink-50">
-              <CardContent className="p-8">
-                <div className="flex items-center mb-6">
-                  <div className="bg-purple-600 p-4 rounded-2xl">
-                    <span className="material-icons text-white text-3xl">balance</span>
-                  </div>
-                  <div className="ml-6">
-                    <h3 className="text-2xl font-bold text-gray-900">SDG 10: Reduced Inequalities</h3>
-                    <Badge className="mt-2 bg-purple-600 text-white">Core Mission</Badge>
-                  </div>
-                </div>
-                <p className="text-gray-700 text-lg leading-relaxed">
-                  {t('home.sdg.reducedInequalities.description')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-            </div>
 
       {/* How It Works - Enhanced */}
       <div className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Sophisticated Learning Journey</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              A carefully designed process that develops critical thinking through structured analysis
+              A structured process that develops critical thinking through scenario analysis
             </p>
           </div>
           

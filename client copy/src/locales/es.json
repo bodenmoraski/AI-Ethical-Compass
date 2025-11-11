@@ -1,0 +1,372 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "scenarios": "Escenarios",
+    "community": "Comunidad",
+    "leaderboard": "Tabla de Posiciones",
+    "about": "Acerca de",
+    "resources": "Recursos",
+    "dashboard": "Panel",
+    "assignments": "Tareas",
+    "teacher": "Profesor",
+    "teacherDashboard": "Panel del Profesor",
+    "tutorial": "Tutorial",
+    "userTutorial": "Tutorial del Usuario",
+    "teacherTutorial": "Tutorial del Profesor"
+  },
+  "common": {
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "submit": "Enviar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "back": "Volver",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "close": "Cerrar",
+      "confirm": "Confirmar",
+      "signIn": "Iniciar Sesión",
+      "signUp": "Registrarse",
+      "signOut": "Cerrar Sesión",
+      "logout": "Cerrar Sesión",
+      "login": "Iniciar Sesión",
+      "create": "Crear",
+      "update": "Actualizar",
+      "view": "Ver",
+      "download": "Descargar",
+      "upload": "Subir",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "sort": "Ordenar",
+      "reset": "Restablecer",
+      "apply": "Aplicar",
+      "learnMore": "Saber Más",
+      "getStarted": "Comenzar",
+      "continue": "Continuar"
+    },
+    "actions": {
+      "loading": "Cargando...",
+      "saving": "Guardando...",
+      "deleting": "Eliminando...",
+      "submitting": "Enviando...",
+      "processing": "Procesando..."
+    },
+    "status": {
+      "success": "Éxito",
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Información",
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "labels": {
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "username": "Nombre de Usuario",
+      "name": "Nombre",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "state": "Estado",
+      "country": "País",
+      "zipCode": "Código Postal",
+      "date": "Fecha",
+      "time": "Hora",
+      "description": "Descripción",
+      "title": "Título",
+      "category": "Categoría",
+      "tags": "Etiquetas",
+      "language": "Idioma",
+      "theme": "Tema"
+    }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "logout": "Cerrar Sesión",
+    "forgotPassword": "¿Olvidaste tu Contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "createAccount": "Crear Cuenta",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "noAccount": "¿No tienes una cuenta?",
+    "rememberMe": "Recuérdame",
+    "or": "o",
+    "continueWith": "Continuar con",
+    "emailAddress": "Correo Electrónico",
+    "yourPassword": "Tu Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "enterEmail": "Ingresa tu correo electrónico",
+    "enterPassword": "Ingresa tu contraseña"
+  },
+  "footer": {
+    "sections": {
+      "about": "Acerca de",
+      "legal": "Legal",
+      "contact": "Contacto"
+    },
+    "links": {
+      "ourMission": "Nuestra Misión",
+      "resources": "Recursos",
+      "termsOfService": "Términos de Servicio",
+      "privacyPolicy": "Política de Privacidad",
+      "getInTouch": "Contáctanos"
+    },
+    "copyright": "© {{year}} AI Ethical Compass. Todos los derechos reservados."
+  },
+  "scenarios": {
+    "title": "Escenarios",
+    "allScenarios": "Todos los Escenarios",
+    "createNew": "Crear Nuevo Escenario",
+    "difficulty": "Dificultad",
+    "level": {
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil"
+    },
+    "viewScenario": "Ver Escenario",
+    "exploreScenario": "Explorar Escenario",
+    "submitPerspective": "Enviar Perspectiva",
+    "perspectives": "Perspectivas",
+    "yourPerspective": "Tu Perspectiva",
+    "sharePerspective": "Comparte Tu Perspectiva"
+  },
+  "teacher": {
+    "dashboard": {
+      "title": "Panel del Profesor",
+      "welcome": "Bienvenido, {{name}}",
+      "overview": "Resumen",
+      "classes": "Clases",
+      "students": "Estudiantes",
+      "assignments": "Tareas",
+      "grading": "Calificación",
+      "analytics": "Analíticas",
+      "settings": "Configuración"
+    },
+    "classes": {
+      "title": "Clases",
+      "create": "Crear Clase",
+      "edit": "Editar Clase",
+      "delete": "Eliminar Clase",
+      "viewDetails": "Ver Detalles",
+      "className": "Nombre de la Clase",
+      "classCode": "Código de Clase",
+      "students": "Estudiantes",
+      "noClasses": "Aún no hay clases. Crea tu primera clase para comenzar."
+    },
+    "assignments": {
+      "title": "Tareas",
+      "create": "Crear Tarea",
+      "edit": "Editar Tarea",
+      "delete": "Eliminar Tarea",
+      "assignmentName": "Nombre de la Tarea",
+      "dueDate": "Fecha de Entrega",
+      "points": "Puntos",
+      "submissions": "Entregas",
+      "graded": "Calificadas",
+      "pending": "Pendientes"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Panel del Estudiante",
+      "welcome": "Bienvenido, {{name}}",
+      "myProgress": "Mi Progreso",
+      "assignments": "Mis Tareas",
+      "recentActivity": "Actividad Reciente",
+      "achievements": "Logros"
+    },
+    "assignments": {
+      "title": "Mis Tareas",
+      "due": "Vence",
+      "submitted": "Entregadas",
+      "graded": "Calificadas",
+      "overdue": "Atrasadas",
+      "submit": "Entregar Tarea",
+      "viewFeedback": "Ver Retroalimentación"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "Este campo es obligatorio",
+      "emailInvalid": "Por favor ingresa un correo electrónico válido",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordsNoMatch": "Las contraseñas no coinciden",
+      "invalidFormat": "Formato inválido",
+      "tooShort": "Demasiado corto",
+      "tooLong": "Demasiado largo"
+    },
+    "placeholders": {
+      "enterEmail": "Ingresa tu correo electrónico",
+      "enterPassword": "Ingresa tu contraseña",
+      "enterName": "Ingresa tu nombre",
+      "searchPlaceholder": "Buscar...",
+      "selectOption": "Selecciona una opción"
+    }
+  },
+  "errors": {
+    "api": {
+      "networkError": "Error de red. Por favor verifica tu conexión e intenta nuevamente.",
+      "serverError": "Error del servidor. Por favor intenta más tarde.",
+      "unauthorized": "No estás autorizado para realizar esta acción.",
+      "forbidden": "Acceso prohibido.",
+      "notFound": "Recurso no encontrado.",
+      "badRequest": "Solicitud incorrecta. Por favor verifica tu entrada.",
+      "timeout": "Tiempo de espera agotado. Por favor intenta nuevamente."
+    },
+    "generic": {
+      "somethingWrong": "Algo salió mal. Por favor intenta nuevamente.",
+      "tryAgain": "Por favor intenta nuevamente",
+      "contactSupport": "Si el problema persiste, por favor contacta a soporte."
+    }
+  },
+  "about": {
+    "title": "Dando Forma al Futuro de la IA en la Educación",
+    "subtitle": "AI Ethical Compass empodera a estudiantes y educadores para navegar el complejo panorama ético de la inteligencia artificial en la educación.",
+    "buttons": {
+      "startExploring": "Comenzar a Explorar",
+      "viewResources": "Ver Recursos",
+      "startScenario": "Comenzar con el Escenario 1",
+      "browseResources": "Explorar Recursos"
+    },
+    "stats": {
+      "scenarios": "Escenarios Éticos",
+      "sdgGoals": "Objetivos ODS de la ONU",
+      "learningOpportunities": "Oportunidades de Aprendizaje"
+    },
+    "mission": {
+      "title": "Nuestra Misión",
+      "content": "AI Ethical Compass fue desarrollado para el Desafío de Innovación en IA ISTE+ASCD 2025 con una misión clara: ayudar a estudiantes de secundaria y educadores a desarrollar habilidades de pensamiento crítico sobre el uso ético, responsable e inclusivo de la Inteligencia Artificial.",
+      "additional": "En un mundo donde la IA influye cada vez más en la educación y la vida diaria, es esencial que los jóvenes y los educadores aprendan a navegar las complejas cuestiones éticas sobre cómo estas tecnologías deben ser utilizadas."
+    },
+    "themes": {
+      "title": "Temas del Desafío",
+      "digitalInclusion": {
+        "title": "Inclusión Digital",
+        "content": "Nuestra plataforma examina cómo las herramientas de IA pueden promover o dificultar la inclusión digital en contextos educativos. Exploramos cuestiones de acceso, equidad, barreras lingüísticas y cómo la IA puede reducir o ampliar las brechas digitales existentes."
+      },
+      "responsibleCitizenship": {
+        "title": "Ciudadanía Digital Responsable",
+        "content": "A través de nuestros escenarios, los usuarios enfrentan preguntas sobre el uso responsable de la IA, incluyendo transparencia, divulgación, preocupaciones sobre plagio, implicaciones de privacidad y el desarrollo de marcos éticos para tecnologías emergentes."
+      }
+    },
+    "sdg": {
+      "title": "Objetivos de Desarrollo Sostenible de la ONU",
+      "intro": "Nuestra plataforma se alinea con múltiples Objetivos de Desarrollo Sostenible de la ONU, con un énfasis particular en transformar la educación y reducir las desigualdades a través de la implementación ética de la IA. Creemos que al abordar estos desafíos fundamentales, podemos crear un futuro más equitativo e inclusivo para todos los estudiantes.",
+      "goals": {
+        "sdg4": {
+          "title": "ODS 4: Educación de Calidad",
+          "content": "En el corazón de nuestra misión, apoyamos el ODS 4 promoviendo el análisis crítico de cómo la IA puede mejorar o perjudicar la educación de calidad. Nuestros escenarios completos examinan las consideraciones éticas que los educadores y estudiantes deben navegar a medida que la IA se vuelve más prevalente en los entornos de aprendizaje, asegurando que el avance tecnológico sirva a la excelencia educativa."
+        },
+        "sdg10": {
+          "title": "ODS 10: Reducción de las Desigualdades",
+          "content": "Un pilar fundamental de nuestro trabajo, abordamos el ODS 10 explorando profundamente cómo la IA puede amplificar o reducir las desigualdades. Nuestros escenarios invitan a los usuarios a considerar los sesgos algorítmicos, las consideraciones de accesibilidad y cómo las decisiones de diseño de la IA impactan a diferentes poblaciones, con un enfoque en crear oportunidades educativas más equitativas."
+        },
+        "sdg9": {
+          "title": "ODS 9: Industria, Innovación e Infraestructura",
+          "content": "Nuestros escenarios examinan cómo la innovación en IA en la educación puede equilibrarse con el desarrollo responsable y el acceso inclusivo, asegurando que el progreso tecnológico beneficie a todos los estudiantes."
+        },
+        "sdg16": {
+          "title": "ODS 16: Paz, Justicia e Instituciones Sólidas",
+          "content": "Exploramos cómo la implementación de la IA afecta la integridad institucional, la transparencia y la justicia en los entornos educativos, promoviendo marcos éticos y gobernanza responsable."
+        },
+        "sdg8": {
+          "title": "ODS 8: Trabajo Decente y Crecimiento Económico",
+          "content": "Nuestros escenarios consideran cómo la IA afecta las oportunidades de empleo y el desarrollo de habilidades en la educación, preparando a los estudiantes para el mercado laboral en evolución mientras se asegura un crecimiento justo e inclusivo."
+        },
+        "sdg3": {
+          "title": "ODS 3: Salud y Bienestar",
+          "content": "Examinamos cómo la IA puede apoyar el bienestar y la salud mental de los estudiantes en entornos educativos, mientras abordamos los riesgos potenciales y aseguramos un enfoque equilibrado del uso de la tecnología."
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "Involúcrate",
+      "content": "Únete a educadores y estudiantes de todo el mundo para explorar las dimensiones éticas de la IA en la educación. Tu perspectiva es importante para dar forma al futuro del uso responsable de la IA."
+    }
+  },
+  "resources": {
+    "hero": {
+      "titlePart1": "Recursos Educativos",
+      "titlePart2": "sobre IA",
+      "description": "Explora nuestra colección de recursos sobre la implementación ética de la IA en la educación, desde directrices completas hasta herramientas prácticas y estudios de casos reales."
+    },
+    "categories": {
+      "all": "Todos los Recursos",
+      "guidelines": "Directrices y Políticas",
+      "research": "Investigación y Estudios",
+      "tools": "Herramientas y Plataformas",
+      "courses": "Cursos y Tutoriales",
+      "caseStudies": "Estudios de Caso",
+      "frameworks": "Marcos Éticos",
+      "communities": "Comunidades",
+      "assessment": "Herramientas de Evaluación"
+    },
+    "learnMore": "Saber Más",
+    "cta": {
+      "title": "Para Educadores",
+      "description": "¿Buscas incorporar la ética de la IA en tu currículo? Estos recursos pueden ayudarte a crear lecciones atractivas y fomentar discusiones significativas sobre el papel de la IA en la educación.",
+      "prompts": {
+        "title": "Temas de Discusión",
+        "description": "Utiliza nuestros escenarios como puntos de partida para discusiones en el aula sobre la ética de la IA."
+      },
+      "activities": {
+        "title": "Ideas de Actividades",
+        "description": "Involucra a los estudiantes con actividades prácticas que exploren el impacto de la IA en la educación."
+      }
+    }
+  },
+  "home": {
+    "title": "Brújula Ética de IA",
+    "subtitle": "Navegando el Futuro de la IA en la Educación",
+    "description": "Desarrolla habilidades de pensamiento crítico sobre el uso ético, responsable e inclusivo de la Inteligencia Artificial en contextos educativos.",
+    "buttons": {
+      "exploreScenarios": "Explorar Escenarios",
+      "learnMore": "Saber Más",
+      "startExploring": "Comenzar a Explorar Escenarios"
+    },
+    "sdg": {
+      "title": "Conectando con los Objetivos de Desarrollo Sostenible de las Naciones Unidas",
+      "qualityEducation": {
+        "title": "Educación de Calidad (ODS 4)",
+        "description": "Nuestros escenarios exploran cómo la IA puede mejorar o desafiar la educación de calidad, centrándose en la equidad, accesibilidad y la naturaleza cambiante del aprendizaje en la era digital."
+      },
+      "reducedInequalities": {
+        "title": "Reducción de las Desigualdades (ODS 10)",
+        "description": "Examinamos cómo la IA puede exacerbar o reducir las desigualdades en entornos educativos, abordando cuestiones de inclusión digital, sesgos algorítmicos y acceso a la tecnología."
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "steps": {
+        "identify": {
+          "title": "Identificar",
+          "description": "Examina los escenarios e identifica si y cómo se está utilizando la IA"
+        },
+        "evaluate": {
+          "title": "Evaluar",
+          "description": "Considera las implicaciones éticas, beneficios y riesgos"
+        },
+        "share": {
+          "title": "Compartir",
+          "description": "Contribuye tu perspectiva sobre el dilema ético"
+        },
+        "explore": {
+          "title": "Explorar",
+          "description": "Visualiza diversas perspectivas de la comunidad"
+        }
+      }
+    }
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "backToHome": "Volver al Inicio"
+  }
+}

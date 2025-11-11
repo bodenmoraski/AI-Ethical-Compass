@@ -237,7 +237,6 @@
     },
     "stats": {
       "scenarios": "Escenarios Éticos",
-      "sdgGoals": "Objetivos ODS de la ONU",
       "learningOpportunities": "Oportunidades de Aprendizaje"
     },
     "mission": {
@@ -254,36 +253,6 @@
       "responsibleCitizenship": {
         "title": "Ciudadanía Digital Responsable",
         "content": "A través de nuestros escenarios, los usuarios enfrentan preguntas sobre el uso responsable de la IA, incluyendo transparencia, divulgación, preocupaciones sobre plagio, implicaciones de privacidad y el desarrollo de marcos éticos para tecnologías emergentes."
-      }
-    },
-    "sdg": {
-      "title": "Objetivos de Desarrollo Sostenible de la ONU",
-      "intro": "Nuestra plataforma se alinea con múltiples Objetivos de Desarrollo Sostenible de la ONU, con un énfasis particular en transformar la educación y reducir las desigualdades a través de la implementación ética de la IA. Creemos que al abordar estos desafíos fundamentales, podemos crear un futuro más equitativo e inclusivo para todos los estudiantes.",
-      "goals": {
-        "sdg4": {
-          "title": "ODS 4: Educación de Calidad",
-          "content": "En el corazón de nuestra misión, apoyamos el ODS 4 promoviendo el análisis crítico de cómo la IA puede mejorar o perjudicar la educación de calidad. Nuestros escenarios completos examinan las consideraciones éticas que los educadores y estudiantes deben navegar a medida que la IA se vuelve más prevalente en los entornos de aprendizaje, asegurando que el avance tecnológico sirva a la excelencia educativa."
-        },
-        "sdg10": {
-          "title": "ODS 10: Reducción de las Desigualdades",
-          "content": "Un pilar fundamental de nuestro trabajo, abordamos el ODS 10 explorando profundamente cómo la IA puede amplificar o reducir las desigualdades. Nuestros escenarios invitan a los usuarios a considerar los sesgos algorítmicos, las consideraciones de accesibilidad y cómo las decisiones de diseño de la IA impactan a diferentes poblaciones, con un enfoque en crear oportunidades educativas más equitativas."
-        },
-        "sdg9": {
-          "title": "ODS 9: Industria, Innovación e Infraestructura",
-          "content": "Nuestros escenarios examinan cómo la innovación en IA en la educación puede equilibrarse con el desarrollo responsable y el acceso inclusivo, asegurando que el progreso tecnológico beneficie a todos los estudiantes."
-        },
-        "sdg16": {
-          "title": "ODS 16: Paz, Justicia e Instituciones Sólidas",
-          "content": "Exploramos cómo la implementación de la IA afecta la integridad institucional, la transparencia y la justicia en los entornos educativos, promoviendo marcos éticos y gobernanza responsable."
-        },
-        "sdg8": {
-          "title": "ODS 8: Trabajo Decente y Crecimiento Económico",
-          "content": "Nuestros escenarios consideran cómo la IA afecta las oportunidades de empleo y el desarrollo de habilidades en la educación, preparando a los estudiantes para el mercado laboral en evolución mientras se asegura un crecimiento justo e inclusivo."
-        },
-        "sdg3": {
-          "title": "ODS 3: Salud y Bienestar",
-          "content": "Examinamos cómo la IA puede apoyar el bienestar y la salud mental de los estudiantes en entornos educativos, mientras abordamos los riesgos potenciales y aseguramos un enfoque equilibrado del uso de la tecnología."
-        }
       }
     },
     "getInvolved": {
@@ -330,17 +299,6 @@
       "exploreScenarios": "Explorar Escenarios",
       "learnMore": "Saber Más",
       "startExploring": "Comenzar a Explorar Escenarios"
-    },
-    "sdg": {
-      "title": "Conectando con los Objetivos de Desarrollo Sostenible de las Naciones Unidas",
-      "qualityEducation": {
-        "title": "Educación de Calidad (ODS 4)",
-        "description": "Nuestros escenarios exploran cómo la IA puede mejorar o desafiar la educación de calidad, centrándose en la equidad, accesibilidad y la naturaleza cambiante del aprendizaje en la era digital."
-      },
-      "reducedInequalities": {
-        "title": "Reducción de las Desigualdades (ODS 10)",
-        "description": "Examinamos cómo la IA puede exacerbar o reducir las desigualdades en entornos educativos, abordando cuestiones de inclusión digital, sesgos algorítmicos y acceso a la tecnología."
-      }
     },
     "howItWorks": {
       "title": "Cómo Funciona",

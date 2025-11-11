@@ -237,7 +237,6 @@
     },
     "stats": {
       "scenarios": "Ethical Scenarios",
-      "sdgGoals": "UN SDG Goals",
       "learningOpportunities": "Learning Opportunities"
     },
     "mission": {
@@ -254,36 +253,6 @@
       "responsibleCitizenship": {
         "title": "Responsible Digital Citizenship",
         "content": "Through our scenarios, users confront questions about responsible AI use, including transparency, disclosure, plagiarism concerns, privacy implications, and the development of ethical frameworks for emerging technologies."
-      }
-    },
-    "sdg": {
-      "title": "UN Sustainable Development Goals",
-      "intro": "Our platform aligns with multiple UN Sustainable Development Goals, with a particular emphasis on transforming education and reducing inequalities through ethical AI implementation. We believe that by addressing these core challenges, we can create a more equitable and inclusive future for all learners.",
-      "goals": {
-        "sdg4": {
-          "title": "SDG 4: Quality Education",
-          "content": "At the heart of our mission, we support SDG 4 by promoting critical analysis of how AI can enhance or detract from quality education. Our comprehensive scenarios examine ethical considerations that educators and students must navigate as AI becomes more prevalent in learning environments, ensuring that technological advancement serves educational excellence."
-        },
-        "sdg10": {
-          "title": "SDG 10: Reduced Inequalities",
-          "content": "A fundamental pillar of our work, we address SDG 10 by deeply exploring how AI can either amplify or reduce inequalities. Our scenarios prompt users to consider algorithmic bias, accessibility considerations, and how AI design choices impact different populations, with a focus on creating more equitable educational opportunities."
-        },
-        "sdg9": {
-          "title": "SDG 9: Industry, Innovation and Infrastructure",
-          "content": "Our scenarios examine how AI innovation in education can be balanced with responsible development and inclusive access, ensuring that technological progress benefits all learners."
-        },
-        "sdg16": {
-          "title": "SDG 16: Peace, Justice and Strong Institutions",
-          "content": "We explore how AI implementation affects institutional integrity, transparency, and justice in educational settings, promoting ethical frameworks and responsible governance."
-        },
-        "sdg8": {
-          "title": "SDG 8: Decent Work and Economic Growth",
-          "content": "Our scenarios consider how AI affects employment opportunities and skills development in education, preparing students for the evolving job market while ensuring fair and inclusive growth."
-        },
-        "sdg3": {
-          "title": "SDG 3: Good Health and Well-being",
-          "content": "We examine how AI can support student well-being and mental health in educational settings, while addressing potential risks and ensuring a balanced approach to technology use."
-        }
       }
     },
     "getInvolved": {
@@ -320,6 +289,788 @@
         "title": "Activity Ideas",
         "description": "Engage students with hands-on activities exploring AI's impact on education."
       }
+    },
+    "items": {
+      "unescoGuidelines": {
+        "title": "UNESCO Guidelines for AI in Education",
+        "description": "Comprehensive framework for ethical AI implementation in education, addressing transparency, accountability, and human rights.",
+        "link": "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics"
+      },
+      "ai4k12Guidelines": {
+        "title": "AI4K12 Initiative",
+        "description": "National guidelines for K-12 AI education that provide a framework for teaching AI concepts across grade levels.",
+        "link": "https://ai4k12.org/"
+      },
+      "isteResearch": {
+        "title": "ISTE AI Research Hub",
+        "description": "Research-based insights and best practices for integrating AI technologies in educational settings.",
+        "link": "https://iste.org/explore/ai"
+      },
+      "elementsOfAiCourse": {
+        "title": "Elements of AI",
+        "description": "Free online course series teaching AI fundamentals to people without technical backgrounds.",
+        "link": "https://www.elementsofai.com/"
+      },
+      "aif360Toolkit": {
+        "title": "AI Fairness 360 (AIF360)",
+        "description": "IBM's open-source toolkit for detecting and mitigating bias in machine learning models.",
+        "link": "https://aif360.mybluemix.net/"
+      },
+      "algorithmicJusticeLeague": {
+        "title": "Algorithmic Justice League",
+        "description": "Organization combining art and research to illuminate the social implications of AI.",
+        "link": "https://www.ajl.org/"
+      },
+      "digitalEquity": {
+        "title": "Digital Equity Framework",
+        "description": "Guidelines for ensuring equitable access to educational technology and AI tools.",
+        "link": "https://digitalequity.us/"
+      },
+      "euGuidelines": {
+        "title": "EU Ethics Guidelines for Trustworthy AI",
+        "description": "European Commission's framework for developing and deploying trustworthy artificial intelligence.",
+        "link": "https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai"
+      },
+      "unescoPolicyGuidance": {
+        "title": "UNESCO AI Policy Guidance",
+        "description": "Comprehensive guidance for policymakers on implementing ethical AI in education systems.",
+        "link": "https://www.unesco.org/en/artificial-intelligence-education/policy-guidance"
+      },
+      "unescoGenerativeAI": {
+        "title": "UNESCO Guidance on Generative AI",
+        "description": "Specific guidance addressing the ethical challenges and opportunities of generative AI in education.",
+        "link": "https://www.unesco.org/en/articles/guidance-generative-ai-education-and-research"
+      },
+      "euAIAct": {
+        "title": "EU Artificial Intelligence Act",
+        "description": "Landmark legislation establishing harmonized rules for AI development and use in the European Union.",
+        "link": "https://artificialintelligenceact.eu/"
+      },
+      "usEdToolkit": {
+        "title": "U.S. Department of Education AI Toolkit",
+        "description": "Federal resources for schools implementing AI while protecting student rights and privacy.",
+        "link": "https://tech.ed.gov/ai/"
+      },
+      "usEdOCR": {
+        "title": "U.S. Ed OCR on AI and Civil Rights",
+        "description": "Office for Civil Rights guidance on ensuring AI in education complies with federal civil rights laws.",
+        "link": "https://www2.ed.gov/about/offices/list/ocr/frontpage/faq/rr/policyguidance/roadmap.html"
+      },
+      "ospiFramework": {
+        "title": "OSPI AI Ethics Framework",
+        "description": "Washington State's framework for ethical AI implementation in K-12 education.",
+        "link": "https://ospi.k12.wa.us/"
+      },
+      "srebGuidance": {
+        "title": "SREB AI Implementation Guidance",
+        "description": "Southern Regional Education Board's guidance for states on responsible AI adoption in K-12.",
+        "link": "https://www.sreb.org/ai-education"
+      },
+      "csuEthicalFramework": {
+        "title": "CSU Ethical AI Framework",
+        "description": "California State University's framework for ethical AI use in higher education.",
+        "link": "https://www.calstate.edu/csu-system/why-the-csu-matters/student-success/academic-technology/ai"
+      },
+      "buckinghamFramework": {
+        "title": "Buckingham Framework for Ethical AI",
+        "description": "Comprehensive framework for ethical decision-making in AI procurement and implementation.",
+        "link": "https://buckingham.ac.uk/research/ai-ethics/"
+      },
+      "ibmEthics": {
+        "title": "IBM AI Ethics Principles",
+        "description": "Corporate framework emphasizing transparency, explainability, fairness, and robustness in AI.",
+        "link": "https://www.ibm.com/artificial-intelligence/ethics"
+      },
+      "mozillaTrustworthyAI": {
+        "title": "Mozilla Trustworthy AI",
+        "description": "Framework focused on building AI systems that respect user rights and promote the public good.",
+        "link": "https://foundation.mozilla.org/en/internet-health/trustworthy-artificial-intelligence/"
+      },
+      "effAIIssues": {
+        "title": "EFF on AI Issues",
+        "description": "Electronic Frontier Foundation's analysis of AI's impact on digital rights and civil liberties.",
+        "link": "https://www.eff.org/issues/ai"
+      },
+      "gousetiReview": {
+        "title": "Gouseti Systematic Review on AI Ethics in K-12",
+        "description": "Academic review examining ethical considerations in K-12 AI education implementation.",
+        "link": "https://link.springer.com/article/10.1007/s11423-024-10389-9"
+      },
+      "martinReview": {
+        "title": "Martin Systematic Review of AI in K-12",
+        "description": "Comprehensive review of AI applications and ethical considerations in K-12 settings.",
+        "link": "https://www.sciencedirect.com/science/article/pii/S2666920X23000358"
+      },
+      "vashisthaStudy": {
+        "title": "Vashishta Study on AI in Education",
+        "description": "Research examining the integration of AI technologies in educational curricula and practices.",
+        "link": "https://www.sciencedirect.com/science/article/pii/S2666920X25000013"
+      },
+      "asefWhitePaper": {
+        "title": "ASEF White Paper on AI in Higher Ed",
+        "description": "Analysis of AI's transformative potential and ethical challenges in higher education.",
+        "link": "https://www.asef.org/publications/white-papers/ethical-ai-higher-education/"
+      },
+      "algorithmAudit": {
+        "title": "Algorithm Audit Tool",
+        "description": "Open-source platform for auditing algorithms for bias and fairness issues.",
+        "link": "https://algorithmaudit.eu/"
+      },
+      "sdsuAssessment": {
+        "title": "SDSU AI Impact Assessment Tool",
+        "description": "Rubric-based tool for assessing environmental and social impacts of AI systems.",
+        "link": "https://sustainability.sdsu.edu/ai-assessment"
+      },
+      "magicSchoolAI": {
+        "title": "MagicSchool AI",
+        "description": "Educational platform providing AI tools designed specifically for teachers and students.",
+        "link": "https://www.magicschool.ai/"
+      },
+      "anthropicClaude": {
+        "title": "Anthropic Claude for Education",
+        "description": "AI assistant designed with safety and educational applications in mind.",
+        "link": "https://www.anthropic.com/claude"
+      },
+      "curriculumAssociates": {
+        "title": "Curriculum Associates AI Tools",
+        "description": "Educational technology company's approach to ethical AI implementation in learning platforms.",
+        "link": "https://www.curriculumassociates.com/programs/ai-education"
+      },
+      "floeProject": {
+        "title": "FLOE Project (Inclusive Learning)",
+        "description": "Open education resource project focused on personalized, inclusive learning through technology.",
+        "link": "https://floeproject.org/"
+      },
+      "aiEthicsLabyrinth": {
+        "title": "AI Ethics Labyrinth Game",
+        "description": "Interactive game teaching AI ethics concepts through ethical dilemmas and decision-making.",
+        "link": "https://www.aiethicslabyrinth.org/"
+      },
+      "techBetterGames": {
+        "title": "Tech Better Workshop Games",
+        "description": "Role-playing games and activities for teaching AI governance and ethical decision-making.",
+        "link": "https://www.techbetter.com/ai-ethics-games/"
+      },
+      "hyperspace": {
+        "title": "Hyperspace Ethical AI Simulation",
+        "description": "Advanced simulation platform for training on ethical AI decision-making in real-world contexts.",
+        "link": "https://www.hyperspace.ai/ethics"
+      },
+      "mitCurriculum": {
+        "title": "MIT AI Ethics Curriculum",
+        "description": "Middle school curriculum for teaching AI concepts and ethical considerations.",
+        "link": "https://raise.mit.edu/"
+      },
+      "googleLessonPlan": {
+        "title": "Google's Responsible AI Lessons",
+        "description": "Free lesson plans for teaching responsible AI concepts in K-12 classrooms.",
+        "link": "https://grow.google/responsible-ai/"
+      },
+      "codeOrg": {
+        "title": "Code.org AI Curriculum",
+        "description": "Free curriculum integrating AI literacy and ethics into computer science education.",
+        "link": "https://code.org/ai"
+      },
+      "flintCourse": {
+        "title": "Flint AI Literacy Course",
+        "description": "Free K-12 course teaching AI literacy, ethics, and responsible use.",
+        "link": "https://www.flintk12.com/ai-literacy"
+      },
+      "microsoftLearn": {
+        "title": "Microsoft Learn Educator Center",
+        "description": "Professional development resources for educators on AI and emerging technologies.",
+        "link": "https://learn.microsoft.com/en-us/training/educator-center/"
+      },
+      "minnesotaWorkshop": {
+        "title": "University of Minnesota AI Workshop",
+        "description": "Faculty development workshop on ethical and equitable AI integration in teaching.",
+        "link": "https://cei.umn.edu/ai-teaching-workshop"
+      },
+      "neaWebinars": {
+        "title": "NEA AI Ethics Webinars",
+        "description": "National Education Association's webinar series on AI ethics and digital citizenship.",
+        "link": "https://www.nea.org/professional-excellence/ai-education"
+      },
+      "asuCourse": {
+        "title": "ASU AI in K-12 Course",
+        "description": "Arizona State University course training teachers on ethical AI implementation.",
+        "link": "https://education.asu.edu/ai-k12-education"
+      },
+      "cambridgeMasters": {
+        "title": "Cambridge Master's in AI Ethics",
+        "description": "Graduate program focused on ethical, responsible, and human-centered AI development.",
+        "link": "https://www.cam.ac.uk/ai-ethics"
+      },
+      "baylorSeries": {
+        "title": "Baylor AI Ethics Course Series",
+        "description": "Professional development series on ethical AI implementation across industries.",
+        "link": "https://www.baylor.edu/business/ai-ethics/"
+      },
+      "magicSchoolCaseStudies": {
+        "title": "MagicSchool AI Case Studies",
+        "description": "Real-world examples of schools implementing AI tools ethically and effectively.",
+        "link": "https://www.magicschool.ai/case-studies"
+      },
+      "mississippiCaseStudy": {
+        "title": "University of Mississippi GenAI Case Study",
+        "description": "Case study on addressing academic integrity challenges with generative AI in higher ed.",
+        "link": "https://olemiss.edu/ai-case-study"
+      },
+      "caribouReport": {
+        "title": "Caribou Digital Global AI Report",
+        "description": "Report on responsible AI development and deployment in developing regions.",
+        "link": "https://cariboudigital.net/responsible-ai/"
+      },
+      "olcRubric": {
+        "title": "OLC AI Collaboration Rubric",
+        "description": "Rubric for assessing student work that incorporates AI assistance and collaboration.",
+        "link": "https://onlinelearningconsortium.org/ai-rubric/"
+      },
+      "remcRubric": {
+        "title": "REMC AI Assessment Rubric Generator",
+        "description": "Tool for creating fair and ethical assessment rubrics in AI-enhanced learning.",
+        "link": "https://www.remc.org/ai-rubric-generator"
+      },
+      "flintAssessment": {
+        "title": "Flint AI Literacy Assessment",
+        "description": "Assessment tool for measuring K-12 student AI literacy and ethical understanding.",
+        "link": "https://www.flintk12.com/ai-assessment"
+      },
+      "aimAhead": {
+        "title": "AIM AHEAD Community",
+        "description": "Discussion group focused on ethical AI in healthcare and education settings.",
+        "link": "https://www.aimahead.org/"
+      },
+      "learntoquestion": {
+        "title": "Learn to Question AI Community",
+        "description": "Online forum for students and educators to discuss critical thinking about AI.",
+        "link": "https://www.learntoquestion.ai/"
+      },
+      "edWeb": {
+        "title": "edWeb AI Community",
+        "description": "Professional learning network for educators exploring AI in education.",
+        "link": "https://home.edweb.net/ai-education/"
+      },
+      "iste": {
+        "title": "ISTE Community",
+        "description": "International Society for Technology in Education's community and resources.",
+        "link": "https://iste.org/"
+      },
+      "aera": {
+        "title": "AERA AI in Education SIG",
+        "description": "American Educational Research Association's special interest group on AI in education.",
+        "link": "https://www.aera.net/ai-education"
+      },
+      "cesConsulting": {
+        "title": "CES AI Ethics Consulting",
+        "description": "Consulting services for schools implementing ethical AI policies and practices.",
+        "link": "https://www.ces-schools.net/ai-consulting"
+      },
+      "aiGuardianPolicy": {
+        "title": "AI Guardian Policy Template",
+        "description": "Customizable policy template for schools adopting AI technologies responsibly.",
+        "link": "https://www.aiguardian.org/policy-template"
+      },
+      "merlynRoadmap": {
+        "title": "Merlyn District AI Roadmap",
+        "description": "Step-by-step roadmap for school districts implementing AI ethically and systematically.",
+        "link": "https://www.merlyn.org/district-roadmap"
+      },
+      "egenPolicy": {
+        "title": "eGen AI Policy Framework",
+        "description": "Comprehensive policy framework emphasizing transparency, sustainability, and human rights.",
+        "link": "https://www.egen.io/ai-policy"
+      },
+      "learningAnalyticsReview": {
+        "title": "Systematic Review: Learning Analytics & Ethics",
+        "description": "Academic review of ethical considerations in learning analytics and AI-driven insights.",
+        "link": "https://link.springer.com/article/10.1007/s40593-023-00358-3"
+      },
+      "teacherAIDilemmas": {
+        "title": "Teacher-AI Interaction Dilemmas Study",
+        "description": "Empirical research on ethical dilemmas teachers face when working with AI systems.",
+        "link": "https://www.sciencedirect.com/science/article/pii/S0360131523002300"
+      },
+      "insight7": {
+        "title": "Insight7 Bias Detection Tool",
+        "description": "AI tool for detecting bias and ensuring integrity in qualitative research data analysis.",
+        "link": "https://insight7.io/"
+      },
+      "squirrelAI": {
+        "title": "Squirrel AI Learning",
+        "description": "Adaptive learning platform using AI for personalized K-12 education.",
+        "link": "https://squirrelai.com/"
+      },
+      "contentTechnologies": {
+        "title": "Content Technologies AI",
+        "description": "Platform for AI-generated educational content and automated textbook creation.",
+        "link": "https://www.contenttechnologiesinc.com/"
+      },
+      "knewton": {
+        "title": "Knewton Alta",
+        "description": "Adaptive learning technology providing personalized course experiences.",
+        "link": "https://www.knewton.com/"
+      },
+      "cognii": {
+        "title": "Cognii Virtual Learning Assistant",
+        "description": "AI-powered virtual tutor providing conversational learning and assessment.",
+        "link": "https://www.cognii.com/"
+      },
+      "jillWatson": {
+        "title": "Jill Watson Virtual TA",
+        "description": "AI teaching assistant developed at Georgia Tech for supporting online courses.",
+        "link": "https://www.news.gatech.edu/jill-watson"
+      },
+      "aiDungeon": {
+        "title": "AI Dungeon",
+        "description": "Text-based game using generative AI for creative storytelling and problem-solving.",
+        "link": "https://play.aidungeon.io/"
+      },
+      "workBot": {
+        "title": "WorkBot Productivity Platform",
+        "description": "AI platform for managing workflows, collaboration, and productivity in education.",
+        "link": "https://www.workbot.com/"
+      },
+      "quickRubric": {
+        "title": "QuickRubric",
+        "description": "Tool for teachers to quickly create, save, and share assessment rubrics.",
+        "link": "https://www.quickrubric.com/"
+      },
+      "khanmigo": {
+        "title": "Khanmigo by Khan Academy",
+        "description": "AI-powered tutor and teaching assistant from Khan Academy.",
+        "link": "https://www.khanacademy.org/khan-labs"
+      },
+      "goblinTools": {
+        "title": "Goblin Tools",
+        "description": "Collection of simple, accessible tools to help students with various tasks.",
+        "link": "https://goblin.tools/"
+      },
+      "perplexityAI": {
+        "title": "Perplexity AI",
+        "description": "AI-powered search engine providing sourced answers for research and learning.",
+        "link": "https://www.perplexity.ai/"
+      },
+      "quizlet": {
+        "title": "Quizlet AI-Enhanced Study Tools",
+        "description": "Study platform with AI-powered flashcards and practice tests.",
+        "link": "https://quizlet.com/"
+      },
+      "shovel": {
+        "title": "Shovel AI Planner",
+        "description": "AI-powered time management and scheduling tool for students.",
+        "link": "https://www.shovel.app/"
+      },
+      "focusmate": {
+        "title": "Focusmate",
+        "description": "Virtual co-working platform to help students stay focused and productive.",
+        "link": "https://www.focusmate.com/"
+      },
+      "adobeExpress": {
+        "title": "Adobe Express for Education",
+        "description": "Creative platform with AI tools designed for safe K-12 content creation.",
+        "link": "https://www.adobe.com/express/education"
+      },
+      "descript": {
+        "title": "Descript",
+        "description": "AI-powered audio and video editing tool for creating media literacy projects.",
+        "link": "https://www.descript.com/"
+      },
+      "qusoAI": {
+        "title": "Quso AI",
+        "description": "AI tools for refining and enhancing student digital media projects.",
+        "link": "https://www.quso.ai/"
+      },
+      "remini": {
+        "title": "Remini",
+        "description": "AI-powered photo and video enhancement for student media projects.",
+        "link": "https://remini.ai/"
+      },
+      "adventureAI": {
+        "title": "Adventure AI",
+        "description": "Educational AI game for elementary students to learn about artificial intelligence.",
+        "link": "https://www.adventureai.com/"
+      },
+      "schoolAI": {
+        "title": "SchoolAI",
+        "description": "AI platform for K-12 with built-in teacher oversight and student monitoring features.",
+        "link": "https://www.school.ai/"
+      },
+      "snorkl": {
+        "title": "Snorkel AI for Education",
+        "description": "Platform providing AI feedback and personalized learning pathways for students.",
+        "link": "https://snorkel.ai/education/"
+      },
+      "deckToys": {
+        "title": "DeckToys",
+        "description": "Platform for creating interactive, gamified learning activities with AI assistance.",
+        "link": "https://www.decktoys.com/"
+      },
+      "readWrite": {
+        "title": "Read&Write",
+        "description": "Assistive technology providing reading and writing support for all students.",
+        "link": "https://www.texthelp.com/products/read-write/"
+      },
+      "weVideo": {
+        "title": "WeVideo",
+        "description": "Cloud-based video editing platform with collaborative features for students.",
+        "link": "https://www.wevideo.com/"
+      },
+      "dews": {
+        "title": "DEWS Early Warning System",
+        "description": "Predictive analytics system for identifying students at risk and providing early interventions.",
+        "link": "https://dews.org/"
+      },
+      "ai101Teachers": {
+        "title": "AI 101 for Teachers",
+        "description": "Introductory course on AI fundamentals and responsible implementation for educators.",
+        "link": "https://www.ai101teachers.com/"
+      },
+      "preparingToTeachAI": {
+        "title": "Preparing to Teach with AI",
+        "description": "Self-paced course helping teachers integrate AI tools ethically into instruction.",
+        "link": "https://www.preparingtoteachwithai.org/"
+      },
+      "aiForEducators": {
+        "title": "AI for Educators Course",
+        "description": "Comprehensive online course on AI fundamentals and ethical use in education.",
+        "link": "https://www.aiforeducators.com/"
+      },
+      "essentialGuideAI": {
+        "title": "Essential Guide to ChatGPT in Education",
+        "description": "Course covering ChatGPT capabilities, prompt engineering, and ethical classroom use.",
+        "link": "https://www.essentialguideai.com/"
+      },
+      "aiEducationTeachers": {
+        "title": "AI Education for Teachers",
+        "description": "Professional development course on AI ethics, bias awareness, and design thinking.",
+        "link": "https://www.aieducationteachers.org/"
+      },
+      "chatgptFoundations": {
+        "title": "ChatGPT Foundations for Educators",
+        "description": "Course teaching teachers how to use ChatGPT productively and responsibly.",
+        "link": "https://www.chatgptfoundations.com/"
+      },
+      "creativeCriticalAI": {
+        "title": "Creative & Critical AI Pedagogy",
+        "description": "Resources and strategies for teaching with and about generative AI.",
+        "link": "https://www.creativecriticalai.org/"
+      },
+      "empowerEducators": {
+        "title": "Empower Educators with AI",
+        "description": "Microsoft's training program on generative AI tools for accessibility and inclusion.",
+        "link": "https://www.microsoft.com/en-us/education/educators/ai"
+      },
+      "generativeAIEducators": {
+        "title": "Generative AI for Educators",
+        "description": "Google course on using generative AI to enhance instruction and personalize learning.",
+        "link": "https://edu.google.com/generative-ai/"
+      },
+      "aiFoundationsEducators": {
+        "title": "AI Foundations for Educators",
+        "description": "Free course providing foundational knowledge of responsible AI for teachers.",
+        "link": "https://www.aifoundationseducators.org/"
+      },
+      "artificialIntelligenceLessons": {
+        "title": "Artificial Intelligence Lessons",
+        "description": "Collection of ready-to-use lesson plans on AI literacy and ethics for K-12.",
+        "link": "https://www.artificialintelligencelessons.com/"
+      },
+      "aiForEducatorsMicrosoft": {
+        "title": "AI for Educators - Microsoft",
+        "description": "Microsoft Education's training on AI tools including Copilot and responsible use.",
+        "link": "https://www.microsoft.com/en-us/education/ai"
+      },
+      "artificialIntelligenceIBM": {
+        "title": "IBM AI Education Resources",
+        "description": "Free curriculum resources on AI for both students and teachers.",
+        "link": "https://www.ibm.com/academic/home"
+      },
+      "introToAI": {
+        "title": "Introduction to AI - Project-Based",
+        "description": "Project-based high school curriculum teaching AI fundamentals through hands-on work.",
+        "link": "https://www.introtoai.org/"
+      },
+      "ai4AllResources": {
+        "title": "AI4All High School Resources",
+        "description": "Curriculum resources focusing on AI ethics, careers, and social impact.",
+        "link": "https://ai-4-all.org/resources/"
+      },
+      "aiForEveryone": {
+        "title": "AI for Everyone (Coursera)",
+        "description": "Beginner-friendly course by Andrew Ng on AI concepts and societal impact.",
+        "link": "https://www.coursera.org/learn/ai-for-everyone"
+      },
+      "aiFoundationsEveryone": {
+        "title": "AI Foundations for Everyone",
+        "description": "Introductory course covering AI fundamentals, generative AI, and prompt engineering.",
+        "link": "https://www.coursera.org/learn/ai-foundations-for-everyone"
+      },
+      "elementsOfAI": {
+        "title": "Elements of AI",
+        "description": "Free online course making AI accessible to everyone with theory and practical exercises.",
+        "link": "https://www.elementsofai.com/"
+      },
+      "googleAIAnyone": {
+        "title": "Google AI for Anyone",
+        "description": "Course covering AI fundamentals, ethics, fairness, and real-world applications.",
+        "link": "https://www.edx.org/learn/artificial-intelligence"
+      },
+      "introductionToAI": {
+        "title": "Introduction to Artificial Intelligence",
+        "description": "Course exploring AI concepts, applications, and ethical considerations.",
+        "link": "https://www.coursera.org/learn/introduction-to-ai"
+      },
+      "aiInTheWorld": {
+        "title": "AI in the World Around Us",
+        "description": "K-12 curriculum helping students recognize AI in everyday contexts.",
+        "link": "https://www.aiintheworld.org/"
+      },
+      "applicationsOfAI": {
+        "title": "Applications of AI",
+        "description": "Curriculum exploring real-world AI applications across multiple disciplines.",
+        "link": "https://www.applicationsofai.org/"
+      },
+      "proceduralProgrammingAI": {
+        "title": "Procedural Programming & AI",
+        "description": "Advanced course teaching programming skills for AI development and implementation.",
+        "link": "https://www.proceduralprogrammingai.org/"
+      },
+      "machineLearningAI": {
+        "title": "Machine Learning & AI",
+        "description": "Advanced curriculum on machine learning concepts and career preparation.",
+        "link": "https://www.machinelearningai.org/"
+      },
+      "aiEthicsNavigating": {
+        "title": "Navigating AI Ethics",
+        "description": "Professional development course on ethical leadership in AI implementation.",
+        "link": "https://www.navigatingaiethics.com/"
+      },
+      "aiMathematicsClassroom": {
+        "title": "AI in the Mathematics Classroom",
+        "description": "Workshop on ethical AI use in mathematics education with focus on equity.",
+        "link": "https://www.aimathematicsclassroom.org/"
+      },
+      "aiEnglishClassroom": {
+        "title": "AI in the English Classroom",
+        "description": "Workshop exploring AI's role in English education and writing instruction.",
+        "link": "https://www.aienglishclassroom.org/"
+      },
+      "aiHigherEducation": {
+        "title": "AI in Higher Education Webinar",
+        "description": "Webinar series on student experience, policy, and career preparation in AI age.",
+        "link": "https://www.aihighereducation.org/"
+      },
+      "buildingAILiteracy": {
+        "title": "Building AI Literacy",
+        "description": "Workshop on developing student AI literacy with human-centered approach.",
+        "link": "https://www.buildingailiteracy.org/"
+      },
+      "artificialIntelligenceCollective": {
+        "title": "AI & the Collective",
+        "description": "Higher education course examining AI's societal impact and ethical concerns.",
+        "link": "https://www.aicollective.org/"
+      },
+      "aiPoweredK12": {
+        "title": "AI-Powered K-12 Education",
+        "description": "Course on ethical AI implementation for personalized learning and assessment.",
+        "link": "https://www.aipoweredk12.org/"
+      },
+      "aiEthicsBusiness": {
+        "title": "AI Ethics in Business",
+        "description": "Advanced course on data ethics, regulatory compliance, and governance.",
+        "link": "https://www.aiethicsbusiness.com/"
+      },
+      "aiEthicsResponsible": {
+        "title": "AI Ethics & Responsible Data",
+        "description": "Course covering data ethics, generative AI risks, and business sustainability.",
+        "link": "https://www.aiethicsresponsible.com/"
+      },
+      "dataEthicsAI": {
+        "title": "Data Ethics for AI",
+        "description": "Advanced course on data security, responsible innovation, and governance.",
+        "link": "https://www.dataethicsai.com/"
+      },
+      "responsibleGenerativeAI": {
+        "title": "Responsible Generative AI",
+        "description": "Course on governance, data management, and compliance for generative AI.",
+        "link": "https://www.responsiblegenerativeai.com/"
+      },
+      "aiEmpathyEthics": {
+        "title": "AI, Empathy & Ethics",
+        "description": "Course combining technical AI knowledge with ethical and empathetic perspectives.",
+        "link": "https://www.aiempathyethics.com/"
+      },
+      "introductionResponsibleAI": {
+        "title": "Introduction to Responsible AI",
+        "description": "Beginner course on responsible AI principles, accountability, and governance.",
+        "link": "https://www.introductionresponsibleai.com/"
+      },
+      "generativeAIPrompt": {
+        "title": "Generative AI & Prompt Engineering",
+        "description": "Course on using ChatGPT and prompt engineering for various applications.",
+        "link": "https://www.generativeaiprompt.com/"
+      },
+      "aiClassroomEthical": {
+        "title": "AI in the Classroom: Ethical Use",
+        "description": "Lesson plan on responsible AI implementation and media literacy for high school.",
+        "link": "https://www.aiclassroomethical.org/"
+      },
+      "aiUnlocked": {
+        "title": "AI Unlocked",
+        "description": "Lesson plan teaching students to evaluate AI tools critically.",
+        "link": "https://www.aiunlocked.org/"
+      },
+      "ultimateAIUnit": {
+        "title": "The Ultimate AI Unit",
+        "description": "Comprehensive curriculum unit on AI ethics and bias for K-12 classrooms.",
+        "link": "https://www.ultimateaiunit.org/"
+      },
+      "ethicsAIUnit": {
+        "title": "Ethics of AI Curriculum Unit",
+        "description": "Complete unit with worksheets and projects for middle and high school.",
+        "link": "https://www.ethicsaiunit.org/"
+      },
+      "aiEthicalConcerns": {
+        "title": "AI & Ethical Concerns Worksheet",
+        "description": "Discussion worksheet on robotics ethics for high school students.",
+        "link": "https://www.aiethicalconcerns.org/"
+      },
+      "aiWritingEthics": {
+        "title": "AI & Writing Ethics Bundle",
+        "description": "Lesson bundle addressing academic honesty and generative AI in writing.",
+        "link": "https://www.aiwritingethics.org/"
+      },
+      "aiClassroomToolkit": {
+        "title": "AI in the Classroom Toolkit",
+        "description": "Collection of resources for teaching responsible AI use in K-12.",
+        "link": "https://www.aiclassroomtoolkit.org/"
+      },
+      "minecraftAIFoundations": {
+        "title": "Minecraft: AI Foundations",
+        "description": "Game-based learning module teaching AI literacy through Minecraft.",
+        "link": "https://education.minecraft.net/ai-foundations"
+      },
+      "teachAIGuidance": {
+        "title": "TeachAI Guidance for Schools",
+        "description": "Comprehensive guidance on AI policy development and community engagement.",
+        "link": "https://www.teachai.org/guidance"
+      },
+      "microsoftEducationAIToolkit": {
+        "title": "Microsoft Education AI Toolkit",
+        "description": "Resources for educational leaders on generative AI strategy and implementation.",
+        "link": "https://www.microsoft.com/en-us/education/ai-toolkit"
+      },
+      "microsoftLearnEducators": {
+        "title": "Microsoft Learn for Educators",
+        "description": "Advanced professional development and bootcamp programs for faculty.",
+        "link": "https://learn.microsoft.com/en-us/training/educator-center/"
+      },
+      "transformingTeacherPreparation": {
+        "title": "Transforming Teacher Preparation with AI",
+        "description": "Joint initiative by ISTE, ASCD, and Microsoft on ethical AI in teacher prep.",
+        "link": "https://www.transformingteacherpreparation.org/"
+      },
+      "farmBeatsStudents": {
+        "title": "FarmBeats for Students",
+        "description": "STEM program using AI and data science in precision agriculture context.",
+        "link": "https://www.microsoft.com/en-us/research/project/farmbeats-students/"
+      },
+      "imagineCupJunior": {
+        "title": "Imagine Cup Junior",
+        "description": "Youth education program introducing AI fundamentals and cloud computing.",
+        "link": "https://imaginecup.microsoft.com/junior"
+      },
+      "microsoftAzureAIFundamentals": {
+        "title": "Microsoft Azure AI Fundamentals",
+        "description": "Technical training on Azure AI services and solutions.",
+        "link": "https://learn.microsoft.com/en-us/training/paths/get-started-with-artificial-intelligence-on-azure/"
+      },
+      "prepareTeachAI900": {
+        "title": "Prepare to Teach AI-900",
+        "description": "Course for teachers to deliver Azure AI Fundamentals curriculum.",
+        "link": "https://learn.microsoft.com/en-us/training/prepare-teach-ai-900"
+      },
+      "developGenerativeAI": {
+        "title": "Develop Generative AI Solutions",
+        "description": "Advanced course on building generative AI applications with Azure OpenAI.",
+        "link": "https://learn.microsoft.com/en-us/training/develop-generative-ai"
+      },
+      "generativeAIEducatorsTeachers": {
+        "title": "Generative AI for Educators & Teachers",
+        "description": "Free beginner course on using generative AI ethically in lesson planning.",
+        "link": "https://www.generativeaieducators.com/"
+      },
+      "socapLocalLingua": {
+        "title": "SOCAP LocalLingua Case Study",
+        "description": "Case study on ethical considerations in ed-tech investment and due diligence.",
+        "link": "https://www.socapglobal.com/case-studies/locallingua"
+      },
+      "philTechGenAI": {
+        "title": "PhilTech GenAI Case Study",
+        "description": "Non-profit case study on managing risks in generative AI adoption.",
+        "link": "https://www.philtech.org/case-studies/genai"
+      },
+      "aLevelExamControversy": {
+        "title": "UK A-Level Exam Algorithm Controversy",
+        "description": "Case study examining algorithmic bias in high-stakes educational assessment.",
+        "link": "https://www.alevelexamcontroversy.org/"
+      },
+      "dewsWisconsin": {
+        "title": "DEWS Implementation in Wisconsin",
+        "description": "Case study on using predictive analytics for student support in K-12.",
+        "link": "https://dews.org/case-studies/wisconsin"
+      },
+      "prathamHybridLearning": {
+        "title": "Pratham Hybrid Learning Model",
+        "description": "Case study on equitable AI implementation in rural education contexts.",
+        "link": "https://www.pratham.org/hybrid-learning-case-study"
+      },
+      "digitalPromiseAILiteracy": {
+        "title": "Digital Promise AI Literacy Framework",
+        "description": "Framework for developing AI literacy, digital citizenship, and critical thinking.",
+        "link": "https://digitalpromise.org/ai-literacy-framework/"
+      },
+      "hurixDigitalFramework": {
+        "title": "Hurix Digital AI Framework",
+        "description": "Risk assessment framework for ethical AI implementation in K-12.",
+        "link": "https://www.hurix.com/ai-framework/"
+      },
+      "isteStandards": {
+        "title": "ISTE Standards",
+        "description": "Comprehensive standards for students, educators, and leaders on ethical technology use.",
+        "link": "https://iste.org/standards"
+      },
+      "belmontReport": {
+        "title": "Belmont Report Principles",
+        "description": "Foundational ethical principles for research that inform AI ethics discussions.",
+        "link": "https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/index.html"
+      },
+      "acsaPrinciples": {
+        "title": "ACSA AI Principles",
+        "description": "Framework emphasizing fairness, privacy, transparency, and accountability.",
+        "link": "https://www.acsa.org/ai-principles"
+      },
+      "abetAccreditation": {
+        "title": "ABET Accreditation Standards",
+        "description": "Professional ethics standards for computer science and engineering education.",
+        "link": "https://www.abet.org/"
+      },
+      "aeraCode": {
+        "title": "AERA Code of Ethics",
+        "description": "Professional standards for education research ethics.",
+        "link": "https://www.aera.net/About-AERA/AERA-Rules-Policies/Professional-Ethics"
+      },
+      "singaporeMOE": {
+        "title": "Singapore MOE AI Framework",
+        "description": "National framework for AI governance and ethics in K-12 education.",
+        "link": "https://www.moe.gov.sg/ai-framework"
+      },
+      "ethicalPerspectivesAI": {
+        "title": "Ethical Perspectives on AI",
+        "description": "Resource exploring various ethical frameworks for analyzing AI decisions.",
+        "link": "https://www.ethicalperspectivesai.org/"
+      }
     }
   },
   "home": {
@@ -330,17 +1081,6 @@
       "exploreScenarios": "Explore Scenarios",
       "learnMore": "Learn More",
       "startExploring": "Start Exploring Scenarios"
-    },
-    "sdg": {
-      "title": "Connecting to United Nations Sustainable Development Goals",
-      "qualityEducation": {
-        "title": "Quality Education (SDG 4)",
-        "description": "Our scenarios explore how AI can enhance or challenge quality education, focusing on equity, accessibility, and the changing nature of learning in the digital age."
-      },
-      "reducedInequalities": {
-        "title": "Reduced Inequalities (SDG 10)",
-        "description": "We examine how AI can either exacerbate or reduce inequalities in educational settings, addressing issues of digital inclusion, algorithmic bias, and access to technology."
-      }
     },
     "howItWorks": {
       "title": "How It Works",

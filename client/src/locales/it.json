@@ -237,7 +237,6 @@
     },
     "stats": {
       "scenarios": "Scenari Etici",
-      "sdgGoals": "Obiettivi SDG dell'ONU",
       "learningOpportunities": "Opportunità di Apprendimento"
     },
     "mission": {
@@ -254,36 +253,6 @@
       "responsibleCitizenship": {
         "title": "Cittadinanza Digitale Responsabile",
         "content": "Attraverso i nostri scenari, gli utenti affrontano domande sull'uso responsabile dell'IA, tra cui trasparenza, divulgazione, preoccupazioni sul plagio, implicazioni sulla privacy e lo sviluppo di framework etici per le tecnologie emergenti."
-      }
-    },
-    "sdg": {
-      "title": "Obiettivi di Sviluppo Sostenibile delle Nazioni Unite",
-      "intro": "La nostra piattaforma si allinea con diversi Obiettivi di Sviluppo Sostenibile delle Nazioni Unite, con particolare enfasi sulla trasformazione dell'istruzione e sulla riduzione delle disuguaglianze attraverso l'implementazione etica dell'IA. Crediamo che affrontando queste sfide fondamentali, possiamo creare un futuro più equo e inclusivo per tutti gli studenti.",
-      "goals": {
-        "sdg4": {
-          "title": "SDG 4: Istruzione di Qualità",
-          "content": "Al centro della nostra missione, sosteniamo l'SDG 4 promuovendo l'analisi critica di come l'IA può migliorare o danneggiare l'istruzione di qualità. I nostri scenari completi esaminano le considerazioni etiche che educatori e studenti devono navigare mentre l'IA diventa più prevalente negli ambienti di apprendimento, assicurando che il progresso tecnologico serva l'eccellenza educativa."
-        },
-        "sdg10": {
-          "title": "SDG 10: Riduzione delle Disuguaglianze",
-          "content": "Come pilastro fondamentale del nostro lavoro, affrontiamo l'SDG 10 esplorando in profondità come l'IA può amplificare o ridurre le disuguaglianze. I nostri scenari invitano gli utenti a considerare i bias algoritmici, le considerazioni sull'accessibilità e come le scelte di progettazione dell'IA impattano diverse popolazioni, con un focus sulla creazione di opportunità educative più eque."
-        },
-        "sdg9": {
-          "title": "SDG 9: Industria, Innovazione e Infrastrutture",
-          "content": "I nostri scenari esaminano come l'innovazione dell'IA nell'istruzione può essere bilanciata con lo sviluppo responsabile e l'accesso inclusivo, assicurando che il progresso tecnologico benefici tutti gli studenti."
-        },
-        "sdg16": {
-          "title": "SDG 16: Pace, Giustizia e Istituzioni Forti",
-          "content": "Esploriamo come l'implementazione dell'IA influenza l'integrità istituzionale, la trasparenza e la giustizia negli ambienti educativi, promuovendo framework etici e governance responsabile."
-        },
-        "sdg8": {
-          "title": "SDG 8: Lavoro Dignitoso e Crescita Economica",
-          "content": "I nostri scenari considerano come l'IA influenza le opportunità di lavoro e lo sviluppo delle competenze nell'istruzione, preparando gli studenti al mercato del lavoro in evoluzione garantendo al contempo una crescita equa e inclusiva."
-        },
-        "sdg3": {
-          "title": "SDG 3: Salute e Benessere",
-          "content": "Esaminiamo come l'IA può supportare il benessere e la salute mentale degli studenti negli ambienti educativi, affrontando al contempo i rischi potenziali e assicurando un approccio equilibrato all'uso della tecnologia."
-        }
       }
     },
     "getInvolved": {
@@ -330,17 +299,6 @@
       "exploreScenarios": "Esplora gli Scenari",
       "learnMore": "Scopri di Più",
       "startExploring": "Inizia a Esplorare gli Scenari"
-    },
-    "sdg": {
-      "title": "Collegamento agli Obiettivi di Sviluppo Sostenibile delle Nazioni Unite",
-      "qualityEducation": {
-        "title": "Istruzione di Qualità (SDG 4)",
-        "description": "I nostri scenari esplorano come l'IA può migliorare o sfidare l'istruzione di qualità, concentrandosi su equità, accessibilità e la natura mutevole dell'apprendimento nell'era digitale."
-      },
-      "reducedInequalities": {
-        "title": "Riduzione delle Disuguaglianze (SDG 10)",
-        "description": "Esaminiamo come l'IA può esacerbare o ridurre le disuguaglianze nei contesti educativi, affrontando questioni di inclusione digitale, bias algoritmici e accesso alla tecnologia."
-      }
     },
     "howItWorks": {
       "title": "Come Funziona",

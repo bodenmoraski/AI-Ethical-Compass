@@ -87,7 +87,7 @@ export default function About() {
                       <span className="material-icons text-blue-600 mr-3">school</span>
                       <h4 className="font-semibold text-gray-900">Educational Excellence</h4>
                     </div>
-                    <p className="text-gray-600">Advanced pedagogical methods for AI ethics education</p>
+                    <p className="text-gray-600">Effective pedagogical methods for AI ethics education</p>
                   </div>
                   <div className="bg-white rounded-xl p-6 shadow-lg">
                     <div className="flex items-center mb-3">
@@ -148,97 +148,6 @@ export default function About() {
             </div>
           </div>
 
-      {/* SDG Goals Section */}
-      <div className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('about.sdg.title')}</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {t('about.sdg.intro')}
-            </p>
-                  </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* SDG 4 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">school</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg4.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg4.content')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SDG 10 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">diversity_3</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg10.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg10.content')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SDG 9 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-orange-500 to-orange-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">precision_manufacturing</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg9.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg9.content')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SDG 16 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-teal-500 to-teal-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">gavel</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg16.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg16.content')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SDG 8 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-red-500 to-red-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">work</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg8.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg8.content')}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* SDG 3 */}
-            <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <span className="material-icons text-white text-xl">favorite</span>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('about.sdg.goals.sdg3.title')}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {t('about.sdg.goals.sdg3.content')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
 
       {/* Tutorial Links Section */}
       <div className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">

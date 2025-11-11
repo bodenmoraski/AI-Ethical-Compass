@@ -1,0 +1,372 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "scenarios": "Szenarien",
+    "community": "Gemeinschaft",
+    "leaderboard": "Bestenliste",
+    "about": "Über Uns",
+    "resources": "Ressourcen",
+    "dashboard": "Dashboard",
+    "assignments": "Aufgaben",
+    "teacher": "Lehrer",
+    "teacherDashboard": "Lehrer-Dashboard",
+    "tutorial": "Anleitung",
+    "userTutorial": "Benutzer-Anleitung",
+    "teacherTutorial": "Lehrer-Anleitung"
+  },
+  "common": {
+    "buttons": {
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "submit": "Absenden",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "back": "Zurück",
+      "next": "Weiter",
+      "previous": "Zurück",
+      "close": "Schließen",
+      "confirm": "Bestätigen",
+      "signIn": "Anmelden",
+      "signUp": "Registrieren",
+      "signOut": "Abmelden",
+      "logout": "Abmelden",
+      "login": "Anmelden",
+      "create": "Erstellen",
+      "update": "Aktualisieren",
+      "view": "Ansehen",
+      "download": "Herunterladen",
+      "upload": "Hochladen",
+      "search": "Suchen",
+      "filter": "Filtern",
+      "sort": "Sortieren",
+      "reset": "Zurücksetzen",
+      "apply": "Anwenden",
+      "learnMore": "Mehr Erfahren",
+      "getStarted": "Loslegen",
+      "continue": "Fortfahren"
+    },
+    "actions": {
+      "loading": "Wird geladen...",
+      "saving": "Wird gespeichert...",
+      "deleting": "Wird gelöscht...",
+      "submitting": "Wird abgesendet...",
+      "processing": "Wird verarbeitet..."
+    },
+    "status": {
+      "success": "Erfolg",
+      "error": "Fehler",
+      "warning": "Warnung",
+      "info": "Information",
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "labels": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "username": "Benutzername",
+      "name": "Name",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "phone": "Telefon",
+      "address": "Adresse",
+      "city": "Stadt",
+      "state": "Bundesland",
+      "country": "Land",
+      "zipCode": "Postleitzahl",
+      "date": "Datum",
+      "time": "Zeit",
+      "description": "Beschreibung",
+      "title": "Titel",
+      "category": "Kategorie",
+      "tags": "Tags",
+      "language": "Sprache",
+      "theme": "Thema"
+    }
+  },
+  "auth": {
+    "login": "Anmelden",
+    "signUp": "Registrieren",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "logout": "Abmelden",
+    "forgotPassword": "Passwort vergessen?",
+    "resetPassword": "Passwort zurücksetzen",
+    "createAccount": "Konto erstellen",
+    "haveAccount": "Haben Sie bereits ein Konto?",
+    "noAccount": "Noch kein Konto?",
+    "rememberMe": "Angemeldet bleiben",
+    "or": "oder",
+    "continueWith": "Fortfahren mit",
+    "emailAddress": "E-Mail-Adresse",
+    "yourPassword": "Ihr Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "enterEmail": "E-Mail eingeben",
+    "enterPassword": "Passwort eingeben"
+  },
+  "footer": {
+    "sections": {
+      "about": "Über Uns",
+      "legal": "Rechtliches",
+      "contact": "Kontakt"
+    },
+    "links": {
+      "ourMission": "Unsere Mission",
+      "resources": "Ressourcen",
+      "termsOfService": "Nutzungsbedingungen",
+      "privacyPolicy": "Datenschutzerklärung",
+      "getInTouch": "Kontakt aufnehmen"
+    },
+    "copyright": "© {{year}} AI Ethical Compass. Alle Rechte vorbehalten."
+  },
+  "scenarios": {
+    "title": "Szenarien",
+    "allScenarios": "Alle Szenarien",
+    "createNew": "Neues Szenario erstellen",
+    "difficulty": "Schwierigkeit",
+    "level": {
+      "easy": "Einfach",
+      "medium": "Mittel",
+      "hard": "Schwierig"
+    },
+    "viewScenario": "Szenario ansehen",
+    "exploreScenario": "Szenario erkunden",
+    "submitPerspective": "Perspektive einreichen",
+    "perspectives": "Perspektiven",
+    "yourPerspective": "Ihre Perspektive",
+    "sharePerspective": "Teilen Sie Ihre Perspektive"
+  },
+  "teacher": {
+    "dashboard": {
+      "title": "Lehrer-Dashboard",
+      "welcome": "Willkommen, {{name}}",
+      "overview": "Überblick",
+      "classes": "Klassen",
+      "students": "Schüler",
+      "assignments": "Aufgaben",
+      "grading": "Bewertung",
+      "analytics": "Analysen",
+      "settings": "Einstellungen"
+    },
+    "classes": {
+      "title": "Klassen",
+      "create": "Klasse erstellen",
+      "edit": "Klasse bearbeiten",
+      "delete": "Klasse löschen",
+      "viewDetails": "Details ansehen",
+      "className": "Klassenname",
+      "classCode": "Klassencode",
+      "students": "Schüler",
+      "noClasses": "Noch keine Klassen. Erstellen Sie Ihre erste Klasse, um zu beginnen."
+    },
+    "assignments": {
+      "title": "Aufgaben",
+      "create": "Aufgabe erstellen",
+      "edit": "Aufgabe bearbeiten",
+      "delete": "Aufgabe löschen",
+      "assignmentName": "Aufgabenname",
+      "dueDate": "Fälligkeitsdatum",
+      "points": "Punkte",
+      "submissions": "Einreichungen",
+      "graded": "Bewertet",
+      "pending": "Ausstehend"
+    }
+  },
+  "student": {
+    "dashboard": {
+      "title": "Schüler-Dashboard",
+      "welcome": "Willkommen, {{name}}",
+      "myProgress": "Mein Fortschritt",
+      "assignments": "Meine Aufgaben",
+      "recentActivity": "Letzte Aktivität",
+      "achievements": "Erfolge"
+    },
+    "assignments": {
+      "title": "Meine Aufgaben",
+      "due": "Fällig",
+      "submitted": "Eingereicht",
+      "graded": "Bewertet",
+      "overdue": "Überfällig",
+      "submit": "Aufgabe einreichen",
+      "viewFeedback": "Feedback ansehen"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "Dieses Feld ist erforderlich",
+      "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+      "passwordsNoMatch": "Die Passwörter stimmen nicht überein",
+      "invalidFormat": "Ungültiges Format",
+      "tooShort": "Zu kurz",
+      "tooLong": "Zu lang"
+    },
+    "placeholders": {
+      "enterEmail": "E-Mail eingeben",
+      "enterPassword": "Passwort eingeben",
+      "enterName": "Namen eingeben",
+      "searchPlaceholder": "Suchen...",
+      "selectOption": "Option auswählen"
+    }
+  },
+  "errors": {
+    "api": {
+      "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+      "unauthorized": "Sie sind nicht berechtigt, diese Aktion durchzuführen.",
+      "forbidden": "Zugriff verweigert.",
+      "notFound": "Ressource nicht gefunden.",
+      "badRequest": "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe.",
+      "timeout": "Zeitüberschreitung. Bitte versuchen Sie es erneut."
+    },
+    "generic": {
+      "somethingWrong": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+      "tryAgain": "Bitte versuchen Sie es erneut",
+      "contactSupport": "Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support."
+    }
+  },
+  "about": {
+    "title": "Die Zukunft der KI in der Bildung gestalten",
+    "subtitle": "AI Ethical Compass befähigt Schüler und Pädagogen, sich in der komplexen ethischen Landschaft der künstlichen Intelligenz in der Bildung zurechtzufinden.",
+    "buttons": {
+      "startExploring": "Mit dem Erkunden beginnen",
+      "viewResources": "Ressourcen ansehen",
+      "startScenario": "Mit Szenario 1 beginnen",
+      "browseResources": "Ressourcen durchsuchen"
+    },
+    "stats": {
+      "scenarios": "Ethische Szenarien",
+      "sdgGoals": "UN-SDG-Ziele",
+      "learningOpportunities": "Lernmöglichkeiten"
+    },
+    "mission": {
+      "title": "Unsere Mission",
+      "content": "AI Ethical Compass wurde für die ISTE+ASCD 2025 AI Innovation Challenge mit einer klaren Mission entwickelt: Schülern der Sekundarstufe und Pädagogen zu helfen, kritisches Denken über den ethischen, verantwortungsvollen und inklusiven Einsatz von Künstlicher Intelligenz zu entwickeln.",
+      "additional": "In einer Welt, in der KI zunehmend Bildung und das tägliche Leben beeinflusst, ist es wichtig, dass junge Menschen und Pädagogen lernen, sich in den komplexen ethischen Fragen darüber zurechtzufinden, wie diese Technologien eingesetzt werden sollten."
+    },
+    "themes": {
+      "title": "Challenge-Themen",
+      "digitalInclusion": {
+        "title": "Digitale Inklusion",
+        "content": "Unsere Plattform untersucht, wie KI-Tools die digitale Inklusion in Bildungskontexten fördern oder behindern können. Wir erforschen Fragen des Zugangs, der Gerechtigkeit, sprachlicher Barrieren und wie KI bestehende digitale Klüfte verringern oder vergrößern kann."
+      },
+      "responsibleCitizenship": {
+        "title": "Verantwortungsvolle digitale Bürgerschaft",
+        "content": "Durch unsere Szenarien werden die Nutzer mit Fragen zum verantwortungsvollen Einsatz von KI konfrontiert, einschließlich Transparenz, Offenlegung, Plagiatsbedenken, Datenschutzimplikationen und der Entwicklung ethischer Rahmenbedingungen für aufkommende Technologien."
+      }
+    },
+    "sdg": {
+      "title": "Nachhaltige Entwicklungsziele der Vereinten Nationen",
+      "intro": "Unsere Plattform orientiert sich an mehreren nachhaltigen Entwicklungszielen der Vereinten Nationen, mit besonderem Schwerpunkt auf der Transformation der Bildung und der Verringerung von Ungleichheiten durch den ethischen Einsatz von KI. Wir glauben, dass wir durch die Bewältigung dieser grundlegenden Herausforderungen eine gerechtere und inklusivere Zukunft für alle Lernenden schaffen können.",
+      "goals": {
+        "sdg4": {
+          "title": "SDG 4: Hochwertige Bildung",
+          "content": "Im Mittelpunkt unserer Mission unterstützen wir SDG 4, indem wir die kritische Analyse fördern, wie KI die hochwertige Bildung verbessern oder beeinträchtigen kann. Unsere umfassenden Szenarien untersuchen die ethischen Überlegungen, die Pädagogen und Schüler berücksichtigen müssen, wenn KI in Lernumgebungen immer präsenter wird, um sicherzustellen, dass technologischer Fortschritt der Bildungsexzellenz dient."
+        },
+        "sdg10": {
+          "title": "SDG 10: Weniger Ungleichheiten",
+          "content": "Als grundlegender Pfeiler unserer Arbeit gehen wir SDG 10 an, indem wir eingehend untersuchen, wie KI Ungleichheiten verstärken oder verringern kann. Unsere Szenarien laden die Nutzer ein, algorithmische Voreingenommenheit, Barrierefreiheit und die Auswirkungen von KI-Designentscheidungen auf verschiedene Bevölkerungsgruppen zu berücksichtigen, mit dem Fokus auf die Schaffung gerechterer Bildungschancen."
+        },
+        "sdg9": {
+          "title": "SDG 9: Industrie, Innovation und Infrastruktur",
+          "content": "Unsere Szenarien untersuchen, wie KI-Innovation in der Bildung mit verantwortungsvoller Entwicklung und inklusivem Zugang in Einklang gebracht werden kann, um sicherzustellen, dass technologischer Fortschritt allen Lernenden zugute kommt."
+        },
+        "sdg16": {
+          "title": "SDG 16: Frieden, Gerechtigkeit und starke Institutionen",
+          "content": "Wir untersuchen, wie die Implementierung von KI die institutionelle Integrität, Transparenz und Gerechtigkeit in Bildungsumgebungen beeinflusst und fördern ethische Rahmenbedingungen und verantwortungsvolle Governance."
+        },
+        "sdg8": {
+          "title": "SDG 8: Menschenwürdige Arbeit und Wirtschaftswachstum",
+          "content": "Unsere Szenarien berücksichtigen, wie KI Beschäftigungsmöglichkeiten und Kompetenzentwicklung in der Bildung beeinflusst und Schüler auf den sich entwickelnden Arbeitsmarkt vorbereitet, während faires und inklusives Wachstum gewährleistet wird."
+        },
+        "sdg3": {
+          "title": "SDG 3: Gesundheit und Wohlergehen",
+          "content": "Wir untersuchen, wie KI das Wohlbefinden und die psychische Gesundheit von Schülern in Bildungsumgebungen unterstützen kann, während wir potenzielle Risiken ansprechen und einen ausgewogenen Ansatz für den Technologieeinsatz sicherstellen."
+        }
+      }
+    },
+    "getInvolved": {
+      "title": "Machen Sie mit",
+      "content": "Schließen Sie sich Pädagogen und Schülern auf der ganzen Welt an, um die ethischen Dimensionen von KI in der Bildung zu erkunden. Ihre Perspektive ist wichtig für die Gestaltung der Zukunft des verantwortungsvollen KI-Einsatzes."
+    }
+  },
+  "resources": {
+    "hero": {
+      "titlePart1": "Bildungsressourcen",
+      "titlePart2": "über KI",
+      "description": "Erkunden Sie unsere Sammlung von Ressourcen zur ethischen Implementierung von KI in der Bildung, von umfassenden Richtlinien bis hin zu praktischen Werkzeugen und realen Fallstudien."
+    },
+    "categories": {
+      "all": "Alle Ressourcen",
+      "guidelines": "Richtlinien und Richtlinien",
+      "research": "Forschung und Studien",
+      "tools": "Werkzeuge und Plattformen",
+      "courses": "Kurse und Anleitungen",
+      "caseStudies": "Fallstudien",
+      "frameworks": "Ethische Rahmenbedingungen",
+      "communities": "Gemeinschaften",
+      "assessment": "Bewertungswerkzeuge"
+    },
+    "learnMore": "Mehr Erfahren",
+    "cta": {
+      "title": "Für Pädagogen",
+      "description": "Möchten Sie KI-Ethik in Ihren Lehrplan integrieren? Diese Ressourcen können Ihnen helfen, ansprechende Lektionen zu erstellen und bedeutungsvolle Diskussionen über die Rolle der KI in der Bildung zu fördern.",
+      "prompts": {
+        "title": "Diskussionsthemen",
+        "description": "Nutzen Sie unsere Szenarien als Ausgangspunkte für Klassendiskussionen über KI-Ethik."
+      },
+      "activities": {
+        "title": "Aktivitätsideen",
+        "description": "Beziehen Sie Schüler mit praktischen Aktivitäten ein, die die Auswirkungen von KI auf die Bildung untersuchen."
+      }
+    }
+  },
+  "home": {
+    "title": "KI-Ethik-Kompass",
+    "subtitle": "Die Zukunft der KI in der Bildung navigieren",
+    "description": "Entwickeln Sie kritisches Denken über den ethischen, verantwortungsvollen und inklusiven Einsatz von Künstlicher Intelligenz in Bildungskontexten.",
+    "buttons": {
+      "exploreScenarios": "Szenarien erkunden",
+      "learnMore": "Mehr Erfahren",
+      "startExploring": "Beginnen Sie mit der Erkundung von Szenarien"
+    },
+    "sdg": {
+      "title": "Verbindung zu den Nachhaltigkeitszielen der Vereinten Nationen",
+      "qualityEducation": {
+        "title": "Hochwertige Bildung (SDG 4)",
+        "description": "Unsere Szenarien untersuchen, wie KI hochwertige Bildung verbessern oder in Frage stellen kann, mit Schwerpunkt auf Gerechtigkeit, Barrierefreiheit und der sich wandelnden Natur des Lernens im digitalen Zeitalter."
+      },
+      "reducedInequalities": {
+        "title": "Weniger Ungleichheiten (SDG 10)",
+        "description": "Wir untersuchen, wie KI Ungleichheiten in Bildungskontexten entweder verschärfen oder verringern kann, und gehen auf Fragen der digitalen Inklusion, algorithmischer Voreingenommenheit und des Zugangs zu Technologie ein."
+      }
+    },
+    "howItWorks": {
+      "title": "Wie es funktioniert",
+      "steps": {
+        "identify": {
+          "title": "Identifizieren",
+          "description": "Untersuchen Sie die Szenarien und identifizieren Sie, ob und wie KI eingesetzt wird"
+        },
+        "evaluate": {
+          "title": "Bewerten",
+          "description": "Berücksichtigen Sie die ethischen Implikationen, Vorteile und Risiken"
+        },
+        "share": {
+          "title": "Teilen",
+          "description": "Tragen Sie Ihre Perspektive zum ethischen Dilemma bei"
+        },
+        "explore": {
+          "title": "Erkunden",
+          "description": "Entdecken Sie vielfältige Perspektiven aus der Community"
+        }
+      }
+    }
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.",
+    "backToHome": "Zurück zur Startseite"
+  }
+}

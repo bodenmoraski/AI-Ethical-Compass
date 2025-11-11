@@ -237,7 +237,6 @@
     },
     "stats": {
       "scenarios": "Ethische Szenarien",
-      "sdgGoals": "UN-SDG-Ziele",
       "learningOpportunities": "Lernmöglichkeiten"
     },
     "mission": {
@@ -254,36 +253,6 @@
       "responsibleCitizenship": {
         "title": "Verantwortungsvolle digitale Bürgerschaft",
         "content": "Durch unsere Szenarien werden die Nutzer mit Fragen zum verantwortungsvollen Einsatz von KI konfrontiert, einschließlich Transparenz, Offenlegung, Plagiatsbedenken, Datenschutzimplikationen und der Entwicklung ethischer Rahmenbedingungen für aufkommende Technologien."
-      }
-    },
-    "sdg": {
-      "title": "Nachhaltige Entwicklungsziele der Vereinten Nationen",
-      "intro": "Unsere Plattform orientiert sich an mehreren nachhaltigen Entwicklungszielen der Vereinten Nationen, mit besonderem Schwerpunkt auf der Transformation der Bildung und der Verringerung von Ungleichheiten durch den ethischen Einsatz von KI. Wir glauben, dass wir durch die Bewältigung dieser grundlegenden Herausforderungen eine gerechtere und inklusivere Zukunft für alle Lernenden schaffen können.",
-      "goals": {
-        "sdg4": {
-          "title": "SDG 4: Hochwertige Bildung",
-          "content": "Im Mittelpunkt unserer Mission unterstützen wir SDG 4, indem wir die kritische Analyse fördern, wie KI die hochwertige Bildung verbessern oder beeinträchtigen kann. Unsere umfassenden Szenarien untersuchen die ethischen Überlegungen, die Pädagogen und Schüler berücksichtigen müssen, wenn KI in Lernumgebungen immer präsenter wird, um sicherzustellen, dass technologischer Fortschritt der Bildungsexzellenz dient."
-        },
-        "sdg10": {
-          "title": "SDG 10: Weniger Ungleichheiten",
-          "content": "Als grundlegender Pfeiler unserer Arbeit gehen wir SDG 10 an, indem wir eingehend untersuchen, wie KI Ungleichheiten verstärken oder verringern kann. Unsere Szenarien laden die Nutzer ein, algorithmische Voreingenommenheit, Barrierefreiheit und die Auswirkungen von KI-Designentscheidungen auf verschiedene Bevölkerungsgruppen zu berücksichtigen, mit dem Fokus auf die Schaffung gerechterer Bildungschancen."
-        },
-        "sdg9": {
-          "title": "SDG 9: Industrie, Innovation und Infrastruktur",
-          "content": "Unsere Szenarien untersuchen, wie KI-Innovation in der Bildung mit verantwortungsvoller Entwicklung und inklusivem Zugang in Einklang gebracht werden kann, um sicherzustellen, dass technologischer Fortschritt allen Lernenden zugute kommt."
-        },
-        "sdg16": {
-          "title": "SDG 16: Frieden, Gerechtigkeit und starke Institutionen",
-          "content": "Wir untersuchen, wie die Implementierung von KI die institutionelle Integrität, Transparenz und Gerechtigkeit in Bildungsumgebungen beeinflusst und fördern ethische Rahmenbedingungen und verantwortungsvolle Governance."
-        },
-        "sdg8": {
-          "title": "SDG 8: Menschenwürdige Arbeit und Wirtschaftswachstum",
-          "content": "Unsere Szenarien berücksichtigen, wie KI Beschäftigungsmöglichkeiten und Kompetenzentwicklung in der Bildung beeinflusst und Schüler auf den sich entwickelnden Arbeitsmarkt vorbereitet, während faires und inklusives Wachstum gewährleistet wird."
-        },
-        "sdg3": {
-          "title": "SDG 3: Gesundheit und Wohlergehen",
-          "content": "Wir untersuchen, wie KI das Wohlbefinden und die psychische Gesundheit von Schülern in Bildungsumgebungen unterstützen kann, während wir potenzielle Risiken ansprechen und einen ausgewogenen Ansatz für den Technologieeinsatz sicherstellen."
-        }
       }
     },
     "getInvolved": {
@@ -330,17 +299,6 @@
       "exploreScenarios": "Szenarien erkunden",
       "learnMore": "Mehr Erfahren",
       "startExploring": "Beginnen Sie mit der Erkundung von Szenarien"
-    },
-    "sdg": {
-      "title": "Verbindung zu den Nachhaltigkeitszielen der Vereinten Nationen",
-      "qualityEducation": {
-        "title": "Hochwertige Bildung (SDG 4)",
-        "description": "Unsere Szenarien untersuchen, wie KI hochwertige Bildung verbessern oder in Frage stellen kann, mit Schwerpunkt auf Gerechtigkeit, Barrierefreiheit und der sich wandelnden Natur des Lernens im digitalen Zeitalter."
-      },
-      "reducedInequalities": {
-        "title": "Weniger Ungleichheiten (SDG 10)",
-        "description": "Wir untersuchen, wie KI Ungleichheiten in Bildungskontexten entweder verschärfen oder verringern kann, und gehen auf Fragen der digitalen Inklusion, algorithmischer Voreingenommenheit und des Zugangs zu Technologie ein."
-      }
     },
     "howItWorks": {
       "title": "Wie es funktioniert",

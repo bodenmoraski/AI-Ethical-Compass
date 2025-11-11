@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../lib/auth';
 import PerspectiveCard from './PerspectiveCard';
-import SdgDetails from './SdgDetails';
 import RelatedResources from './RelatedResources';
 import { type Scenario, type Perspective } from '@shared/schema';
 import { submitPerspective, updateProgress } from '../lib/scenarios';
@@ -22,28 +21,6 @@ const scenarios: Scenario[] = scenariosData.map((scenario: any) => ({
   ...scenario,
   options: scenario.options, // Keep full option objects with text and consequence
   aiUseAnswer: scenario.description,
-  sdgDetails: scenario.sdgTags.map((tag: string) => {
-    const normalizedTag = tag.replace(/\D/g, '');
-    const sdgDescriptions: Record<string, { goal: string; description: string; icon: string }> = {
-      "1": { goal: "No Poverty (SDG 1)", description: "End poverty in all its forms everywhere.", icon: "attach_money" },
-      "3": { goal: "Good Health and Well-being (SDG 3)", description: "Ensure healthy lives and promote well-being.", icon: "favorite" },
-      "4": { goal: "Quality Education (SDG 4)", description: "Ensure inclusive and equitable quality education.", icon: "school" },
-      "5": { goal: "Gender Equality (SDG 5)", description: "Achieve gender equality and empower all women and girls.", icon: "diversity_3" },
-      "8": { goal: "Decent Work and Economic Growth (SDG 8)", description: "Promote sustained, inclusive economic growth.", icon: "work" },
-      "9": { goal: "Industry, Innovation and Infrastructure (SDG 9)", description: "Build resilient infrastructure and foster innovation.", icon: "precision_manufacturing" },
-      "10": { goal: "Reduced Inequalities (SDG 10)", description: "Reduce inequality within and among countries.", icon: "balance" },
-      "11": { goal: "Sustainable Cities and Communities (SDG 11)", description: "Make cities inclusive, safe, and sustainable.", icon: "location_city" },
-      "13": { goal: "Climate Action (SDG 13)", description: "Take urgent action to combat climate change.", icon: "eco" },
-      "16": { goal: "Peace, Justice and Strong Institutions (SDG 16)", description: "Promote peaceful and inclusive societies.", icon: "gavel" }
-    };
-    const description = sdgDescriptions[normalizedTag];
-    return description ? {
-      goal: description.goal,
-      description: description.description,
-      relevance: `This scenario relates to ${description.goal} by examining AI's impact on educational equity and access.`,
-      icon: description.icon
-    } : null;
-  }).filter(Boolean),
   relatedResources: scenario.resources.map((res: any) => ({
     title: res.title,
     source: res.type,
@@ -72,6 +49,9 @@ const ScenarioView = () => {
   const [assignmentId, setAssignmentId] = useState<number | null>(null);
   const [showScenarioReference, setShowScenarioReference] = useState(false);
   const [submitAnonymously, setSubmitAnonymously] = useState(false);
+
+  // Ref for perspective section to enable scroll-into-view
+  const perspectiveSectionRef = useRef<HTMLDivElement>(null);
 
   // Get current scenario
   const currentScenario = scenarios.find(s => s.id === scenarioId);
@@ -118,7 +98,19 @@ const ScenarioView = () => {
     setIsSubmitting(false);
   }, [scenarioId]);
 
-
+  // Scroll perspective section into view when reaching step 4
+  useEffect(() => {
+    if (currentStep === 4 && perspectiveSectionRef.current) {
+      // Small delay to ensure DOM is fully rendered
+      setTimeout(() => {
+        perspectiveSectionRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  }, [currentStep]);
 
   // Fetch perspectives for current scenario
   const { data: perspectivesData, isLoading, error } = useQuery({
@@ -734,7 +726,7 @@ const ScenarioView = () => {
 
           {/* Step 4: Share Perspective */}
           {currentStep === 4 && (
-            <div className="space-y-6">
+            <div className="space-y-6" ref={perspectiveSectionRef}>
               <div className="flex items-center gap-3 mb-6">
                 <span className="material-icons text-primary-600 text-2xl">edit</span>
                 <h2 className="text-xl font-semibold">Share Your Perspective</h2>
@@ -968,11 +960,6 @@ const ScenarioView = () => {
           )}
         </div>
       </div>
-
-      {/* SDG Details */}
-      {currentScenario.sdgDetails && currentScenario.sdgDetails.length > 0 && (
-        <SdgDetails sdgDetails={currentScenario.sdgDetails} />
-      )}
 
       {/* Related Resources */}
       {currentScenario.relatedResources && currentScenario.relatedResources.length > 0 && (

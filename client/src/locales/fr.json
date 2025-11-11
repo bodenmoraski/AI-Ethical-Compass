@@ -237,7 +237,6 @@
     },
     "stats": {
       "scenarios": "Scénarios Éthiques",
-      "sdgGoals": "Objectifs ODD de l'ONU",
       "learningOpportunities": "Opportunités d'Apprentissage"
     },
     "mission": {
@@ -254,36 +253,6 @@
       "responsibleCitizenship": {
         "title": "Citoyenneté Numérique Responsable",
         "content": "À travers nos scénarios, les utilisateurs sont confrontés à des questions sur l'utilisation responsable de l'IA, notamment la transparence, la divulgation, les préoccupations concernant le plagiat, les implications sur la vie privée et le développement de cadres éthiques pour les technologies émergentes."
-      }
-    },
-    "sdg": {
-      "title": "Objectifs de Développement Durable de l'ONU",
-      "intro": "Notre plateforme s'aligne sur plusieurs Objectifs de Développement Durable de l'ONU, avec un accent particulier sur la transformation de l'éducation et la réduction des inégalités grâce à la mise en œuvre éthique de l'IA. Nous croyons qu'en abordant ces défis fondamentaux, nous pouvons créer un avenir plus équitable et inclusif pour tous les apprenants.",
-      "goals": {
-        "sdg4": {
-          "title": "ODD 4: Éducation de Qualité",
-          "content": "Au cœur de notre mission, nous soutenons l'ODD 4 en promouvant l'analyse critique de la façon dont l'IA peut améliorer ou nuire à l'éducation de qualité. Nos scénarios complets examinent les considérations éthiques que les éducateurs et les étudiants doivent naviguer à mesure que l'IA devient plus prévalente dans les environnements d'apprentissage, assurant que le progrès technologique serve l'excellence éducative."
-        },
-        "sdg10": {
-          "title": "ODD 10: Réduction des Inégalités",
-          "content": "Un pilier fondamental de notre travail, nous abordons l'ODD 10 en explorant profondément comment l'IA peut amplifier ou réduire les inégalités. Nos scénarios invitent les utilisateurs à considérer les biais algorithmiques, les considérations d'accessibilité et comment les choix de conception de l'IA impactent différentes populations, avec un accent sur la création d'opportunités éducatives plus équitables."
-        },
-        "sdg9": {
-          "title": "ODD 9: Industrie, Innovation et Infrastructure",
-          "content": "Nos scénarios examinent comment l'innovation en IA dans l'éducation peut être équilibrée avec le développement responsable et l'accès inclusif, assurant que le progrès technologique profite à tous les apprenants."
-        },
-        "sdg16": {
-          "title": "ODD 16: Paix, Justice et Institutions Efficaces",
-          "content": "Nous explorons comment la mise en œuvre de l'IA affecte l'intégrité institutionnelle, la transparence et la justice dans les environnements éducatifs, promouvant des cadres éthiques et une gouvernance responsable."
-        },
-        "sdg8": {
-          "title": "ODD 8: Travail Décent et Croissance Économique",
-          "content": "Nos scénarios considèrent comment l'IA affecte les opportunités d'emploi et le développement des compétences dans l'éducation, préparant les étudiants au marché du travail en évolution tout en assurant une croissance juste et inclusive."
-        },
-        "sdg3": {
-          "title": "ODD 3: Bonne Santé et Bien-être",
-          "content": "Nous examinons comment l'IA peut soutenir le bien-être et la santé mentale des étudiants dans les environnements éducatifs, tout en abordant les risques potentiels et en assurant une approche équilibrée de l'utilisation de la technologie."
-        }
       }
     },
     "getInvolved": {
@@ -330,17 +299,6 @@
       "exploreScenarios": "Explorer les Scénarios",
       "learnMore": "En Savoir Plus",
       "startExploring": "Commencer à Explorer les Scénarios"
-    },
-    "sdg": {
-      "title": "Connexion aux Objectifs de Développement Durable des Nations Unies",
-      "qualityEducation": {
-        "title": "Éducation de Qualité (ODD 4)",
-        "description": "Nos scénarios explorent comment l'IA peut améliorer ou remettre en question l'éducation de qualité, en se concentrant sur l'équité, l'accessibilité et l'évolution de l'apprentissage à l'ère numérique."
-      },
-      "reducedInequalities": {
-        "title": "Réduction des Inégalités (ODD 10)",
-        "description": "Nous examinons comment l'IA peut soit exacerber soit réduire les inégalités dans les contextes éducatifs, en abordant les questions d'inclusion numérique, de biais algorithmiques et d'accès à la technologie."
-      }
     },
     "howItWorks": {
       "title": "Comment ça Marche",
