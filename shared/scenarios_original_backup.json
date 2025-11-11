@@ -2,8 +2,7 @@
   {
     "id": 1,
     "title": "AI-Generated Essay",
-    "description": "Ms. Chen, a 10th-grade English teacher, receives an essay from Marcus, a student whose previous work averaged C+ grades. This essay analyzes Shakespeare with remarkable sophistication—15 properly formatted MLA citations, graduate-level vocabulary, and nuanced arguments about postcolonial interpretations.\n\nMarcus comes from a household where English is not the primary language, and his spoken English is stronger than his usual written work. The essay represents 30% of his semester grade. Ms. Chen has no definitive proof of AI use, but the sudden jump in quality is striking.",
-    "dilemmaQuestion": "What should be Ms. Chen's PRIMARY priority in responding to this situation?",
+    "description": "A high school teacher receives an essay from a student that seems unusually sophisticated. The writing style is polished, references are extensive and accurate, and the arguments are well-structured. The teacher suspects that the student may have used an AI tool to generate part or all of the essay, but has no definitive proof.\n\nThe student in question has previously submitted work of varying quality, and comes from a household where English is not the primary language. The assignment was a crucial part of the semester grade.",
     "resolutions": [
       {
         "id": "confrontational",
@@ -23,24 +22,24 @@
     ],
     "options": [
       {
-        "text": "Uphold academic integrity standards, even without definitive proof",
-        "consequence": "Prioritizes maintaining clear expectations for all students and ensuring fair assessment"
+        "text": "Yes - The student likely used an AI text generator to write the entire essay",
+        "consequence": "Raises questions about academic integrity and learning outcomes"
       },
       {
-        "text": "Support the student and avoid accusations that could harm an ESL learner",
-        "consequence": "Prioritizes equity, student trust, and avoiding potential damage to a vulnerable student"
+        "text": "Yes - The student may have used AI to help edit or enhance their own writing",
+        "consequence": "Blurs the line between assistance and authorship"
       },
       {
-        "text": "Investigate further through conversation before making any judgment",
-        "consequence": "Prioritizes due process and gathering evidence before taking action"
+        "text": "Yes - The student possibly used AI for research or finding references",
+        "consequence": "Questions the value of AI-assisted research"
       },
       {
-        "text": "Rethink the assignment since AI tools are now widely available",
-        "consequence": "Prioritizes adapting education to new technological realities"
+        "text": "No - The improvement is likely due to the student getting outside help or making extra effort",
+        "consequence": "Highlights the importance of not jumping to conclusions"
       },
       {
-        "text": "Use this as a teaching moment about proper use of AI and citations",
-        "consequence": "Prioritizes education over punishment and developing responsible AI use"
+        "text": "Not sure - There's insufficient information to determine AI use",
+        "consequence": "Emphasizes the need for clear policies and evidence"
       }
     ],
     "ethicalConsiderations": [
@@ -66,8 +65,7 @@
   {
     "id": 2,
     "title": "Facial Recognition in Schools",
-    "description": "Jefferson High School (2,100 students, 45% students of color) is considering implementing facial recognition technology at all three entrances. The FaceGuard Pro system would scan faces, match them against a database, and alert security if someone isn't recognized. The school board estimates the system would cost $45,000 annually.\n\nProponents cite safety concerns after a recent incident at a nearby school. Critics worry about privacy, the technology's documented bias against darker skin tones, and creating a surveillance environment. The parent-teacher association is divided 48-52% on the proposal.",
-    "dilemmaQuestion": "What should be the PRIMARY consideration in deciding whether to implement this system?",
+    "description": "A high school is considering implementing facial recognition technology at school entrances to enhance security. The system would scan students' faces upon entry to verify their identity against a database and alert security staff of any unrecognized individuals.\n\nSome students and parents have expressed privacy concerns, while others believe the safety benefits outweigh these concerns. Additionally, there are questions about the accuracy of facial recognition with diverse student populations.",
     "resolutions": [
       {
         "id": "implemented",
@@ -87,24 +85,24 @@
     ],
     "options": [
       {
-        "text": "Safety and security effectiveness—if it protects students, privacy concerns can be addressed",
-        "consequence": "Prioritizes student physical safety as the highest value"
+        "text": "Yes - Facial recognition is a form of AI used for identity verification",
+        "consequence": "Raises privacy and surveillance concerns"
       },
       {
-        "text": "Student privacy rights and freedom from surveillance in educational spaces",
-        "consequence": "Prioritizes civil liberties and the learning environment over security measures"
+        "text": "Yes - The system uses AI algorithms to match faces to a database",
+        "consequence": "Highlights potential bias in facial recognition"
       },
       {
-        "text": "Equity and fairness—the system must work equally well for all students",
-        "consequence": "Prioritizes avoiding discrimination and ensuring technology works for everyone"
+        "text": "Partially - There's AI involved but it's primarily a security camera system",
+        "consequence": "Blurs the line between security and surveillance"
       },
       {
-        "text": "Student and family consent—those who want it can opt-in, others can use alternatives",
-        "consequence": "Prioritizes individual choice and informed consent over uniform policy"
+        "text": "No - This is standard security technology without advanced AI",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Cost-effectiveness compared to alternative security approaches",
-        "consequence": "Prioritizes practical resource allocation and proven effectiveness"
+        "text": "Not sure - Need more technical details to determine AI involvement",
+        "consequence": "Emphasizes the need for transparency"
       }
     ],
     "ethicalConsiderations": [
@@ -130,8 +128,7 @@
   {
     "id": 3,
     "title": "AI Content Moderation",
-    "description": "ClassConnect, an educational discussion platform used by 50,000 students across 200 schools, has implemented AI content moderation. The system automatically removes posts flagged as inappropriate within seconds. In the first month, it removed 1,847 posts.\n\nTeachers report that discussions about Holocaust literature, biology topics like reproduction, and even posts containing the word 'kill' in scientific contexts (\"kill bacteria\") have been incorrectly flagged. Students are starting to self-censor important academic topics. The platform argues rapid moderation protects students from harm.",
-    "dilemmaQuestion": "What should guide decisions about content moderation on educational platforms?",
+    "description": "A popular educational discussion platform used by students and teachers has implemented an AI content moderation system to automatically detect and filter inappropriate content. The system reviews posts in real-time and can automatically remove content it flags as harmful, offensive, or inappropriate for an educational setting.\n\nSome users have noticed that discussions about certain historical events, literature containing sensitive topics, or even scientific discussions are sometimes incorrectly flagged and removed.",
     "resolutions": [
       {
         "id": "overcensored",
@@ -151,24 +148,24 @@
     ],
     "options": [
       {
-        "text": "Student safety first—aggressive moderation even if some legitimate content gets removed",
-        "consequence": "Prioritizes protecting students from harmful content over open discussion"
+        "text": "Yes - The platform is using AI to automatically moderate content",
+        "consequence": "Raises concerns about censorship and academic freedom"
       },
       {
-        "text": "Academic freedom—allow open discussion of difficult topics, accept some risks",
-        "consequence": "Prioritizes intellectual exploration and free inquiry over complete safety"
+        "text": "Yes - The system uses natural language processing to analyze posts",
+        "consequence": "Highlights limitations of AI in understanding context"
       },
       {
-        "text": "Accuracy over speed—require human review before removing flagged content",
-        "consequence": "Prioritizes getting decisions right over immediate response"
+        "text": "Partially - There's likely some human oversight combined with AI tools",
+        "consequence": "Suggests a hybrid approach might be more effective"
       },
       {
-        "text": "Context awareness—invest in better AI that understands educational settings",
-        "consequence": "Prioritizes technological improvement over accepting current limitations"
+        "text": "No - This appears to be basic keyword filtering, not AI",
+        "consequence": "Underestimates the sophistication of modern content moderation"
       },
       {
-        "text": "Teacher control—let educators set moderation levels for their classes",
-        "consequence": "Prioritizes professional judgment and local control over centralized policy"
+        "text": "Not sure - Can't determine without knowing the specific technology used",
+        "consequence": "Emphasizes the need for transparency in moderation systems"
       }
     ],
     "ethicalConsiderations": [
@@ -194,8 +191,7 @@
   {
     "id": 4,
     "title": "AI in College Admissions",
-    "description": "A consortium of 12 state universities has implemented ApplicantIQ, an AI system that screens 78,000 applications annually. The system generates an \"applicant score\" (0-100) based on grades, test scores, essays, and activities. Admissions officers review applications scoring above 60 first, then work down if space permits.\n\nThe universities claim this helps identify overlooked talent and improves efficiency. However, students can't see their scores or understand why they were rejected. Some counselors have noticed students from certain zip codes seem to score lower regardless of individual merit.",
-    "dilemmaQuestion": "What should be the PRIMARY concern about using AI in college admissions decisions?",
+    "description": "A group of universities has begun using an AI system to help screen initial college applications. The system analyzes various factors including grades, standardized test scores, extracurricular activities, and recommendation letters to generate an \"applicant score\" that admissions officers use to prioritize applications for further review.\n\nThe universities claim this makes the process more efficient and helps identify promising candidates who might otherwise be overlooked. However, some students and education advocates have raised concerns about transparency and potential bias in the system.",
     "resolutions": [
       {
         "id": "biased_results",
@@ -215,24 +211,24 @@
     ],
     "options": [
       {
-        "text": "Algorithmic fairness—the system must not disadvantage certain groups",
-        "consequence": "Prioritizes equity and avoiding bias in life-changing decisions"
+        "text": "Yes - The universities are using AI to evaluate and score applications",
+        "consequence": "Raises concerns about algorithmic bias and fairness"
       },
       {
-        "text": "Transparency—students deserve to know how they're evaluated",
-        "consequence": "Prioritizes explainability and students' right to understand the process"
+        "text": "Yes - The system uses machine learning to predict student success potential",
+        "consequence": "Questions the validity of AI predictions"
       },
       {
-        "text": "Human judgment—important decisions shouldn't be delegated to algorithms",
-        "consequence": "Prioritizes personal assessment and human wisdom over automation"
+        "text": "Partially - The AI is only providing initial screening, with humans making final decisions",
+        "consequence": "Suggests a balanced approach to AI use"
       },
       {
-        "text": "Effectiveness—AI helps discover deserving students who'd otherwise be missed",
-        "consequence": "Prioritizes practical outcomes and identifying hidden talent"
+        "text": "No - This is just an automated scoring system without true AI capabilities",
+        "consequence": "Underestimates the AI's role in decision-making"
       },
       {
-        "text": "Continuous auditing—require regular bias testing and public reporting",
-        "consequence": "Prioritizes accountability and evidence-based validation of AI systems"
+        "text": "Not sure - More information about the algorithm is needed",
+        "consequence": "Highlights the need for transparency in AI systems"
       }
     ],
     "ethicalConsiderations": [
@@ -258,8 +254,7 @@
   {
     "id": 5,
     "title": "Accessibility AI Tools",
-    "description": "Riverside High has introduced AI accessibility tools: speech-to-text for students with writing difficulties, real-time captioning for deaf students, text-to-speech for dyslexia, and translation for English learners. The district spent $125,000 on the system serving 340 students with documented needs.\n\nStudent participation has increased dramatically. However, the AI sometimes misunderstands scientific terminology and accented speech. More controversially, some teachers question whether AI-assisted writing gives students an unfair advantage on standardized tests, and other students have requested access to the same tools.",
-    "dilemmaQuestion": "What should guide decisions about AI accessibility tools and their use?",
+    "description": "A high school has introduced AI-powered accessibility tools to support students with different learning needs. These include speech-to-text tools for students with writing difficulties, text-to-speech for reading challenges, real-time captioning for deaf or hard-of-hearing students, and language translation for English language learners.\n\nWhile many students benefit from these tools, there have been instances where the technology misunderstood specialized terminology in science classes or struggled with accented speech. Some teachers also wonder if certain accommodations might give some students an unfair advantage in assessments.",
     "resolutions": [
       {
         "id": "successful_inclusion",
@@ -279,24 +274,24 @@
     ],
     "options": [
       {
-        "text": "Equity—these tools level the playing field for students with disabilities",
-        "consequence": "Prioritizes ensuring all students can demonstrate their knowledge"
+        "text": "Yes - Multiple AI technologies are being used for accessibility purposes",
+        "consequence": "Highlights the potential of AI for inclusion"
       },
       {
-        "text": "Academic standards—accommodations shouldn't change what's being assessed",
-        "consequence": "Prioritizes maintaining consistent evaluation of actual skills"
+        "text": "Yes - Speech recognition and language processing are AI applications",
+        "consequence": "Shows the complexity of AI language processing"
       },
       {
-        "text": "Universal design—make materials accessible to all without special tools",
-        "consequence": "Prioritizes designing better assessments over technology solutions"
+        "text": "Partially - Some of these tools use AI while others use simpler technologies",
+        "consequence": "Suggests a mixed approach to accessibility"
       },
       {
-        "text": "Individual needs—each student's situation requires personalized evaluation",
-        "consequence": "Prioritizes flexibility and case-by-case decision-making"
+        "text": "No - These are basic assistive technologies without advanced AI",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Universal access—all students should have access to helpful AI tools",
-        "consequence": "Prioritizes broader availability over restricting to documented disabilities"
+        "text": "Not sure - The level of AI sophistication in these tools is unclear",
+        "consequence": "Emphasizes the need for better understanding of AI tools"
       }
     ],
     "ethicalConsiderations": [
@@ -322,8 +317,7 @@
   {
     "id": 6,
     "title": "AI-Powered Tutoring Systems",
-    "description": "Mountain View School District (18,000 students) has implemented MathGenius AI, a tutoring system that adapts to each student's learning pace and provides unlimited practice problems. The district pays $12 per student annually. After one semester, 70% of participating students showed test score improvements.\n\nHowever, engagement varies—motivated students thrive while struggling students often abandon the system. To fund the AI platform, the district cut two human tutor positions. Some parents argue their children need emotional support and motivation that AI can't provide.",
-    "dilemmaQuestion": "What should be the priority in deciding how AI tutoring fits into education?",
+    "description": "A school district has implemented an AI-powered tutoring system that provides personalized learning assistance to students outside of regular class hours. The system adapts to each student's learning pace, identifies knowledge gaps based on their responses, and customizes explanations and practice problems accordingly.\n\nSome students have shown significant improvement in their understanding and test scores after using the system, while others find the experience impersonal or struggle to engage with the digital interface. Parents and educators are debating whether AI tutoring should complement or replace traditional tutoring programs.",
     "resolutions": [
       {
         "id": "mixed_results",
@@ -343,24 +337,24 @@
     ],
     "options": [
       {
-        "text": "Effectiveness—use what helps students learn, whether AI or human",
-        "consequence": "Prioritizes measurable learning outcomes over the method"
+        "text": "Yes - The system uses AI to personalize learning experiences for each student",
+        "consequence": "Highlights the potential of personalized learning"
       },
       {
-        "text": "Human connection—students need emotional support AI cannot provide",
-        "consequence": "Prioritizes relationships and motivation over efficiency"
+        "text": "Yes - Adaptive learning algorithms are being used to identify knowledge gaps",
+        "consequence": "Shows how AI can enhance learning assessment"
       },
       {
-        "text": "Cost and access—AI enables support for more students at lower cost",
-        "consequence": "Prioritizes serving more students even if quality differs"
+        "text": "Partially - There are some AI elements but likely with significant human oversight",
+        "consequence": "Suggests a balanced approach to AI tutoring"
       },
       {
-        "text": "Complementary roles—AI for practice, humans for complex thinking",
-        "consequence": "Prioritizes using each approach for its strengths"
+        "text": "No - This is mainly an automated practice system with pre-programmed responses",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Student choice—let families decide between AI and human tutoring",
-        "consequence": "Prioritizes individual preferences and circumstances"
+        "text": "Not sure - Need more technical details to determine the level of AI involvement",
+        "consequence": "Emphasizes the need for transparency in educational AI"
       }
     ],
     "ethicalConsiderations": [
@@ -386,8 +380,7 @@
   {
     "id": 7,
     "title": "Predictive Analytics for Dropout Prevention",
-    "description": "Metro Public Schools (42,000 students) has implemented RiskAlert, an AI system that analyzes attendance, grades, disciplinary records, and socioeconomic data to identify students at risk of dropping out. The system flags about 3,200 students annually for early intervention.\n\nGraduation rates have increased 8% since implementation. However, a civil rights group discovered the system disproportionately flags students of color. Additionally, a data breach exposed sensitive family information for 127 flagged students. Some students report feeling stigmatized by being labeled \"at-risk.\"",
-    "dilemmaQuestion": "What should be the PRIMARY consideration in using predictive analytics for students?",
+    "description": "A large public school system has implemented an AI-based predictive analytics program that identifies students at risk of dropping out. The system analyzes various data points including attendance records, grades, disciplinary incidents, and socioeconomic factors to flag students who might need additional support.\n\nThe school's intervention team uses these predictions to allocate resources and create personalized support plans. While graduation rates have improved since implementation, some parents and civil rights advocates have raised concerns about privacy, data security, and potential bias in how students are identified and assisted.",
     "resolutions": [
       {
         "id": "successful_intervention",
@@ -407,24 +400,24 @@
     ],
     "options": [
       {
-        "text": "Effectiveness—if it helps students graduate, other concerns are manageable",
-        "consequence": "Prioritizes positive outcomes for identified students"
+        "text": "Yes - AI algorithms are analyzing student data to predict dropout risk",
+        "consequence": "Raises concerns about data privacy and algorithmic bias"
       },
       {
-        "text": "Fairness—the system must not disproportionately flag certain groups",
-        "consequence": "Prioritizes avoiding discriminatory impact over efficiency"
+        "text": "Yes - Machine learning models are identifying patterns in student behavior",
+        "consequence": "Highlights the complexity of student success prediction"
       },
       {
-        "text": "Privacy—student data must be protected above all else",
-        "consequence": "Prioritizes data security and confidentiality"
+        "text": "Partially - The system uses some AI but relies heavily on traditional statistical methods",
+        "consequence": "Suggests a balanced approach to data analysis"
       },
       {
-        "text": "Transparency—students and families should know when they're flagged and why",
-        "consequence": "Prioritizes informed awareness over behind-the-scenes intervention"
+        "text": "No - This is standard data analysis without advanced AI capabilities",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Human judgment—counselors should decide who needs help, not algorithms",
-        "consequence": "Prioritizes professional expertise over data-driven identification"
+        "text": "Not sure - The distinction between complex analytics and AI is unclear here",
+        "consequence": "Emphasizes the need for better understanding of AI systems"
       }
     ],
     "ethicalConsiderations": [
@@ -450,8 +443,7 @@
   {
     "id": 8,
     "title": "AI Writing Feedback Tools",
-    "description": "Wilson High's English department has adopted WritePro AI, which provides instant feedback on grammar, style, organization, and content. Students can submit unlimited drafts before final submission. The department head reports that technical writing quality has improved 35% since implementation.\n\nHowever, students now struggle when writing without AI assistance during in-class assignments. The tool consistently pushes creative writing toward conventional, formulaic structures. Teachers notice increased technical proficiency but declining voice, originality, and willingness to take creative risks.",
-    "dilemmaQuestion": "What should guide decisions about AI writing feedback tools in education?",
+    "description": "An English department has adopted an AI-powered writing feedback tool that analyzes student essays and provides immediate suggestions on grammar, style, organization, and content. Students submit drafts to the system and receive automated feedback before submitting their final work to teachers.\n\nSome students find the instant feedback helpful for improving their writing, while others feel the AI doesn't fully understand nuanced or creative approaches. Teachers have noticed improvements in technical aspects of writing but wonder if students are becoming overly dependent on the tool rather than developing their own editing skills.",
     "resolutions": [
       {
         "id": "improved_writing",
@@ -471,24 +463,24 @@
     ],
     "options": [
       {
-        "text": "Skill development—students should learn editing without AI dependency",
-        "consequence": "Prioritizes developing independent writing and revision abilities"
+        "text": "Yes - Natural language processing AI is analyzing and providing feedback on writing",
+        "consequence": "Raises questions about the role of AI in developing writing skills"
       },
       {
-        "text": "Efficiency and quality—AI helps produce better writing in less time",
-        "consequence": "Prioritizes improved outcomes and productivity"
+        "text": "Yes - The system uses machine learning to evaluate various aspects of written work",
+        "consequence": "Highlights the complexity of writing assessment"
       },
       {
-        "text": "Creative expression—protect student voice even if technical quality suffers",
-        "consequence": "Prioritizes originality and personal style over convention"
+        "text": "Partially - The tool likely combines predefined rules with some AI capabilities",
+        "consequence": "Suggests a balanced approach to writing feedback"
       },
       {
-        "text": "Critical evaluation—teach students to assess AI feedback, not blindly accept it",
-        "consequence": "Prioritizes developing judgment about when to use AI suggestions"
+        "text": "No - This is primarily automated grammar checking without true AI understanding",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Different tools for different writing—AI for formal work, not creative",
-        "consequence": "Prioritizes matching tool use to specific writing purposes"
+        "text": "Not sure - The sophistication of the writing analysis is unclear",
+        "consequence": "Emphasizes the need for transparency in AI tools"
       }
     ],
     "ethicalConsiderations": [
@@ -514,8 +506,7 @@
   {
     "id": 9,
     "title": "AI-Enhanced Science Labs",
-    "description": "Lincoln Science Academy has implemented VirtualLab AI, which simulates advanced experiments too dangerous or expensive for high school labs—radiation experiments, complex organic synthesis, and environmental modeling. The system adapts difficulty based on student performance and provides 24/7 access.\n\nStudents are excited to explore college-level concepts. However, when three graduates took college chemistry, they struggled with basic pipetting and equipment handling. Additionally, teachers discovered the simulation oversimplified certain chemical reactions, creating misconceptions about real-world outcomes.",
-    "dilemmaQuestion": "What should be the priority in balancing virtual AI labs with traditional hands-on experience?",
+    "description": "A science department has implemented AI-enhanced virtual laboratory experiences that allow students to conduct sophisticated experiments that would be too dangerous, expensive, or time-consuming in a traditional school lab. The simulations use AI to model realistic outcomes based on student inputs and can adapt the complexity based on student performance.\n\nMost students are excited about the opportunity to explore advanced concepts, but some teachers worry that students are missing out on developing hands-on laboratory skills. There are also questions about whether the simulations might oversimplify certain scientific phenomena or embed unintended biases in how scientific concepts are presented.",
     "resolutions": [
       {
         "id": "enhanced_learning",
@@ -535,24 +526,24 @@
     ],
     "options": [
       {
-        "text": "Access to advanced concepts—virtual labs enable learning impossible otherwise",
-        "consequence": "Prioritizes exposing students to sophisticated scientific ideas"
+        "text": "Yes - AI is powering the simulation and adapting to student interactions",
+        "consequence": "Raises questions about the role of virtual labs in science education"
       },
       {
-        "text": "Hands-on skills—lab technique is essential and cannot be learned virtually",
-        "consequence": "Prioritizes practical skills that require physical experience"
+        "text": "Yes - Machine learning models are generating realistic experimental outcomes",
+        "consequence": "Highlights the complexity of scientific simulation"
       },
       {
-        "text": "Scientific accuracy—simulations must not create false understanding",
-        "consequence": "Prioritizes correct conceptual models over access to more topics"
+        "text": "Partially - There's some AI involvement but primarily pre-programmed simulations",
+        "consequence": "Suggests a balanced approach to virtual labs"
       },
       {
-        "text": "Cost-effectiveness—serve more students with limited lab resources",
-        "consequence": "Prioritizes making science education accessible to more students"
+        "text": "No - These are advanced graphics and physics engines but not true AI",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Hybrid approach—virtual for dangerous experiments, physical for fundamentals",
-        "consequence": "Prioritizes using each method where it's most appropriate"
+        "text": "Not sure - It's difficult to determine the level of AI without technical details",
+        "consequence": "Emphasizes the need for transparency in educational technology"
       }
     ],
     "ethicalConsiderations": [
@@ -578,8 +569,7 @@
   {
     "id": 10,
     "title": "AI Teacher Assistants",
-    "description": "Oakwood Middle School (grades 6-8, 850 students) is piloting TeachBot AI in 12 classrooms. The system answers common student questions, provides additional explanations, tracks participation, and grades objective assignments. Teachers report 40% more time for individualized instruction.\n\nHowever, parents discovered TeachBot collects detailed data on student interactions, emotional responses, and behavioral patterns—data shared with the commercial vendor for product improvement. Some students have become overly dependent on instant AI responses. Students with learning differences report feeling disconnected without human encouragement.",
-    "dilemmaQuestion": "What should be the PRIMARY concern about AI assistants in classrooms?",
+    "description": "A middle school is piloting AI-powered digital teaching assistants in several classrooms. These assistants help manage routine tasks like answering common student questions, providing additional explanations of concepts, tracking participation, and even helping with initial grading of objective assignments.\n\nTeachers report having more time for individualized instruction and creative activities, but some parents worry about the reduced human interaction and oversight. Questions have also been raised about data privacy, as the system collects detailed information about student interactions and performance to improve its responses.",
     "resolutions": [
       {
         "id": "teacher_enhancement",
@@ -599,24 +589,24 @@
     ],
     "options": [
       {
-        "text": "Teacher time—if it frees teachers for higher-value work, it's worthwhile",
-        "consequence": "Prioritizes maximizing teacher effectiveness and individualized attention"
+        "text": "Yes - The digital assistants use AI to respond to student questions and grade work",
+        "consequence": "Raises questions about the role of AI in teaching"
       },
       {
-        "text": "Human relationships—teacher-student connection is too important to automate",
-        "consequence": "Prioritizes personal bonds and emotional support in learning"
+        "text": "Yes - Machine learning allows the system to improve over time based on interactions",
+        "consequence": "Highlights the adaptive nature of AI assistants"
       },
       {
-        "text": "Data privacy—student information must not be shared with commercial vendors",
-        "consequence": "Prioritizes protecting children's behavioral and academic data"
+        "text": "Partially - The assistants combine scripted responses with some AI capabilities",
+        "consequence": "Suggests a balanced approach to AI assistance"
       },
       {
-        "text": "Student autonomy—teach students when to use AI help vs. figure things out",
-        "consequence": "Prioritizes developing independence and problem-solving"
+        "text": "No - These are primarily automated tools without sophisticated AI understanding",
+        "consequence": "Underestimates the AI capabilities involved"
       },
       {
-        "text": "Transparency and consent—families must know what data is collected and why",
-        "consequence": "Prioritizes informed choice about AI use in education"
+        "text": "Not sure - More information is needed about the technology behind the assistants",
+        "consequence": "Emphasizes the need for transparency in educational AI"
       }
     ],
     "ethicalConsiderations": [
@@ -639,5 +629,4 @@
       }
     ]
   }
-]
-
+] 

@@ -600,16 +600,16 @@ const ScenarioView = () => {
             </div>
           )}
 
-          {/* Step 2: Identify AI Use */}
+          {/* Step 2: Core Ethical Dilemma */}
           {currentStep === 2 && (
             <div className="space-y-6">
               <div className="flex items-center gap-3 mb-6">
-                <span className="material-icons text-primary-600 text-2xl">search</span>
-                <h2 className="text-xl font-semibold">Identify AI Use</h2>
+                <span className="material-icons text-primary-600 text-2xl">balance</span>
+                <h2 className="text-xl font-semibold">Core Ethical Dilemma</h2>
               </div>
 
-              <p className="text-neutral-700 mb-6">
-                How do you think AI is being used in this scenario? Select the option that best represents your analysis:
+              <p className="text-neutral-700 mb-6 font-medium">
+                {(currentScenario as any).dilemmaQuestion || "What ethical considerations are most important in this scenario?"}
               </p>
 
               <div className="space-y-3">
