@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { notifyStudentOfManualEnrollment, notifyStudentOfRemoval } from '../lib/notifications.js';
 
 // Environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
@@ -46,8 +47,8 @@ const AssignmentSchema = z.object({
 
 const TeacherAccessSchema = z.object({
   institution_name: z.string().min(1).max(200),
-  institution_type: z.string().min(1).max(100),
-  department: z.string().min(1).max(100),
+  institution_type: z.string().min(1).max(100).optional(),
+  department: z.string().min(1).max(100).optional(),
   request_reason: z.string().min(10).max(1000)
 });
 
@@ -91,6 +92,10 @@ const authenticateUser = async (req: VercelRequest) => {
     return userProfile.id;
   } catch (error) {
     console.error('Authentication error:', error);
+    // Re-throw specific errors as-is
+    if (error instanceof Error && error.message === 'Teacher access required') {
+      throw error;
+    }
     throw new Error('Authentication failed');
   }
 };
@@ -469,6 +474,36 @@ const handleStudents = async (req: VercelRequest, res: VercelResponse) => {
         throw error;
       }
 
+      // Send notification to student (don't fail enrollment if notification fails)
+      try {
+        const { data: classInfo } = await supabase
+          .from('classes')
+          .select('name')
+          .eq('id', classId)
+          .single();
+        
+        const { data: teacher } = await supabase
+          .from('users')
+          .select('first_name, last_name, email')
+          .eq('id', userId)
+          .single();
+        
+        const teacherName = teacher
+          ? `${teacher.first_name || ''} ${teacher.last_name || ''}`.trim() || teacher.email
+          : 'Your teacher';
+        
+        await notifyStudentOfManualEnrollment(
+          student.id,
+          classInfo?.name || 'Class',
+          teacherName,
+          parseInt(classId as string)
+        );
+        console.log('Manual enrollment notification sent to student');
+      } catch (notifError) {
+        console.error('Failed to send manual enrollment notification:', notifError);
+        // Continue anyway - enrollment was successful
+      }
+
       return res.status(201).json({ success: true, enrollment });
     }
 
@@ -500,6 +535,36 @@ const handleStudents = async (req: VercelRequest, res: VercelResponse) => {
 
       if (error) throw error;
 
+      // Send notification to student (don't fail if notification fails)
+      try {
+        const { data: classInfo } = await supabase
+          .from('classes')
+          .select('name')
+          .eq('id', classId)
+          .single();
+        
+        const { data: teacher } = await supabase
+          .from('users')
+          .select('first_name, last_name, email')
+          .eq('id', userId)
+          .single();
+        
+        const teacherName = teacher
+          ? `${teacher.first_name || ''} ${teacher.last_name || ''}`.trim() || teacher.email
+          : 'Your teacher';
+        
+        await notifyStudentOfRemoval(
+          parseInt(studentId as string),
+          classInfo?.name || 'Class',
+          teacherName,
+          parseInt(classId as string)
+        );
+        console.log('Removal notification sent to student');
+      } catch (notifError) {
+        console.error('Failed to send removal notification:', notifError);
+        // Continue anyway - removal was successful
+      }
+
       return res.json({ success: true, message: 'Student removed from class' });
     }
 
@@ -511,72 +576,91 @@ const handleStudents = async (req: VercelRequest, res: VercelResponse) => {
 const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
   switch (req.method) {
     case 'POST': {
-      const validatedData = TeacherAccessSchema.parse(req.body);
-      const { userEmail } = req.body;
+      try {
+        const validatedData = TeacherAccessSchema.parse(req.body);
+        const { userEmail } = req.body;
 
-      if (!userEmail) {
-        throw new Error('User email required');
-      }
+        if (!userEmail) {
+          return res.status(400).json({
+            success: false,
+            error: 'User email required'
+          });
+        }
 
-      // Find user by email
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('id, role')
-        .eq('email', userEmail)
-        .single();
+        // Find user by email
+        const { data: user, error: userError } = await supabase
+          .from('users')
+          .select('id, role')
+          .eq('email', userEmail)
+          .single();
 
-      if (userError || !user) {
-        throw new Error('User not found');
-      }
+        if (userError || !user) {
+          return res.status(400).json({
+            success: false,
+            error: 'User not found'
+          });
+        }
 
-      // Check if user already has teacher access
-      if (user.role === 'teacher') {
-        return res.json({ 
-          success: false, 
-          message: 'User already has teacher access' 
+        // Check if user already has teacher access
+        if (user.role === 'teacher') {
+          return res.status(200).json({ 
+            success: false, 
+            message: 'User already has teacher access' 
+          });
+        }
+
+        // SECURITY FIX: Do NOT auto-approve teacher access
+        // Create pending request that requires admin review
+        
+        // Create teacher access request with 'pending' status
+        const { data: request, error: requestError } = await supabase
+          .from('teacher_access_requests')
+          .insert({
+            user_id: user.id,
+            institution_name: validatedData.institution_name,
+            institution_type: validatedData.institution_type,
+            department: validatedData.department,
+            request_reason: validatedData.request_reason,
+            status: 'pending', // Keep as pending for admin review
+            created_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (requestError) {
+          console.error('Failed to create teacher access request:', requestError);
+          return res.status(500).json({
+            success: false,
+            error: 'Failed to submit teacher access request'
+          });
+        }
+
+        // TODO: Send email notification to admins
+        // await sendAdminNotification({
+        //   userName: `${user.first_name} ${user.last_name}`,
+        //   userEmail: user.email,
+        //   institution: validatedData.institution_name,
+        //   reason: validatedData.request_reason,
+        //   requestId: request.id
+        // });
+
+        console.log(`Teacher access request created (pending): user_id=${user.id}, request_id=${request.id}`);
+
+        return res.status(201).json({ 
+          success: true, 
+          message: 'Teacher access request submitted successfully. You will receive an email notification when your request has been reviewed. This typically takes 24-48 hours.',
+          status: 'pending',
+          request_id: request.id
         });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return res.status(400).json({ 
+            success: false, 
+            error: error.errors[0].message 
+          });
+        }
+        throw error;
       }
-
-      // For demo purposes, immediately grant teacher access
-      // In production, you'd want to review requests manually
-      
-      // Update user role to teacher
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ 
-          role: 'teacher',
-          institution_name: validatedData.institution_name,
-          institution_type: validatedData.institution_type
-        })
-        .eq('id', user.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Create a record of this access grant for audit purposes
-      const { error: accessError } = await supabase
-        .from('teacher_access_requests')
-        .insert({
-          user_id: user.id,
-          institution_name: validatedData.institution_name,
-          institution_type: validatedData.institution_type,
-          department: validatedData.department,
-          request_reason: validatedData.request_reason,
-          status: 'approved',
-          reviewed_at: new Date().toISOString()
-        });
-
-      // Don't fail if audit record creation fails
-      if (accessError) {
-        console.warn('Failed to create audit record:', accessError);
-      }
-
-      return res.status(201).json({ 
-        success: true, 
-        message: 'Teacher access granted successfully! You can now access the teacher dashboard.',
-        role: 'teacher'
-      });
     }
 
     case 'GET': {

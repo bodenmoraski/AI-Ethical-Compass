@@ -1,7 +1,9 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { I18nextProvider } from 'react-i18next';
+import '@testing-library/jest-dom';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 import i18n from '../i18n';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from '@jest/globals';
 
 // Mock component to test translations
 const TestComponent = () => {
@@ -14,8 +16,6 @@ const TestComponent = () => {
     </div>
   );
 };
-
-import { useTranslation } from 'react-i18next';
 
 describe('i18n Configuration', () => {
   beforeEach(async () => {

@@ -1,0 +1,33 @@
+{
+  "name": "ethicalai-tests",
+  "version": "1.0.0",
+  "description": "Test suite for Teacher Interface & Enrollment fixes",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:api": "jest api/",
+    "test:lib": "jest lib/",
+    "test:ui": "jest client/",
+    "test:security": "jest api/teacher-security.test.ts",
+    "test:critical": "jest --testNamePattern='CRITICAL|SECURITY'",
+    "test:all": "jest --runInBand --forceExit"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.1"
+  }
+}
+

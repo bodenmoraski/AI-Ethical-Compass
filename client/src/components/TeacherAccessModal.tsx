@@ -100,18 +100,15 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
       }
 
       toast({
-        title: "Teacher Access Granted! 🎉",
-        description: "Your teacher access has been approved. Redirecting to teacher dashboard...",
+        title: "Request Submitted! 📝",
+        description: result.message || "Your teacher access request has been submitted for review. You'll receive an email notification within 24-48 hours.",
       });
 
       // Close the modal
       onClose();
 
-      // Refresh user profile to get updated role
-      await refreshUserProfile();
-
-      // Navigate to teacher dashboard
-      navigate('/teacher/dashboard');
+      // Do NOT refresh profile or navigate - user doesn't have teacher access yet
+      // They will be notified via email when approved
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

@@ -19,8 +19,10 @@ import {
   FileText,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Users
 } from 'lucide-react';
+import StudentClassList from '../components/student/StudentClassList';
 
 interface DashboardData {
   user_id: string;
@@ -326,8 +328,9 @@ export default function Dashboard() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="perspectives" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="perspectives">My Perspectives</TabsTrigger>
+          <TabsTrigger value="classes">My Classes</TabsTrigger>
           <TabsTrigger value="liked">Liked Content</TabsTrigger>
           <TabsTrigger value="progress">Progress</TabsTrigger>
         </TabsList>
@@ -374,6 +377,10 @@ export default function Dashboard() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="classes" className="space-y-6">
+          <StudentClassList />
         </TabsContent>
 
         <TabsContent value="liked" className="space-y-6">
