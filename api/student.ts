@@ -208,16 +208,17 @@ const handleJoinClass = async (req: VercelRequest, res: VercelResponse) => {
     return res.status(201).json({ 
       success: true, 
       message: `Successfully joined ${classData.name}!`,
-      class: {
-        id: classData.id,
-        name: classData.name,
-        subject: classData.subject,
-        grade_level: classData.grade_level,
-        teacher_name: teacherName
-      },
       enrollment: {
         id: enrollment.id,
-        enrollment_date: enrollment.enrollment_date
+        class_id: classData.id,
+        student_id: enrollment.student_id,
+        status: enrollment.status,
+        enrollment_date: enrollment.enrollment_date,
+        // Include class info for convenience
+        class_name: classData.name,
+        class_subject: classData.subject,
+        class_grade_level: classData.grade_level,
+        teacher_name: teacherName
       }
     });
     

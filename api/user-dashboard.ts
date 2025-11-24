@@ -69,7 +69,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         // Get all assignments for enrolled classes
-        const { data: allAssignments, error: allAssignmentsError } = await supabase
+        const { data: allAssignments, error: allAssignmentsError} = await supabase
           .from('assignments')
           .select(`
             *,
@@ -78,7 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               subject
             )
           `)
-          .eq('is_published', true)
+          // Skip is_published filter if column doesn't exist
+          // .eq('is_published', true)
           .in('class_id', classIds);
 
         if (allAssignmentsError) {

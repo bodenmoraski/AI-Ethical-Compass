@@ -23,12 +23,12 @@ export default {
       }
     ]
   },
-  roots: ['<rootDir>/api', '<rootDir>/lib', '<rootDir>/client/src'],
+  roots: ['<rootDir>/api', '<rootDir>/lib', '<rootDir>/client/src', '<rootDir>/tests'],
   testMatch: [
     '**/__tests__/**/*.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
   ],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   collectCoverageFrom: [
     'api/**/*.{ts,tsx}',
     'lib/**/*.{ts,tsx}',

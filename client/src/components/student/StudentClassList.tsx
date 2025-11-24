@@ -1,385 +1,193 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '../ui/alert-dialog';
-import { useToast } from '../../hooks/use-toast';
-import { supabase } from '../../../../lib/supabase-client';
-import {
-  BookOpen,
-  Users,
-  Calendar,
-  FileText,
-  Mail,
-  Loader2,
-  Plus,
-  ExternalLink,
-  LogOut
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { Plus, Users, BookOpen, Calendar, ChevronRight } from 'lucide-react';
+import JoinClassModal from './JoinClassModal';
 
-interface Class {
+interface EnrolledClass {
   id: number;
   name: string;
-  description: string;
   subject: string;
   grade_level: string;
   class_code: string;
-  school_year: string;
-  semester: string;
-  is_active: boolean;
   teacher_name: string;
-  teacher_email: string;
   enrollment_date: string;
-  assignment_count: number;
-  created_at: string;
+  student_count?: number;
 }
 
 export default function StudentClassList() {
-  const [classes, setClasses] = useState<Class[]>([]);
+  const { user, getAccessToken } = useAuth();
+  const [classes, setClasses] = useState<EnrolledClass[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-  const [leavingClass, setLeavingClass] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const [error, setError] = useState('');
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
-  // Fetch enrolled classes
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      setError(null);
+      const token = await getAccessToken();
       
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        throw new Error('No authentication token available');
-      }
-      
-      const response = await fetch('/api/student?action=classes', {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/student?action=classes`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
         }
-      });
-      
+      );
+
       if (!response.ok) {
         throw new Error('Failed to fetch classes');
       }
-      
+
       const data = await response.json();
       setClasses(data.classes || []);
-      
     } catch (err) {
       console.error('Error fetching classes:', err);
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-      toast({
-        title: "Error loading classes",
-        description: err instanceof Error ? err.message : 'An unexpected error occurred',
-        variant: "destructive"
-      });
+      setError('Failed to load your classes');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchClasses();
-  }, []);
-
-  // Handle leave class button click
-  const handleLeaveClick = (classItem: Class) => {
-    setSelectedClass(classItem);
-    setShowLeaveDialog(true);
-  };
-
-  // Confirm leave class
-  const confirmLeaveClass = async () => {
-    if (!selectedClass) return;
-    
-    setLeavingClass(true);
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.access_token) {
-        throw new Error('No authentication token available');
-      }
-      
-      const response = await fetch('/api/student?action=leave-class', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          class_id: selectedClass.id
-        })
-      });
-      
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to leave class');
-      }
-      
-      toast({
-        title: "Left Class",
-        description: `You've successfully left ${selectedClass.name}`,
-      });
-      
-      // Refresh class list
-      await fetchClasses();
-      
-    } catch (err) {
-      toast({
-        title: "Error leaving class",
-        description: err instanceof Error ? err.message : 'An unexpected error occurred',
-        variant: "destructive"
-      });
-    } finally {
-      setLeavingClass(false);
-      setShowLeaveDialog(false);
-      setSelectedClass(null);
+    if (user) {
+      fetchClasses();
     }
+  }, [user]);
+
+  const handleClassJoined = () => {
+    // Refresh the class list
+    fetchClasses();
+    setShowJoinModal(false);
   };
 
-  // Format enrollment date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
-
-  // Loading state
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>My Classes</CardTitle>
-          <CardDescription>Loading your enrolled classes...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="border rounded-lg p-4 animate-pulse">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="space-y-2 flex-1">
-                    <div className="h-5 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                  <div className="h-6 bg-gray-200 rounded w-16"></div>
-                </div>
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center text-red-600">
-            <p>Error: {error}</p>
-            <Button onClick={fetchClasses} className="mt-4">
-              Try Again
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Empty state
-  if (classes.length === 0) {
-    return (
-      <Card>
-        <CardContent className="pt-12 pb-12">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-              <BookOpen className="h-8 w-8 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No Classes Yet
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-              You haven't joined any classes yet. Use a class code provided by your teacher to get started.
-            </p>
-            <Button 
-              onClick={() => navigate('/join-class')}
-              className="inline-flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Join a Class
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Classes list
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                My Classes ({classes.length})
-              </CardTitle>
-              <CardDescription>
-                Classes you are currently enrolled in
-              </CardDescription>
-            </div>
-            <Button 
-              onClick={() => navigate('/join-class')}
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Join Class
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {classes.map((cls) => (
-              <div 
-                key={cls.id} 
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                {/* Class Header */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg">{cls.name}</h3>
-                      {!cls.is_active && (
-                        <Badge variant="secondary">Inactive</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      {cls.subject} • {cls.grade_level}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="font-mono">
-                    {cls.class_code}
-                  </Badge>
-                </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">My Classes</h2>
+          <p className="text-gray-600 mt-1">
+            {classes.length} {classes.length === 1 ? 'class' : 'classes'} enrolled
+          </p>
+        </div>
+        <button
+          onClick={() => setShowJoinModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Join Class
+        </button>
+      </div>
 
-                {/* Class Description */}
-                {cls.description && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {cls.description}
-                  </p>
-                )}
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
 
-                {/* Class Info */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 text-sm">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Users className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Teacher:</span>
-                    <span>{cls.teacher_name}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <FileText className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Assignments:</span>
-                    <span>{cls.assignment_count}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Enrolled:</span>
-                    <span>{formatDate(cls.enrollment_date)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Mail className="h-4 w-4 flex-shrink-0" />
-                    <span className="text-sm truncate">{cls.teacher_email}</span>
-                  </div>
-                </div>
+      {/* Empty State */}
+      {!loading && classes.length === 0 && (
+        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No Classes Yet
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Join your first class using a class code from your teacher
+          </p>
+          <button
+            onClick={() => setShowJoinModal(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Join a Class
+          </button>
+        </div>
+      )}
 
-                {/* Term Info */}
-                <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-                  <span>{cls.school_year}</span>
-                  <span>•</span>
-                  <span>{cls.semester}</span>
-                </div>
+      {/* Class Grid */}
+      {classes.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {classes.map((classItem) => (
+            <ClassCard key={classItem.id} classItem={classItem} />
+          ))}
+        </div>
+      )}
 
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => navigate(`/class/${cls.id}`)}
-                    className="flex-1 sm:flex-none"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View Details
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost"
-                    onClick={() => handleLeaveClick(cls)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Leave Class
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Leave Class Confirmation Dialog */}
-      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Leave {selectedClass?.name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to leave this class? You will no longer have access to assignments and materials. You'll need the class code to rejoin.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={leavingClass}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmLeaveClass}
-              disabled={leavingClass}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {leavingClass ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Leaving...
-                </>
-              ) : (
-                'Leave Class'
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      {/* Join Class Modal */}
+      {showJoinModal && (
+        <JoinClassModal
+          onClose={() => setShowJoinModal(false)}
+          onSuccess={handleClassJoined}
+        />
+      )}
+    </div>
   );
 }
 
+function ClassCard({ classItem }: { classItem: EnrolledClass }) {
+  return (
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Class Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+        <h3 className="text-white font-semibold text-lg truncate">
+          {classItem.name}
+        </h3>
+        <p className="text-blue-100 text-sm mt-1">{classItem.subject}</p>
+      </div>
+
+      {/* Class Details */}
+      <div className="p-4 space-y-3">
+        <div className="flex items-center gap-2 text-gray-600 text-sm">
+          <Users className="w-4 h-4" />
+          <span>{classItem.teacher_name || 'Teacher'}</span>
+        </div>
+
+        {classItem.grade_level && (
+          <div className="flex items-center gap-2 text-gray-600 text-sm">
+            <BookOpen className="w-4 h-4" />
+            <span>{classItem.grade_level}</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 text-gray-600 text-sm">
+          <Calendar className="w-4 h-4" />
+          <span>
+            Joined{' '}
+            {new Date(classItem.enrollment_date).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        </div>
+
+        {/* Class Code */}
+        <div className="pt-3 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">Class Code</span>
+            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+              {classItem.class_code}
+            </code>
+          </div>
+        </div>
+
+        {/* View Class Button */}
+        <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+          View Class
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}

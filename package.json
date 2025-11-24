@@ -14,7 +14,11 @@
     "db:push": "drizzle-kit push",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest tests/integration/full-classroom-workflow.test.ts --verbose --runInBand",
+    "test:integration:watch": "jest tests/integration/full-classroom-workflow.test.ts --watch",
+    "test:cleanup": "ts-node tests/integration/cleanup-test-data.ts",
+    "test:all": "jest --verbose"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

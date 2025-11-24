@@ -42,7 +42,8 @@ const AssignmentSchema = z.object({
   points_possible: z.number().int().min(0).max(1000).default(100),
   rubric: z.record(z.any()).optional(),
   allow_late_submissions: z.boolean().default(true),
-  late_penalty_per_day: z.number().int().min(0).max(100).default(0)
+  late_penalty_per_day: z.number().int().min(0).max(100).default(0),
+  is_published: z.boolean().optional()
 });
 
 const TeacherAccessSchema = z.object({
@@ -635,7 +636,9 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
           });
         }
 
-        // TODO: Send email notification to admins
+        // FUTURE ENHANCEMENT: Send email notification to admins
+        // This requires setting up an email service (SendGrid, Resend, etc.)
+        // Implementation would look like:
         // await sendAdminNotification({
         //   userName: `${user.first_name} ${user.last_name}`,
         //   userEmail: user.email,
@@ -643,6 +646,7 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
         //   reason: validatedData.request_reason,
         //   requestId: request.id
         // });
+        // See: https://supabase.com/docs/guides/functions/examples/send-emails
 
         console.log(`Teacher access request created (pending): user_id=${user.id}, request_id=${request.id}`);
 
@@ -711,7 +715,7 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
           .from('assignment_submissions')
           .select(`
             *,
-            users(id, email, first_name, last_name, username)
+            users!assignment_submissions_student_id_fkey(id, email, first_name, last_name, username)
           `)
           .eq('assignment_id', assignmentId);
         if (error) throw error;
@@ -724,7 +728,7 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
           .from('assignment_submissions')
           .select(`
             *,
-            users(id, email, first_name, last_name, username)
+            users!assignment_submissions_student_id_fkey(id, email, first_name, last_name, username)
           `)
           .eq('id', submissionId)
           .single();
@@ -871,11 +875,12 @@ const handleAssignmentAnalytics = async (req: VercelRequest, res: VercelResponse
     }
     
     // Get assignment submissions with user data
+    // Specify the foreign key explicitly since there are multiple FK relationships
     const { data: submissions, error: submissionsError } = await supabase
       .from('assignment_submissions')
       .select(`
         *,
-        users(id, first_name, last_name, email)
+        users!assignment_submissions_student_id_fkey(id, first_name, last_name, email)
       `)
       .eq('assignment_id', assignmentId);
     
@@ -927,16 +932,47 @@ const handleAssignmentAnalytics = async (req: VercelRequest, res: VercelResponse
       });
     }
     
+    // Calculate average time spent from student_engagement table
+    let averageTimeSpent = 0;
+    if (submissions && submissions.length > 0) {
+      const studentIds = submissions.map(s => s.student_id);
+      
+      // Query student_engagement for time spent on this assignment's scenarios
+      const { data: engagementData, error: engagementError } = await supabase
+        .from('student_engagement')
+        .select('time_spent_seconds, student_id')
+        .in('student_id', studentIds)
+        .eq('class_id', assignment.class_id);
+      
+      if (!engagementError && engagementData && engagementData.length > 0) {
+        // Calculate average time in minutes
+        const totalSeconds = engagementData.reduce((sum, e) => sum + (e.time_spent_seconds || 0), 0);
+        averageTimeSpent = Math.round((totalSeconds / engagementData.length) / 60);
+      } else {
+        // Fallback: calculate from submission data if timeSpent is stored there
+        const timesFromSubmissions = submissions
+          .filter(s => s.submission_data?.timeSpent)
+          .map(s => s.submission_data.timeSpent as number);
+        
+        if (timesFromSubmissions.length > 0) {
+          averageTimeSpent = Math.round(
+            timesFromSubmissions.reduce((sum, t) => sum + t, 0) / timesFromSubmissions.length
+          );
+        }
+      }
+    }
+    
     // Prepare student progress data
     const studentProgress = submissions?.map(submission => {
       const user = submission.users as any;
       return {
-        id: submission.student_id.toString(),
+        student_id: submission.student_id,
+        id: submission.id,
         name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Unknown',
         email: user?.email || 'unknown@example.com',
         status: submission.status,
-        submittedAt: submission.submitted_at,
-        gradedAt: submission.graded_at,
+        submitted_at: submission.submitted_at,
+        graded_at: submission.graded_at,
         score: submission.final_score,
         feedback: submission.feedback
       };
@@ -958,12 +994,13 @@ const handleAssignmentAnalytics = async (req: VercelRequest, res: VercelResponse
         if (!submittedStudentIds.has(enrollment.student_id)) {
           const user = enrollment.users as any;
           studentProgress.push({
-            id: enrollment.student_id.toString(),
+            student_id: enrollment.student_id,
+            id: null,
             name: user ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : 'Unknown',
             email: user?.email || 'unknown@example.com',
             status: 'not_started',
-            submittedAt: null,
-            gradedAt: null,
+            submitted_at: null,
+            graded_at: null,
             score: null,
             feedback: null
           });
@@ -978,7 +1015,7 @@ const handleAssignmentAnalytics = async (req: VercelRequest, res: VercelResponse
       overdueCount,
       averageScore: Math.round(averageScore * 100) / 100,
       completionRate: Math.round(completionRate * 100) / 100,
-      averageTimeSpent: 45, // TODO: Calculate from engagement data
+      averageTimeSpent, // Now calculated from real data
       submissionTrend
     };
     

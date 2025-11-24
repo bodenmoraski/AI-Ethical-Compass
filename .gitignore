@@ -1,10 +1,38 @@
-node_modules
-dist/*
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
-.env
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
 !dist/public
+server/public
+
+# Test coverage
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.tar.gz
+*.bak
+*_backup.*
+*.log
+npm-debug.log*
+
+# Vercel
 .vercel
-.env.local
+
+# Vite
+vite.config.ts.*
