@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../lib/auth';
 import { Plus, Users, BookOpen, Calendar, ChevronRight } from 'lucide-react';
 import JoinClassModal from './JoinClassModal';
 
@@ -15,7 +15,7 @@ interface EnrolledClass {
 }
 
 export default function StudentClassList() {
-  const { user, getAccessToken } = useAuth();
+  const { user, session } = useAuth();
   const [classes, setClasses] = useState<EnrolledClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,7 +24,7 @@ export default function StudentClassList() {
   const fetchClasses = async () => {
     try {
       setLoading(true);
-      const token = await getAccessToken();
+      const token = session?.access_token;
       
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/student?action=classes`,
@@ -50,10 +50,10 @@ export default function StudentClassList() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && session) {
       fetchClasses();
     }
-  }, [user]);
+  }, [user, session]);
 
   const handleClassJoined = () => {
     // Refresh the class list

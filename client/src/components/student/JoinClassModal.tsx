@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Users, CheckCircle, AlertCircle } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../lib/auth';
 
 interface JoinClassModalProps {
   onClose: () => void;
@@ -8,7 +8,7 @@ interface JoinClassModalProps {
 }
 
 export default function JoinClassModal({ onClose, onSuccess }: JoinClassModalProps) {
-  const { getAccessToken } = useAuth();
+  const { session } = useAuth();
   const [classCode, setClassCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +26,7 @@ export default function JoinClassModal({ onClose, onSuccess }: JoinClassModalPro
     try {
       setLoading(true);
       setError('');
-      const token = await getAccessToken();
+      const token = session?.access_token;
 
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/student?action=join-class`,
