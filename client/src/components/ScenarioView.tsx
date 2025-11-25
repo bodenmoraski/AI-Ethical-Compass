@@ -114,10 +114,10 @@ const ScenarioView = () => {
 
   // Fetch perspectives for current scenario
   const { data: perspectivesData, isLoading, error } = useQuery({
-    queryKey: ["/api/perspective-rankings", scenarioId, sortBy, currentResolution?.id],
+    queryKey: ["/api/perspectives", "rankings", scenarioId, sortBy, currentResolution?.id],
     queryFn: async () => {
       if (!scenarioId) return { perspectives: [], pagination: {}, ranking: {}, metadata: {} };
-      let url = `/api/perspective-rankings?scenarioId=${scenarioId}&rankBy=${sortBy}&limit=50`;
+      let url = `/api/perspectives?action=rankings&scenarioId=${scenarioId}&rankBy=${sortBy}&limit=50`;
       if (currentResolution?.id) {
         url += `&resolutionId=${currentResolution.id}`;
       }
@@ -185,7 +185,7 @@ const ScenarioView = () => {
             ? "Thank you for sharing your thoughtful perspective anonymously."
             : "Thank you for sharing your thoughtful perspective.",
         });
-        queryClient.invalidateQueries({ queryKey: ["/api/perspective-rankings", scenarioId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/perspectives", "rankings", scenarioId] });
       }
     },
     onError: (error: any) => {
