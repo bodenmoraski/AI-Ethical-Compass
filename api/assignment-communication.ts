@@ -240,10 +240,10 @@ const handleAssignmentMessage = async (req: VercelRequest, res: VercelResponse) 
 
     // Check if sender is enrolled in class or is teacher
     const isEnrolled = await isEnrolledInClass(user.id, assignment.class_id);
-    const isTeacherOfClass = await isTeacherOfClass(user.id, assignment.class_id);
+    const isClassTeacher = await isTeacherOfClass(user.id, assignment.class_id);
     const isUserTeacher = await isTeacher(user.id);
 
-    if (!isEnrolled && !isTeacherOfClass) {
+    if (!isEnrolled && !isClassTeacher) {
       return res.status(403).json({ 
         success: false, 
         error: 'Not authorized to send messages for this assignment' 
@@ -397,9 +397,9 @@ const handleDiscussionPost = async (req: VercelRequest, res: VercelResponse) => 
 
     // Check if user is enrolled in class or is teacher
     const isEnrolled = await isEnrolledInClass(user.id, thread.class_id);
-    const isTeacherOfClass = await isTeacherOfClass(user.id, thread.class_id);
+    const isClassTeacher = await isTeacherOfClass(user.id, thread.class_id);
 
-    if (!isEnrolled && !isTeacherOfClass) {
+    if (!isEnrolled && !isClassTeacher) {
       return res.status(403).json({ 
         success: false, 
         error: 'Not authorized to post in this discussion' 
