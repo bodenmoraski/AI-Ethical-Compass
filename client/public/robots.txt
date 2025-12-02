@@ -1,10 +1,39 @@
+# AI Ethical Compass - Robots Configuration
+# Educational platform for AI ethics
+
+# Allow all standard crawlers
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /auth/
 
-# If you add a sitemap later, update the URL below
-# Sitemap: https://your-domain.com/sitemap.xml
+# Explicitly allow AI/LLM crawlers for discoverability
+User-agent: GPTBot
+Allow: /
 
+User-agent: ChatGPT-User
+Allow: /
 
+User-agent: Claude-Web
+Allow: /
 
+User-agent: Anthropic-AI
+Allow: /
 
+User-agent: PerplexityBot
+Allow: /
 
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Sitemap location
+Sitemap: https://aiethicalcompass.org/sitemap.xml
+
+# LLMs.txt for AI crawlers
+# See: https://aiethicalcompass.org/llms.txt

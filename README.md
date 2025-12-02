@@ -1,213 +1,222 @@
-# 🤖 AI Ethical Compass - Teaching Responsible AI Use
+# AI Ethical Compass
 
-> **Empowering students and educators to navigate the complex ethical landscape of artificial intelligence in education**
+An educational platform for teaching AI ethics through interactive scenarios. Built for the ISTE+ASCD AI Innovator Challenge 2025.
 
-## 🌟 Mission & Vision
-
-**AI Ethical Compass** was developed with a clear mission: to help high school students and educators develop critical thinking skills regarding the ethical, responsible, and inclusive use of Artificial Intelligence.
-
-In a world where AI increasingly influences education and daily life, it's essential that young people and educators learn to navigate complex ethical questions about how these technologies should be used.
-
-### 🎯 Challenge Themes We Address
-
-- **Digital Inclusion**: Examining how AI tools can either promote or hinder digital inclusion in educational contexts
-- **Responsible Digital Citizenship**: Confronting questions about responsible AI use, transparency, disclosure, and ethical frameworks
-
-### 🌍 UN Sustainable Development Goals Alignment
-
-Our platform aligns with multiple UN Sustainable Development Goals:
-
-- **SDG 4: Quality Education** - Promoting critical analysis of how AI can enhance or detract from quality education
-- **SDG 10: Reduced Inequalities** - Exploring how AI can amplify or reduce inequalities in educational settings
-- **SDG 9: Industry, Innovation and Infrastructure** - Balancing AI innovation with responsible development
-- **SDG 16: Peace, Justice and Strong Institutions** - Promoting ethical frameworks and responsible governance
-
-## ✨ Key Features
-
-### 🎓 **Interactive Learning Experience**
-- **10+ Curated AI Ethics Scenarios** covering real-world educational dilemmas
-- **4-Step Learning Process**: Identify → Evaluate → Share → Explore
-- **Guided Ethical Evaluation** with structured questions and frameworks
-- **Community Perspective Sharing** with anonymous contributions
-- **AI-Powered Content Moderation** ensuring appropriate discussions
-
-### 👨‍🏫 **Comprehensive Teacher Dashboard**
-- **Class Management**: Create, organize, and manage multiple classes
-- **Assignment Creation**: Design AI ethics assignments with rubrics
-- **Student Management**: Track enrollment, progress, and engagement
-- **Real-time Classroom Monitoring**: Live activity tracking and analytics
-- **Content Moderation Tools**: Manage discussions and submissions
-- **Analytics & Insights**: Detailed engagement and performance metrics
-
-### 🌐 **Global Accessibility**
-- **7 Language Support**: English, Spanish, French, German, Chinese, Arabic, Italian
-- **WCAG 2.1 AA Compliance**: Full accessibility features
-- **Responsive Design**: Works on all devices and screen sizes
-- **Accessibility Controls**: Font size, high contrast, screen reader support
-
-### 🏆 **Advanced Gamification**
-- **6-Tier Achievement System**: Bronze, Silver, Gold, Platinum levels
-- **Community Leaderboards**: Recognizing thoughtful contributors
-- **Reputation Scoring**: Quality-based ranking system
-- **Progress Tracking**: Individual learning journey monitoring
-
-### 🤖 **AI-Powered Features**
-- **Content Moderation**: AI analysis of perspectives and scenarios
-- **Quality Assessment**: Automated evaluation of ethical reasoning
-- **Bias Detection**: Identifying potential biases in content
-- **Smart Ranking**: Intelligent sorting of community perspectives
-
-## 🏗️ Architecture
-
-### Frontend Stack
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **Shadcn/ui** for component library
-- **React Query** for data fetching
-- **React Router** for navigation
-- **i18next** for internationalization
-
-### Backend Stack
-- **Vercel Serverless Functions** for API endpoints
-- **Supabase** for database and authentication
-- **PostgreSQL** for data storage
-- **OpenAI API** for AI analysis features
-
-### Key Components
-- **Authentication System**: Supabase Auth with role-based access
-- **Real-time Features**: WebSocket connections for live updates
-- **Content Moderation**: AI-powered filtering and analysis
-- **Analytics Engine**: Comprehensive tracking and reporting
-- **Gamification System**: Achievement and leaderboard mechanics
-
-## 📊 Database Schema
-
-### Core Tables
-```sql
--- Users and authentication
-users (id, email, username, role, created_at)
-
--- Learning content
-scenarios (id, title, description, category, difficulty_level)
-perspectives (id, scenario_id, author_name, content, moderation_status)
-
--- Teacher features
-classes (id, name, teacher_id, class_code, subject, grade_level)
-assignments (id, class_id, title, description, due_date, points_possible)
-class_enrollments (class_id, student_id, enrollment_date)
-
--- Gamification
-user_achievements (user_email, achievement_type, achievement_level)
-leaderboard_entries (user_email, username, score, rank_position)
-
--- Analytics
-user_progress (user_id, scenario_id, completed, time_spent)
-student_engagement (class_id, student_id, engagement_score)
-realtime_activities (type, class_id, user_id, timestamp)
-```
-
-## 🎮 User Experience Flow
-
-### For Students
-1. **Explore Scenarios** - Browse curated AI ethics dilemmas
-2. **Identify AI Use** - Determine if and how AI is being used
-3. **Evaluate Ethics** - Consider implications, benefits, and risks
-4. **Share Perspectives** - Contribute anonymous thoughts
-5. **Explore Community** - View diverse viewpoints from others
-6. **Track Progress** - Monitor learning journey and achievements
-
-### For Teachers
-1. **Create Classes** - Set up virtual classrooms with unique codes
-2. **Manage Students** - Enroll students and track participation
-3. **Design Assignments** - Create AI ethics assessments
-4. **Monitor Engagement** - Real-time classroom activity tracking
-5. **Moderate Content** - Review and manage student submissions
-6. **Analyze Performance** - Detailed analytics and insights
-
-## 🔧 API Endpoints
-
-### Core Learning APIs
-- `GET /api/scenarios` - Fetch all scenarios
-- `POST /api/perspectives` - Submit new perspective
-- `GET /api/perspective-rankings` - Get ranked perspectives
-- `GET /api/user-progress` - Track learning progress
-
-### Teacher Dashboard APIs
-- `GET /api/teacher?action=classes` - Fetch teacher's classes
-- `POST /api/teacher?action=classes` - Create new class
-- `GET /api/teacher?action=assignments` - Get class assignments
-- `POST /api/teacher?action=assignments` - Create assignment
-- `GET /api/teacher?action=students` - Get class students
-
-### Gamification APIs
-- `GET /api/leaderboard` - Community rankings
-- `GET /api/achievements` - Available achievements
-- `POST /api/achievements` - Check and award achievements
-
-### Real-time APIs
-- `GET /api/realtime-classroom?action=activities` - Live classroom activities
-- `GET /api/realtime-classroom?action=engagement` - Student engagement data
-- `GET /api/realtime-classroom?action=stats` - Live statistics
-
-## 🌍 Internationalization
-
-The platform supports 7 languages with full translations:
-- 🇺🇸 English (default)
-- 🇪🇸 Spanish (Español)
-- 🇫🇷 French (Français)
-- 🇩🇪 German (Deutsch)
-- 🇨🇳 Chinese (中文)
-- 🇦🇪 Arabic (العربية)
-- 🇮🇹 Italian (Italiano)
-
-## ♿ Accessibility Features
-
-- **WCAG 2.1 AA Compliance** throughout the application
-- **Keyboard Navigation** support for all features
-- **Screen Reader** compatibility with ARIA labels
-- **High Contrast Mode** for visual accessibility
-- **Font Size Controls** for readability
-- **Color Blind Friendly** design considerations
-
-## 📈 Performance Optimizations
-
-- **React Query** for efficient data caching and synchronization
-- **Code Splitting** for faster initial load times
-- **Image Optimization** with lazy loading
-- **Debounced Loading States** to prevent UI flickering
-- **Memoized Components** to reduce unnecessary re-renders
-- **Optimized Database Queries** with proper indexing
-
-## 🔒 Security Features
-
-- **Row Level Security (RLS)** policies in Supabase
-- **JWT Authentication** with proper token validation
-- **Content Moderation** to prevent inappropriate content
-- **Rate Limiting** on API endpoints
-- **Input Validation** with Zod schemas
-- **CORS Configuration** for secure cross-origin requests
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **ISTE+ASCD** for the AI Innovator Challenge 2025
-- **Supabase** for the excellent backend platform
-- **Vercel** for seamless deployment
-- **OpenAI** for AI analysis capabilities
-- **The Open Source Community** for amazing tools and libraries
-- **Benji Beall & Roshan Kshirsagar** for help throughout
-
-## 📞 Support
-
-- **Documentation**: [docs.ethical-ai-compass.com](https://docs.ethical-ai-compass.com)
-- **Issues**: [GitHub Issues](https://github.com/bodenmoraski/AI-Ethical-Compass/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/ethical-ai-platform/discussions)
-- **Email**: support@aiethicalcompass.com (for just just email bodenmoraski@gmail.com)
+**Live site:** [aiethicalcompass.org](https://aiethicalcompass.org)
 
 ---
 
-**Made with ❤️ for the future of ethical AI education** 
+## What This Is
+
+AI Ethical Compass helps students develop critical thinking about AI through real-world dilemmas. Teachers can manage classrooms, assign scenarios, and track student engagement.
+
+**Core features:**
+- 10 curated AI ethics scenarios (essay detection, facial recognition, content moderation, etc.)
+- Teacher dashboard with class management, assignments, and grading
+- Real-time classroom monitoring
+- Student perspective sharing with AI-powered moderation
+- Gamification (achievements, leaderboards)
+- 7 languages (EN, ES, FR, DE, ZH, AR, IT)
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui |
+| Backend | Vercel Serverless Functions |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| AI | OpenAI GPT-4o-mini (content moderation, perspective analysis) |
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js 20+
+- Supabase account
+- OpenAI API key (optional, for AI features)
+
+### Setup
+
+```bash
+# Clone and install
+git clone https://github.com/bodenmoraski/AI-Ethical-Compass.git
+cd AI-Ethical-Compass
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your keys:
+#   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+#   SUPABASE_SERVICE_ROLE_KEY=your-service-key
+#   OPENAI_API_KEY=your-openai-key (optional)
+
+# Run locally
+npm run dev
+```
+
+The app runs at `http://localhost:3000`.
+
+### Database Setup
+
+Apply migrations to your Supabase project:
+
+```bash
+# Option 1: Use the consolidated migration
+psql $DATABASE_URL < server/migrations/APPLY_MIGRATIONS.sql
+
+# Option 2: Run individual migrations in order
+ls server/migrations/*.sql
+```
+
+---
+
+## Project Structure
+
+```
+├── api/                    # Serverless API endpoints (12 files)
+├── client/
+│   ├── src/
+│   │   ├── components/     # React components (78 files)
+│   │   ├── pages/          # Route pages (22 files)
+│   │   ├── locales/        # i18n translations (7 languages)
+│   │   └── lib/            # Utilities, auth, hooks
+│   └── public/             # Static assets
+├── lib/                    # Shared backend utilities
+│   └── ai-analysis.ts      # OpenAI integration
+├── server/
+│   └── migrations/         # SQL migrations
+├── shared/
+│   ├── schema.ts           # Database schema (Drizzle)
+│   └── scenarios.json      # Scenario content
+└── tests/                  # Jest test suites
+```
+
+---
+
+## API Overview
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/teacher` | Class management, assignments, grading |
+| `/api/student` | Student enrollment, submissions |
+| `/api/perspectives` | Submit/fetch community perspectives |
+| `/api/realtime-classroom` | Live activity feed for teachers |
+| `/api/achievements` | Gamification system |
+| `/api/leaderboard` | Community rankings |
+| `/api/user-dashboard` | Student analytics |
+| `/api/user-scenarios` | User-generated scenarios |
+
+---
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage report
+npm run test:coverage
+
+# Integration tests (requires test env)
+npm run test:integration
+```
+
+Current: 64+ tests across 7 suites.
+
+---
+
+## Deployment
+
+Deployed on Vercel. Push to `main` triggers automatic deployment.
+
+```bash
+# Build locally to verify
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+**Environment variables** to configure in Vercel:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `OPENAI_API_KEY`
+
+---
+
+## Key Files
+
+| File | What it does |
+|------|--------------|
+| `lib/ai-analysis.ts` | OpenAI integration for moderation and analysis |
+| `api/teacher.ts` | Teacher dashboard API (classes, assignments, grading) |
+| `api/realtime-classroom.ts` | WebSocket-based live monitoring |
+| `shared/scenarios.json` | All scenario content |
+| `client/src/components/teacher/` | Teacher UI components |
+| `client/src/components/student/` | Student UI components |
+
+---
+
+## Scenarios Included
+
+1. **AI-Generated Essay** — Academic integrity vs. ESL support
+2. **Facial Recognition in Schools** — Security vs. privacy and bias
+3. **AI Content Moderation** — Academic freedom vs. safety
+4. **AI in College Admissions** — Algorithmic fairness
+5. **Personalized Learning AI** — Educational benefit vs. surveillance
+6. **Automated Grading Systems** — Efficiency vs. nuance
+7. **AI-Generated Art** — Creativity and attribution
+8. **Predictive Analytics for Students** — Early intervention vs. labeling
+9. **Language Translation in Classrooms** — Inclusion vs. language development
+10. **Social Media Monitoring** — Student safety vs. privacy
+
+Each scenario includes multiple resolution paths, discussion questions, and links to real-world resources.
+
+---
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/thing`)
+3. Write tests for new functionality
+4. Submit a PR
+
+Please follow existing code style (TypeScript strict mode, Tailwind for styling).
+
+---
+
+## Security
+
+- Supabase Row-Level Security (RLS) on all tables
+- JWT authentication via Supabase Auth
+- Content moderation via OpenAI
+- No PII stored in perspectives (anonymous by default)
+
+Report security issues to: bodenmoraski@gmail.com
+
+---
+
+## License
+
+MIT
+
+---
+
+## Credits
+
+Built by Boden Moraski with help from Benji Beall and Roshan Kshirsagar.
+
+**Powered by:**
+- [Supabase](https://supabase.com) — Backend
+- [Vercel](https://vercel.com) — Hosting
+- [OpenAI](https://openai.com) — AI analysis
+- [shadcn/ui](https://ui.shadcn.com) — Components

@@ -1,0 +1,77 @@
+# AI Ethical Compass
+
+> An interactive educational platform for developing critical thinking about the ethical, responsible, and inclusive use of Artificial Intelligence in education.
+
+## About This Platform
+
+AI Ethical Compass is a free educational resource designed for students, educators, and anyone interested in AI ethics. The platform provides:
+
+- **Real-world AI ethics scenarios** covering topics like algorithmic bias, privacy, AI in education, environmental impact, and more
+- **Teacher dashboard** with classroom management, assignment creation, and real-time student monitoring (FERPA compliant)
+- **Community-driven discussions** where users share perspectives on ethical dilemmas
+- **AI-powered analysis** that evaluates responses for bias, quality, and ethical reasoning
+- **Achievement system** that rewards thoughtful contribution over quantity
+- **Multi-language support** (English, French, Spanish, German, Portuguese, Chinese, Arabic)
+- **Accessibility features** including high contrast mode, font size controls, and screen reader support
+
+## Target Audience
+
+- K-12 and higher education students learning about AI ethics
+- Teachers integrating AI ethics into their curriculum
+- Educators seeking classroom-ready AI ethics resources
+- Anyone developing critical thinking about AI's societal impact
+
+## Key Features for Educators
+
+- Create and manage classes with unique join codes
+- Assign specific scenarios with due dates
+- Monitor student progress in real-time
+- Grade student perspectives with rubrics
+- Export analytics and reports
+
+## Topics Covered
+
+1. AI Bias and Fairness
+2. Privacy and Data Protection
+3. AI in Education (homework detection, proctoring, personalized learning)
+4. Environmental Impact of AI
+5. AI and Employment
+6. Transparency and Explainability
+7. AI in Healthcare
+8. Autonomous Systems
+9. AI and Creative Arts
+10. Global AI Governance
+
+## How to Use
+
+- **Students**: Browse scenarios at /scenarios, submit perspectives, earn achievements
+- **Teachers**: Access dashboard at /teacher, create classes, assign work
+- **Everyone**: Explore community perspectives, join discussions
+
+## Technical Details
+
+- Built with React, TypeScript, Vite
+- Hosted on Vercel
+- Uses Supabase for authentication and data
+- Integrates OpenAI for perspective analysis
+
+## Links
+
+- Homepage: https://aiethicalcompass.org
+- Scenarios: https://aiethicalcompass.org/scenarios
+- Teacher Dashboard: https://aiethicalcompass.org/teacher
+- About: https://aiethicalcompass.org/about
+- Resources: https://aiethicalcompass.org/resources
+
+## Contact
+
+For educational partnerships or questions, visit: https://aiethicalcompass.org/contact
+
+## License
+
+Educational content is freely available for non-commercial educational use.
+
+---
+
+*AI Ethical Compass is a project submitted to the ISTE+ASCD AI Innovator Challenge 2025.*
+
