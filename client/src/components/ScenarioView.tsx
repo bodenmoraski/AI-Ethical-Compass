@@ -153,7 +153,9 @@ const ScenarioView = () => {
               scenarioId,
               selectedOption,
               ethicsRatings,
+              // Store both shapes so grading UI (perspectives[0]) and older readers work
               perspective: content,
+              perspectives: [content],
               completedAt: new Date().toISOString()
             }
           }),

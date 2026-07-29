@@ -10,6 +10,18 @@ interface AssignmentGradingViewProps {
   pointsPossible: number;
 }
 
+/** ScenarioView stores `perspective`; free-response assignments store `perspectives[0]`. */
+function getSubmissionPerspective(data: any): string {
+  if (!data) return '';
+  if (typeof data.perspective === 'string' && data.perspective.trim()) {
+    return data.perspective;
+  }
+  if (Array.isArray(data.perspectives) && data.perspectives[0]) {
+    return String(data.perspectives[0]);
+  }
+  return '';
+}
+
 export default function AssignmentGradingView({ assignmentId, pointsPossible }: AssignmentGradingViewProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -54,7 +66,9 @@ export default function AssignmentGradingView({ assignmentId, pointsPossible }: 
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="font-medium mb-2">Perspective/Response:</div>
               <div className="whitespace-pre-wrap text-gray-800">
-                {selectedSubmission.submission_data?.perspectives?.[0] || <span className="italic text-gray-400">No response</span>}
+                {getSubmissionPerspective(selectedSubmission.submission_data) || (
+                  <span className="italic text-gray-400">No response</span>
+                )}
               </div>
             </div>
           </CardContent>

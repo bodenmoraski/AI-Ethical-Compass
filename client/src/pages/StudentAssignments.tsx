@@ -55,7 +55,11 @@ export default function StudentAssignments() {
   const handleAssignmentSelect = (assignment: Assignment) => {
     // Scenario assignments are completed inside ScenarioView with ?assignment=
     if (assignment.assignment_type === 'scenario') {
-      const scenarioId = assignment.scenario_ids?.[0] || 1;
+      const scenarioId = assignment.scenario_ids?.[0];
+      if (!scenarioId) {
+        console.error('Scenario assignment missing scenario_ids', assignment.id);
+        return;
+      }
       navigate(`/scenarios/${scenarioId}?assignment=${assignment.id}`);
       return;
     }

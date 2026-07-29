@@ -231,8 +231,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             break;
         }
 
+        const p = perspective as any;
         return {
-          ...(perspective as object),
+          id: p.id,
+          scenarioId: p.scenario_id,
+          authorName: p.author_name,
+          content: p.content,
+          likes: p.likes || 0,
+          moderationStatus: p.moderation_status,
+          createdAt: p.created_at,
+          updatedAt: p.updated_at,
+          resolutionId: p.resolution_id ?? null,
           ranking_score: rankingScore,
           user_reputation: userReputation,
           quality_score: qualityScore,

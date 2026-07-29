@@ -85,8 +85,8 @@ const authenticateUser = async (req: VercelRequest) => {
       throw new Error('User profile not found');
     }
     
-    // Check if user has teacher role
-    if (userProfile.role !== 'teacher') {
+    // Teachers and admins can access teacher APIs
+    if (userProfile.role !== 'teacher' && userProfile.role !== 'admin') {
       throw new Error('Teacher access required');
     }
     
@@ -99,6 +99,14 @@ const authenticateUser = async (req: VercelRequest) => {
     }
     throw new Error('Authentication failed');
   }
+};
+
+/** Supabase `relation(count)` returns `[{ count: N }]`, not a row array. */
+const relationCount = (rel: unknown): number => {
+  if (!Array.isArray(rel) || rel.length === 0) return 0;
+  const first = rel[0] as { count?: number };
+  if (typeof first?.count === 'number') return first.count;
+  return rel.length;
 };
 
 // Generate unique class code
@@ -139,27 +147,38 @@ const handleTeacherClasses = async (req: VercelRequest, res: VercelResponse) => 
           throw error;
         }
 
-        // Calculate real completion rate
+        const studentCount = relationCount(classData.class_enrollments);
+        const assignmentCount = relationCount(classData.assignments);
+
+        // Count aggregates are `[{ count: N }]` — fetch real assignment IDs for completion %
         let completionRate = 0;
-        if (classData.assignments?.length > 0 && classData.class_enrollments?.length > 0) {
-          // Get actual submission data
-          const { data: submissions, error: submissionError } = await supabase
-            .from('assignment_submissions')
-            .select('id, assignment_id, student_id')
-            .in('assignment_id', classData.assignments.map((a: any) => a.id))
-            .in('status', ['submitted', 'graded', 'completed']);
-          
-          if (!submissionError && submissions) {
-            const totalExpectedSubmissions = classData.assignments.length * classData.class_enrollments.length;
-            const actualSubmissions = submissions.length;
-            completionRate = totalExpectedSubmissions > 0 ? Math.round((actualSubmissions / totalExpectedSubmissions) * 100) : 0;
+        if (assignmentCount > 0 && studentCount > 0) {
+          const { data: classAssignments } = await supabase
+            .from('assignments')
+            .select('id')
+            .eq('class_id', classId);
+
+          const assignmentIds = classAssignments?.map((a) => a.id) || [];
+          if (assignmentIds.length > 0) {
+            const { data: submissions, error: submissionError } = await supabase
+              .from('assignment_submissions')
+              .select('id, assignment_id, student_id')
+              .in('assignment_id', assignmentIds)
+              .in('status', ['submitted', 'graded', 'completed']);
+
+            if (!submissionError && submissions) {
+              const totalExpected = assignmentIds.length * studentCount;
+              completionRate = totalExpected > 0
+                ? Math.round((submissions.length / totalExpected) * 100)
+                : 0;
+            }
           }
         }
 
         const classWithCounts = {
           ...classData,
-          student_count: classData.class_enrollments?.length || 0,
-          assignment_count: classData.assignments?.length || 0,
+          student_count: studentCount,
+          assignment_count: assignmentCount,
           completion_rate: completionRate
         };
 
@@ -180,8 +199,8 @@ const handleTeacherClasses = async (req: VercelRequest, res: VercelResponse) => 
 
         const classesWithCounts = classes?.map(cls => ({
           ...cls,
-          student_count: cls.class_enrollments?.length || 0,
-          assignment_count: cls.assignments?.length || 0
+          student_count: relationCount(cls.class_enrollments),
+          assignment_count: relationCount(cls.assignments)
         })) || [];
 
         return res.json({ success: true, classes: classesWithCounts });
@@ -294,7 +313,7 @@ const handleAssignments = async (req: VercelRequest, res: VercelResponse) => {
 
       const assignmentsWithCounts = assignments?.map(assignment => ({
         ...assignment,
-        submission_count: assignment.assignment_submissions?.length || 0
+        submission_count: relationCount(assignment.assignment_submissions)
       })) || [];
 
       return res.json({ success: true, assignments: assignmentsWithCounts });
@@ -1191,9 +1210,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   } catch (error) {
     console.error('Teacher API error:', error);
-    return res.status(500).json({
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    const status =
+      message === 'Teacher access required' ? 403
+      : message === 'Authentication failed' || message === 'No authorization token provided' || message === 'Invalid or expired token'
+        ? 401
+        : 500;
+    return res.status(status).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
+      error: message
     });
   }
 } 

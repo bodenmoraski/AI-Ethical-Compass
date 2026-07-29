@@ -63,7 +63,7 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
       
       // Update cache to reflect the new like count
       queryClient.invalidateQueries({ 
-        queryKey: [`/api/scenarios/${scenarioId}/perspectives`] 
+        queryKey: ["/api/perspectives", "rankings", scenarioId]
       });
       
       toast({
@@ -171,12 +171,12 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-medium">
-                  {perspective.authorName?.[0] || "A"}
+                  {((perspective as any).authorName || (perspective as any).author_name)?.[0] || "A"}
                 </div>
                 <div>
-                  <p className="font-medium">{perspective.authorName || "Anonymous"}</p>
+                  <p className="font-medium">{(perspective as any).authorName || (perspective as any).author_name || "Anonymous"}</p>
                   <p className="text-xs text-neutral-500">
-                    {getRelativeTimeString(new Date(perspective.createdAt))}
+                    {getRelativeTimeString(new Date((perspective as any).createdAt || (perspective as any).created_at || Date.now()))}
                   </p>
                 </div>
               </div>

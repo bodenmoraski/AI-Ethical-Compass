@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { useAuth } from '../lib/auth';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../../lib/supabase-client';
 import { 
   MessageSquare, 
   Heart, 
@@ -102,7 +103,11 @@ export default function Dashboard() {
     
     try {
       setLoading(true);
-      const response = await fetch(`/api/user-dashboard?userId=${encodeURIComponent(user.email || user.id)}`);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      const response = await fetch('/api/user-dashboard', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       
       if (!response.ok) {
         throw new Error('Failed to fetch dashboard data');
@@ -121,7 +126,11 @@ export default function Dashboard() {
     if (!user) return;
     
     try {
-      const response = await fetch(`/api/user-dashboard?action=assignments&userEmail=${encodeURIComponent(user.email || user.id)}`);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      const response = await fetch('/api/user-dashboard?action=assignments', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       
       if (response.ok) {
         const data = await response.json();

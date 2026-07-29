@@ -39,16 +39,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let resolvedEmail = typeof userEmail === 'string' ? userEmail : undefined;
       let resolvedUserId = typeof userId === 'string' ? userId : undefined;
 
-      // Prefer JWT identity when query params are omitted (student assignment list)
-      if (!resolvedUserId && !resolvedEmail) {
-        const authHeader = req.headers.authorization;
-        if (authHeader?.startsWith('Bearer ')) {
-          const token = authHeader.substring(7);
-          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-          if (!authError && user?.email) {
-            resolvedEmail = user.email;
-          }
+      // Always resolve identity from JWT when present; reject cross-user query params
+      const authHeader = req.headers.authorization;
+      let authEmail: string | undefined;
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        if (!authError && user?.email) {
+          authEmail = user.email;
         }
+      }
+
+      if (authEmail) {
+        // Ignore spoofable query identity — use the authenticated email
+        resolvedEmail = authEmail;
+        resolvedUserId = undefined;
+      } else if (resolvedUserId || resolvedEmail) {
+        // Sensitive dashboard data requires auth
+        return res.status(401).json({ message: 'Authentication required' });
       }
       
       if (!resolvedUserId && !resolvedEmail) {
