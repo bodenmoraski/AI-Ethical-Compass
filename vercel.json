@@ -9,6 +9,11 @@
       "destination": "/index.html"
     }
   ],
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "shared/**"
+    }
+  },
   "buildCommand": "npm ci && npm run build",
   "devCommand": "vite --port $PORT",
   "outputDirectory": "dist/public",
