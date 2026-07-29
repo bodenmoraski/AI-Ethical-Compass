@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 export type ScenarioRecord = {
   id: number;
@@ -10,12 +9,10 @@ export type ScenarioRecord = {
 };
 
 function resolveScenariosPath(): string {
-  const here = path.dirname(fileURLToPath(import.meta.url));
+  // Vercel includes shared/** via vercel.json functions.includeFiles.
   const candidates = [
     path.join(process.cwd(), 'shared', 'scenarios.json'),
     path.join(process.cwd(), '..', 'shared', 'scenarios.json'),
-    path.join(here, '..', 'shared', 'scenarios.json'),
-    path.join(here, 'shared', 'scenarios.json'),
   ];
 
   for (const candidate of candidates) {
