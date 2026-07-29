@@ -31,10 +31,18 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
 
   const handleLike = async () => {
     if (loading.like || isLiked) return; // Prevent multiple likes
+    if (!userProfile?.email && !user?.email) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to like perspectives.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     // Optimistic update - update UI immediately
     setIsLiked(true);
@@ -42,12 +50,14 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     setLoading((prev) => ({ ...prev, like: true }));
     
     try {
+      // user_likes.user_id is TEXT — prefer email for dashboard join consistency
+      const likeUserKey = userProfile?.email || user?.email || String(userProfile?.id);
       await apiRequest(
         "POST",
-        `/api/perspectives/${perspective.id}/like`,
+        `/api/perspectives?action=like&id=${perspective.id}`,
         {
-          userId: userProfile?.id,
-          userEmail: userProfile?.email
+          userId: likeUserKey,
+          userEmail: userProfile?.email || user?.email
         }
       );
       
@@ -83,7 +93,7 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     try {
       const response = await apiRequest(
         "POST",
-        `/api/perspectives/${perspective.id}/replies`,
+        `/api/perspectives?action=replies&id=${perspective.id}`,
         {
           content: replyContent,
           authorName: userProfile?.username || "Anonymous"
@@ -124,7 +134,7 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     
     setLoading((prev) => ({ ...prev, loadingReplies: true }));
     try {
-      const response = await fetch(`/api/perspectives/${perspective.id}/replies`, {
+      const response = await fetch(`/api/perspectives?action=replies&id=${perspective.id}`, {
         credentials: "include"
       });
       
@@ -285,7 +295,7 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
                             onClick={async () => {
                               await apiRequest(
                                 "POST",
-                                `/api/perspectives/${reply.id}/like`
+                                `/api/perspectives?action=like&id=${reply.id}`
                               );
                               // Update local data
                               setReplies(replies.map(r => 

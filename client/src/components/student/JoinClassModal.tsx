@@ -28,9 +28,7 @@ export default function JoinClassModal({ onClose, onSuccess }: JoinClassModalPro
       setError('');
       const token = session?.access_token;
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/student?action=join-class`,
-        {
+      const response = await fetch('/api/student?action=join-class', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -39,8 +37,7 @@ export default function JoinClassModal({ onClose, onSuccess }: JoinClassModalPro
           body: JSON.stringify({
             class_code: classCode.trim().toUpperCase(),
           }),
-        }
-      );
+        });
 
       const data = await response.json();
 

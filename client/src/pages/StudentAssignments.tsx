@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -24,6 +25,7 @@ interface Assignment {
   description?: string;
   instructions?: string;
   assignment_type: 'scenario' | 'custom' | 'discussion';
+  scenario_ids?: number[] | null;
   due_date?: string;
   points_possible: number;
   is_published: boolean;
@@ -46,10 +48,17 @@ interface Assignment {
 export default function StudentAssignments() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleAssignmentSelect = (assignment: Assignment) => {
+    // Scenario assignments are completed inside ScenarioView with ?assignment=
+    if (assignment.assignment_type === 'scenario') {
+      const scenarioId = assignment.scenario_ids?.[0] || 1;
+      navigate(`/scenarios/${scenarioId}?assignment=${assignment.id}`);
+      return;
+    }
     setSelectedAssignment(assignment);
   };
 

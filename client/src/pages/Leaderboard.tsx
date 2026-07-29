@@ -4,6 +4,9 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Trophy, Medal, Award, Brain, Heart, Sparkles, Users, TrendingUp } from 'lucide-react';
+import { useAuth } from '../lib/auth';
+import { supabase } from '../../../lib/supabase-client';
+import { useToast } from '../hooks/use-toast';
 
 interface LeaderboardEntry {
   id: number;
@@ -42,6 +45,9 @@ export default function Leaderboard() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('all_time');
+  const { userProfile } = useAuth();
+  const { toast } = useToast();
+  const canRefresh = userProfile?.role === 'teacher' || userProfile?.role === 'admin';
 
   useEffect(() => {
     fetchLeaderboard();
@@ -76,9 +82,32 @@ export default function Leaderboard() {
 
   const recalculateLeaderboard = async () => {
     try {
-      const response = await fetch('/api/leaderboard', { method: 'POST' });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast({
+          title: 'Sign in required',
+          description: 'Teachers must be signed in to refresh rankings.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const response = await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
       if (response.ok) {
+        toast({ title: 'Rankings refreshed' });
         fetchLeaderboard();
+      } else {
+        const err = await response.json().catch(() => ({}));
+        toast({
+          title: 'Could not refresh rankings',
+          description: err.error || 'Only teachers can refresh the leaderboard.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       console.error('Error recalculating leaderboard:', error);
@@ -133,13 +162,15 @@ export default function Leaderboard() {
                 </Button>
               </div>
               
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={recalculateLeaderboard}
-              >
-                Refresh Rankings
-              </Button>
+              {canRefresh && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={recalculateLeaderboard}
+                >
+                  Refresh Rankings
+                </Button>
+              )}
             </div>
 
             {loading ? (

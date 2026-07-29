@@ -1,5 +1,6 @@
 import { type Scenario, type Perspective } from "@shared/schema";
 import { apiRequest } from "./queryClient";
+import { supabase } from "../../../lib/supabase-client";
 
 export async function submitPerspective(scenarioId: number, content: string, authorName: string = "Anonymous User", userId?: string, userEmail?: string, resolutionId?: string | null, parentId?: number): Promise<Perspective> {
   const response = await apiRequest(
@@ -18,14 +19,35 @@ export async function submitPerspective(scenarioId: number, content: string, aut
   return await response.json();
 }
 
-export async function updateProgress(scenarioId: number, completed: boolean = true): Promise<void> {
+export async function updateProgress(scenarioId: number, completed: boolean = true, userId?: number | string): Promise<void> {
   try {
+    let resolvedUserId = userId;
+
+    if (resolvedUserId == null) {
+      const { data: { session } } = await supabase.auth.getSession();
+      const email = session?.user?.email;
+      if (!email) {
+        console.warn('Skipping progress update: no signed-in user');
+        return;
+      }
+
+      // Resolve integer users.id expected by user_progress
+      const profileRes = await fetch(`/api/user-profile?email=${encodeURIComponent(email)}`);
+      if (!profileRes.ok) {
+        console.warn('Skipping progress update: user profile not found');
+        return;
+      }
+      const profile = await profileRes.json();
+      resolvedUserId = profile.id;
+    }
+
     const response = await fetch('/api/user-progress', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        userId: resolvedUserId,
         scenarioId,
         completed,
       }),

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 // Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -57,12 +57,16 @@ const authenticateUser = async (req: VercelRequest) => {
   return user;
 };
 
-// Helper function to check if user is teacher
-const isTeacher = async (userId: string) => {
+// Helper function to check if user is teacher (look up by email — users.id is integer, auth id is UUID)
+const isTeacher = async (authUser: { id: string; email?: string | null }) => {
+  if (!authUser.email) {
+    return false;
+  }
+
   const { data: user, error } = await supabase
     .from('users')
-    .select('role')
-    .eq('id', userId)
+    .select('id, role')
+    .eq('email', authUser.email)
     .single();
 
   if (error || !user) {
@@ -70,6 +74,25 @@ const isTeacher = async (userId: string) => {
   }
 
   return user.role === 'teacher' || user.role === 'admin';
+};
+
+// Resolve app user row from auth user
+const getAppUser = async (authUser: { id: string; email?: string | null }) => {
+  if (!authUser.email) {
+    return null;
+  }
+
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id, role, email')
+    .eq('email', authUser.email)
+    .single();
+
+  if (error || !user) {
+    return null;
+  }
+
+  return user;
 };
 
 // Helper function to check if user is enrolled in class
@@ -103,7 +126,7 @@ const isTeacherOfClass = async (userId: string, classId: number) => {
 const handleEnhancedFeedback = async (req: VercelRequest, res: VercelResponse) => {
   try {
     const user = await authenticateUser(req);
-    const isUserTeacher = await isTeacher(user.id);
+    const isUserTeacher = await isTeacher(user);
 
     if (!isUserTeacher) {
       return res.status(403).json({ 
@@ -241,7 +264,7 @@ const handleAssignmentMessage = async (req: VercelRequest, res: VercelResponse) 
     // Check if sender is enrolled in class or is teacher
     const isEnrolled = await isEnrolledInClass(user.id, assignment.class_id);
     const isClassTeacher = await isTeacherOfClass(user.id, assignment.class_id);
-    const isUserTeacher = await isTeacher(user.id);
+    const isUserTeacher = await isTeacher(user);
 
     if (!isEnrolled && !isClassTeacher) {
       return res.status(403).json({ 
@@ -513,7 +536,7 @@ const handleGetClarifications = async (req: VercelRequest, res: VercelResponse) 
   try {
     const user = await authenticateUser(req);
     const { assignmentId, status = 'all' } = req.query;
-    const isUserTeacher = await isTeacher(user.id);
+    const isUserTeacher = await isTeacher(user);
 
     let query = supabase
       .from('assignment_clarifications')

@@ -36,14 +36,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     try {
       const { userId, userEmail, action } = req.query;
+      let resolvedEmail = typeof userEmail === 'string' ? userEmail : undefined;
+      let resolvedUserId = typeof userId === 'string' ? userId : undefined;
+
+      // Prefer JWT identity when query params are omitted (student assignment list)
+      if (!resolvedUserId && !resolvedEmail) {
+        const authHeader = req.headers.authorization;
+        if (authHeader?.startsWith('Bearer ')) {
+          const token = authHeader.substring(7);
+          const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+          if (!authError && user?.email) {
+            resolvedEmail = user.email;
+          }
+        }
+      }
       
-      if (!userId && !userEmail) {
+      if (!resolvedUserId && !resolvedEmail) {
         return res.status(400).json({ 
           message: 'User ID or email is required' 
         });
       }
 
-      const effectiveUserId = userId || userEmail || 'anonymous_user';
+      const effectiveUserId = resolvedUserId || resolvedEmail || 'anonymous_user';
       console.log(`Getting dashboard data for user: ${effectiveUserId}`);
       
       // Handle assignment-specific actions
@@ -78,8 +92,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               subject
             )
           `)
-          // Skip is_published filter if column doesn't exist
-          // .eq('is_published', true)
+          // Only show published assignments to students
+          .eq('is_published', true)
           .in('class_id', classIds);
 
         if (allAssignmentsError) {
@@ -165,7 +179,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       // Get user's liked perspectives
-      const { data: likedPerspectives, error: likedError } = await supabase
+      const { data: likedRows, error: likedError } = await supabase
         .from('user_likes')
         .select(`
           perspective_id,
@@ -188,24 +202,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (likedError) {
         console.error('Error fetching user likes:', likedError);
       }
-      
-      // Get user's scenario progress
-      const { data: scenarioProgress, error: progressError } = await supabase
-        .from('user_scenario_progress')
-        .select(`
-          scenario_id,
-          completed_at,
-          perspectives_submitted,
-          scenarios (
-            id,
-            title
-          )
-        `)
-        .eq('user_id', effectiveUserId)
-        .order('completed_at', { ascending: false });
-      
-      if (progressError) {
-        console.error('Error fetching scenario progress:', progressError);
+
+      // Flatten nested join so the dashboard UI can read perspective fields directly
+      const likedPerspectives = (likedRows || []).map((row: any) => {
+        const perspective = row.perspectives || {};
+        return {
+          id: perspective.id || row.perspective_id,
+          content: perspective.content || '',
+          scenario_id: perspective.scenario_id,
+          author_name: perspective.author_name || 'Anonymous',
+          likes: perspective.likes || 0,
+          created_at: row.created_at,
+          scenarios: perspective.scenarios,
+        };
+      });
+
+      // Resolve numeric users.id for user_progress (integer FK)
+      let numericUserId: number | null = null;
+      try {
+        if (typeof effectiveUserId === 'string' && effectiveUserId.includes('@')) {
+          numericUserId = await getUserIdFromEmail(effectiveUserId);
+        } else if (!Number.isNaN(Number(effectiveUserId))) {
+          numericUserId = Number(effectiveUserId);
+        }
+      } catch (e) {
+        console.warn('Could not resolve numeric user id for progress:', e);
+      }
+
+      let scenarioProgress: any[] = [];
+      if (numericUserId != null) {
+        const { data: progressRows, error: progressError } = await supabase
+          .from('user_progress')
+          .select(`
+            scenario_id,
+            completed,
+            completed_at,
+            scenarios (
+              id,
+              title
+            )
+          `)
+          .eq('user_id', numericUserId)
+          .eq('completed', true)
+          .order('completed_at', { ascending: false });
+
+        if (progressError) {
+          console.error('Error fetching scenario progress:', progressError);
+        } else {
+          scenarioProgress = (progressRows || []).map((row: any) => ({
+            scenario_id: row.scenario_id,
+            completed_at: row.completed_at,
+            perspectives_submitted: row.completed ? 1 : 0,
+            scenarios: row.scenarios,
+          }));
+        }
       }
       
       // Calculate statistics

@@ -34,7 +34,7 @@ const ScenarioView = () => {
   const params = useParams();
   const navigate = useNavigate();
   const scenarioId = params.id ? parseInt(params.id) : null;
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, session } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -44,7 +44,7 @@ const ScenarioView = () => {
   const [ethicsRatings, setEthicsRatings] = useState<Record<string, number>>({});
   const [perspective, setPerspective] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sortBy, setSortBy] = useState('quality');
+  const [sortBy, setSortBy] = useState('highest_quality');
   const [assignmentMode, setAssignmentMode] = useState(false);
   const [assignmentId, setAssignmentId] = useState<number | null>(null);
   const [showScenarioReference, setShowScenarioReference] = useState(false);
@@ -137,11 +137,15 @@ const ScenarioView = () => {
       
       // If this is part of an assignment, submit to assignment system
       if (assignmentMode && assignmentId) {
+        if (!session?.access_token) {
+          throw new Error('You must be signed in to submit an assignment');
+        }
+
         const response = await fetch('/api/user-dashboard?action=submit-assignment', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user?.email}`,
+            'Authorization': `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
             assignmentId,
@@ -163,7 +167,8 @@ const ScenarioView = () => {
           scenarioId,
           content,
           submitAnonymously ? 'Anonymous User' : (userProfile?.username || user?.email?.split('@')[0] || 'Anonymous User'),
-          submitAnonymously ? undefined : user?.id,
+          // perspectives.user_id is TEXT — store email for dashboard matching
+          submitAnonymously ? undefined : (user?.email || user?.id),
           submitAnonymously ? undefined : user?.email,
           currentResolution?.id || null
         );
@@ -177,6 +182,11 @@ const ScenarioView = () => {
         });
         navigate('/assignments');
       } else {
+        // Record scenario completion for signed-in users
+        if (user && !submitAnonymously && userProfile?.id) {
+          await updateProgress(scenarioId!, true, userProfile.id);
+        }
+
         setPerspective('');
         setCurrentStep(5);
         toast({
@@ -853,9 +863,9 @@ const ScenarioView = () => {
                 <span className="text-sm font-medium text-neutral-700">Sort by:</span>
                 <div className="flex gap-2">
                   {[
-                    { value: 'quality', label: 'Quality Score' },
-                    { value: 'recent', label: 'Most Recent' },
-                    { value: 'likes', label: 'Most Liked' }
+                    { value: 'highest_quality', label: 'Quality Score' },
+                    { value: 'most_recent', label: 'Most Recent' },
+                    { value: 'most_liked', label: 'Most Liked' }
                   ].map(option => (
                     <Button
                       key={option.value}

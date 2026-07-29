@@ -35,7 +35,3 @@ const getSupabaseClient = (): SupabaseClient => {
 export const supabase = getSupabaseClient();
 
 export default supabase;
-
-if (!supabase) {
-  console.warn('Supabase client not available');
-} 

@@ -147,7 +147,7 @@ const handleTeacherClasses = async (req: VercelRequest, res: VercelResponse) => 
             .from('assignment_submissions')
             .select('id, assignment_id, student_id')
             .in('assignment_id', classData.assignments.map((a: any) => a.id))
-            .eq('status', 'completed');
+            .in('status', ['submitted', 'graded', 'completed']);
           
           if (!submissionError && submissions) {
             const totalExpectedSubmissions = classData.assignments.length * classData.class_enrollments.length;
@@ -269,7 +269,7 @@ const handleAssignments = async (req: VercelRequest, res: VercelResponse) => {
 
   switch (req.method) {
     case 'GET': {
-      const { classId } = req.query;
+      const { classId, assignmentId } = req.query;
 
       let query = supabase
         .from('assignments')
@@ -282,6 +282,10 @@ const handleAssignments = async (req: VercelRequest, res: VercelResponse) => {
 
       if (classId) {
         query = query.eq('class_id', classId);
+      }
+
+      if (assignmentId) {
+        query = query.eq('id', assignmentId);
       }
 
       const { data: assignments, error } = await query.order('created_at', { ascending: false });
@@ -578,15 +582,27 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
   switch (req.method) {
     case 'POST': {
       try {
-        const validatedData = TeacherAccessSchema.parse(req.body);
-        const { userEmail } = req.body;
-
-        if (!userEmail) {
-          return res.status(400).json({
+        // Require a real JWT so callers cannot submit requests for arbitrary emails
+        const authHeader = req.headers.authorization;
+        if (!authHeader?.startsWith('Bearer ')) {
+          return res.status(401).json({
             success: false,
-            error: 'User email required'
+            error: 'Unauthorized'
           });
         }
+
+        const token = authHeader.substring(7);
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !authUser?.email) {
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid or expired token'
+          });
+        }
+
+        const validatedData = TeacherAccessSchema.parse(req.body);
+        const userEmail = authUser.email;
 
         // Find user by email
         const { data: user, error: userError } = await supabase

@@ -51,16 +51,16 @@ const getBaseUrl = (): string => {
 
   // In production, use the Vercel URL or auto-detect
   if (typeof window !== 'undefined') {
-    // Check if we're on localhost (development)
+    // Local development: keep redirects on the current origin so OAuth/email
+    // callbacks land back on the running Vite app (not production).
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      // Use production URL for email redirects even during development
-      return 'https://ai-ethical-compass-build.vercel.app';
+      return window.location.origin;
     }
     // Use the current origin if we're already on production
     return window.location.origin;
   }
   // Fallback for SSR or when window is not available
-  return 'https://ai-ethical-compass-build.vercel.app';
+  return 'https://aiethicalcompass.org';
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -160,7 +160,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const response = await apiRequest('POST', '/api/user-profile', {
         email: user.email,
         username,
-        institution,
+        institutionName: institution,
       });
 
       const profile = await response.json();

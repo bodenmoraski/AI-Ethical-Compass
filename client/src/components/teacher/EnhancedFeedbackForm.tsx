@@ -17,6 +17,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { toast } from '../hooks/use-toast';
+import { supabase } from '../../../../lib/supabase-client';
 
 interface RubricCriteria {
   id: string;
@@ -121,11 +122,16 @@ export const EnhancedFeedbackForm: React.FC<EnhancedFeedbackFormProps> = ({
     setIsSubmitting(true);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('You must be signed in to submit feedback');
+      }
+
       const response = await fetch('/api/assignment-communication?action=enhanced-feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('supabase.auth.token')}`
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({
           submissionId,

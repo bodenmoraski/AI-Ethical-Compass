@@ -24,6 +24,9 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../../lib/supabase-client';
 import StudentEnrollmentModal from './StudentEnrollmentModal';
+import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
+import { useToast } from '../../hooks/use-toast';
 
 interface ClassDetailViewProps {
   classId: string;
@@ -89,7 +92,16 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
   const [enrollmentModalOpen, setEnrollmentModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    description: '',
+    subject: '',
+    grade_level: '',
+  });
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function getToken() {
@@ -182,7 +194,27 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
         }
         
         const result = await response.json();
-        return result.success ? result : { data: [], total: 0 };
+        if (!result.success) {
+          return { data: [], total: 0 };
+        }
+
+        // API returns enrollments with nested users — normalize for the UI
+        const normalized = (result.students || []).map((enrollment: any) => {
+          const user = enrollment.users || {};
+          const nameParts = (user.name || user.username || '').split(' ').filter(Boolean);
+          return {
+            id: user.id || enrollment.student_id,
+            first_name: user.first_name || nameParts[0] || 'Student',
+            last_name: user.last_name || nameParts.slice(1).join(' ') || '',
+            email: user.email || '',
+            enrollment_date: enrollment.enrolled_at || enrollment.created_at || '',
+            status: enrollment.status || 'active',
+            completion_rate: enrollment.completion_rate || 0,
+            last_activity: enrollment.last_activity || enrollment.updated_at || '',
+          };
+        });
+
+        return { data: normalized, total: normalized.length };
       } catch (error) {
         console.error('Error fetching students:', error);
         return { data: [], total: 0 }; // Return empty data instead of throwing
@@ -236,7 +268,8 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
       }
       
       try {
-        const response = await fetch(`/api/teacher-analytics?endpoint=analytics&classId=${classId}&type=summary`, {
+        // Use class detail payload (includes completion_rate) — dedicated analytics endpoint does not exist
+        const response = await fetch(`/api/teacher?action=classes&classId=${classId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
@@ -248,11 +281,15 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
         }
         
         const result = await response.json();
-        return result.success ? result : { 
-          data: { 
-            engagement_trends: [], 
-            completion_rates: { total: 0, by_assignment: [] } 
-          } 
+        const classInfo = result.data || result.class || {};
+        return {
+          data: {
+            engagement_trends: [],
+            completion_rates: {
+              total: classInfo.completion_rate ?? 0,
+              by_assignment: [],
+            },
+          },
         };
       } catch (error) {
         console.error('Error fetching analytics:', error);
@@ -292,7 +329,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
     if (classData) {
       // Refetch students and class data
       queryClient.invalidateQueries({ queryKey: ['class', classId, accessToken] });
-      queryClient.invalidateQueries({ queryKey: ['students', classId, accessToken] });
+      queryClient.invalidateQueries({ queryKey: ['class-students', classId, accessToken] });
     }
   };
 
@@ -326,6 +363,51 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
 
   if (!classData) return null;
 
+  const openEditModal = () => {
+    setEditForm({
+      name: classData.name || '',
+      description: classData.description || '',
+      subject: classData.subject || '',
+      grade_level: classData.grade_level || '',
+    });
+    setEditModalOpen(true);
+  };
+
+  const saveClassEdits = async () => {
+    if (!accessToken || !editForm.name.trim()) return;
+    setEditSaving(true);
+    try {
+      const response = await fetch(`/api/teacher?action=classes&classId=${classId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          description: editForm.description.trim() || undefined,
+          subject: editForm.subject.trim() || classData.subject,
+          grade_level: editForm.grade_level.trim() || classData.grade_level,
+        }),
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to update class');
+      }
+      toast({ title: 'Class updated' });
+      setEditModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['class', classId, accessToken] });
+    } catch (error) {
+      toast({
+        title: 'Could not update class',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Class Header */}
@@ -339,11 +421,65 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
             <span>{classData.subject} • Grade {classData.grade_level}</span>
           </div>
         </div>
-        <Button variant="outline">
+        <Button variant="outline" onClick={openEditModal}>
           <Edit className="h-4 w-4 mr-2" />
           Edit Class
         </Button>
       </div>
+
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Class</DialogTitle>
+            <DialogDescription>Update basic class details. Class code cannot be changed here.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-class-name">Name</Label>
+              <Input
+                id="edit-class-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-class-description">Description</Label>
+              <Textarea
+                id="edit-class-description"
+                value={editForm.description}
+                onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-class-subject">Subject</Label>
+                <Input
+                  id="edit-class-subject"
+                  value={editForm.subject}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, subject: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-class-grade">Grade level</Label>
+                <Input
+                  id="edit-class-grade"
+                  value={editForm.grade_level}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, grade_level: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditModalOpen(false)} disabled={editSaving}>
+                Cancel
+              </Button>
+              <Button onClick={saveClassEdits} disabled={editSaving || !editForm.name.trim()}>
+                {editSaving ? 'Saving...' : 'Save changes'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

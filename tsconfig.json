@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "downlevelIteration": true,
     "baseUrl": ".",
     "types": ["node", "vite/client", "@testing-library/jest-dom"],

@@ -104,7 +104,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(404).json({ message: 'User not found' });
       }
       
-      res.status(200).json(user);
+      // Return camelCase to match client Auth UserProfile expectations
+      res.status(200).json({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        institutionName: user.institution_name,
+        institutionType: user.institution_type,
+        role: user.role,
+        created_at: user.created_at,
+      });
       
     } catch (error) {
       console.error('API error:', error);

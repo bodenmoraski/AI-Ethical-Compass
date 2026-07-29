@@ -36,51 +36,95 @@ const AuthCallback = () => {
           console.log('User authenticated:', user.email);
           console.log('User metadata:', user.user_metadata);
 
-          // Check if this user has profile data in metadata (from signup)
-          const metadata = user.user_metadata;
-          if (metadata?.username) {
-            setStatus('Creating your profile...');
-            
-            try {
-              // Create user profile from signup metadata
-              const response = await apiRequest('POST', '/api/user-profile', {
-                email: user.email,
-                username: metadata.username,
-                institutionName: metadata.institution_name || null,
-                institutionType: metadata.institution_type || null,
-              });
+          const metadata = user.user_metadata || {};
+          const email = user.email;
 
-              if (response.ok) {
-                console.log('User profile created successfully');
-                toast({
-                  title: "Welcome!",
-                  description: `Your account has been created successfully, ${metadata.username}!`,
-                });
-              } else {
-                const errorData = await response.json();
-                console.error('Profile creation failed:', errorData);
-                
-                // If username is taken, we still let them in but they'll need to update it
-                if (errorData.message?.includes('already taken')) {
-                  toast({
-                    title: "Username Issue",
-                    description: "Your chosen username was taken. You can update it in your profile settings.",
-                    variant: "destructive",
+          // Prefer explicit signup username; otherwise derive one for OAuth users
+          const derivedUsername = (
+            metadata.username ||
+            metadata.preferred_username ||
+            metadata.full_name ||
+            metadata.name ||
+            email?.split('@')[0] ||
+            ''
+          )
+            .toString()
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, '_')
+            .replace(/_+/g, '_')
+            .replace(/^_|_$/g, '')
+            .slice(0, 30);
+
+          if (email && derivedUsername.length >= 3) {
+            setStatus('Setting up your profile...');
+
+            try {
+              // Skip create if profile already exists
+              let profileExists = false;
+              try {
+                const existing = await fetch(
+                  `/api/user-profile?email=${encodeURIComponent(email)}`,
+                  { credentials: 'include' }
+                );
+                profileExists = existing.ok;
+              } catch {
+                profileExists = false;
+              }
+
+              if (!profileExists) {
+                try {
+                  await apiRequest('POST', '/api/user-profile', {
+                    email,
+                    username: derivedUsername,
+                    institutionName: metadata.institution_name || null,
+                    institutionType: metadata.institution_type || null,
                   });
-                } else {
                   toast({
-                    title: "Profile Setup Issue",
-                    description: "There was an issue setting up your profile. You can complete it later.",
-                    variant: "destructive",
+                    title: 'Welcome!',
+                    description: `Your account is ready, ${derivedUsername}!`,
                   });
+                } catch (createErr: any) {
+                  console.error('Profile creation failed:', createErr);
+                  const message = createErr?.message || createErr?.data?.message || '';
+
+                  if (message.includes('already taken')) {
+                    // Retry with a short unique suffix so OAuth users aren't stuck
+                    const fallback = `${derivedUsername.slice(0, 24)}_${Math.random()
+                      .toString(36)
+                      .slice(2, 6)}`;
+                    try {
+                      await apiRequest('POST', '/api/user-profile', {
+                        email,
+                        username: fallback,
+                        institutionName: metadata.institution_name || null,
+                        institutionType: metadata.institution_type || null,
+                      });
+                      toast({
+                        title: 'Welcome!',
+                        description: `Your account is ready, ${fallback}!`,
+                      });
+                    } catch {
+                      toast({
+                        title: 'Profile Setup Needed',
+                        description: 'Please choose a username to finish setup.',
+                        variant: 'destructive',
+                      });
+                    }
+                  } else {
+                    toast({
+                      title: 'Profile Setup Needed',
+                      description: 'Please finish setting up your profile.',
+                      variant: 'destructive',
+                    });
+                  }
                 }
               }
             } catch (profileError) {
               console.error('Profile creation error:', profileError);
               toast({
-                title: "Profile Setup Issue",
-                description: "There was an issue setting up your profile. You can complete it later.",
-                variant: "destructive",
+                title: 'Profile Setup Needed',
+                description: 'Please finish setting up your profile.',
+                variant: 'destructive',
               });
             }
           }

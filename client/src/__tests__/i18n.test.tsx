@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -153,6 +156,8 @@ describe('RTL (Right-to-Left) Support', () => {
 
 describe('Component Integration', () => {
   it('should render translated content in components', async () => {
+    await i18n.changeLanguage('en');
+
     const { rerender } = render(
       <I18nextProvider i18n={i18n}>
         <TestComponent />

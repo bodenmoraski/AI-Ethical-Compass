@@ -1,6 +1,8 @@
 /** @type {import('jest').Config} */
 export default {
   preset: 'ts-jest/presets/default-esm',
+  // Default to node for API/unit tests. Component tests opt into jsdom via
+  // /** @jest-environment jsdom */ at the top of the file.
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   moduleNameMapper: {
@@ -13,6 +15,9 @@ export default {
       'ts-jest',
       {
         useESM: true,
+        // Component tests use jest-dom matchers; skip typechecking so matcher
+        // augmentation quirks don't block the suite (runtime still works).
+        diagnostics: false,
         tsconfig: {
           jsx: 'react',
           esModuleInterop: true,

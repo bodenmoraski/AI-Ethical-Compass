@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient, type Perspective } from '../lib/supabase-server.js';
 import { analyzePerspective, moderatePerspective } from '../lib/ai-analysis.js';
-import fs from 'fs';
-import path from 'path';
+import { getScenarioById } from '../lib/scenarios-data.js';
 
 // ============================================
 // RANKING HELPER FUNCTIONS (merged from perspective-rankings.ts)
@@ -291,11 +290,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Parse URL to determine sub-route
+  // Parse URL / query to determine sub-route.
+  // Prefer ?action=like|replies&id=... because Vercel only mounts api/perspectives.ts at /api/perspectives
   const url = req.url || '';
-  const pathParts = url.split('/').filter(part => part && part !== 'api' && part !== 'perspectives');
+  let pathParts = url.split('/').filter(part => part && part !== 'api' && part !== 'perspectives' && !part.includes('?'));
+
+  if ((action === 'like' || action === 'replies') && req.query.id) {
+    pathParts = [String(req.query.id), String(action)];
+  }
   
-  // Handle like functionality: /api/perspectives/[id]/like
+  // Handle like functionality: /api/perspectives/[id]/like or ?action=like&id=
   if (pathParts.length === 2 && pathParts[1] === 'like' && req.method === 'POST') {
     const perspectiveId = pathParts[0];
     const { userId, userEmail } = req.body;
@@ -387,7 +391,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Handle replies functionality: /api/perspectives/[id]/replies
+  // Handle replies functionality: /api/perspectives/[id]/replies or ?action=replies&id=
   if (pathParts.length === 2 && pathParts[1] === 'replies') {
     const perspectiveId = pathParts[0];
     
@@ -660,23 +664,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       // Verify scenario exists and get title/description for moderation
-      // Since scenarios are stored in static JSON, load them from the file
-      let scenarioCheck;
-      try {
-        const scenariosPath = path.join(process.cwd(), 'shared', 'scenarios.json');
-        const scenariosData = JSON.parse(fs.readFileSync(scenariosPath, 'utf8'));
-        scenarioCheck = scenariosData.find((s: any) => s.id === parseInt(scenarioId));
+      // Scenarios are bundled from shared/scenarios.json (fs paths break on Vercel)
+      const scenarioCheck = getScenarioById(parseInt(scenarioId));
         
-        if (!scenarioCheck) {
-          console.error(`Scenario ${scenarioId} not found in scenarios.json`);
-          return res.status(400).json({ 
-            message: `Scenario with ID ${scenarioId} does not exist` 
-          });
-        }
-      } catch (fileError) {
-        console.error('Error reading scenarios.json:', fileError);
-        return res.status(500).json({ 
-          message: 'Error loading scenarios data' 
+      if (!scenarioCheck) {
+        console.error(`Scenario ${scenarioId} not found in scenarios.json`);
+        return res.status(400).json({ 
+          message: `Scenario with ID ${scenarioId} does not exist` 
         });
       }
       

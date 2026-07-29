@@ -243,10 +243,11 @@ export default function TeacherDashboard() {
       }
 
       const newClass = await response.json();
+      const createdClass = newClass.class || newClass;
       
       toast({
         title: "Class Created Successfully!",
-        description: `"${classFormData.name}" has been created with code: ${newClass.class_code}`,
+        description: `"${classFormData.name}" has been created with code: ${createdClass.class_code}`,
       });
 
       // Reset form and close modal

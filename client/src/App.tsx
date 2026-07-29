@@ -30,6 +30,7 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import StudentAssignments from "@/pages/StudentAssignments";
 import AssignmentGrading from "@/pages/AssignmentGrading";
 import JoinClass from "@/pages/JoinClass";
+import UserProfileSetup from "@/components/UserProfileSetup";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +43,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const { user, needsProfileSetup, loading, createUserProfile } = useAuth();
+  const { user, needsProfileSetup, loading } = useAuth();
 
   const handleFontSizeChange = (size: number) => {
     document.documentElement.style.setProperty('--font-size', `${size}px`);
@@ -54,12 +55,6 @@ function AppContent() {
 
   const handleScreenReaderToggle = (enabled: boolean) => {
     document.documentElement.setAttribute('aria-live', enabled ? 'polite' : 'off');
-  };
-
-  const handleProfileComplete = async (profileData: any) => {
-    // Profile is created through the UserProfileSetup component
-    // The auth context will automatically update
-    console.log('Profile setup complete:', profileData);
   };
 
   // Show loading screen while checking auth state
@@ -78,6 +73,7 @@ function AppContent() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Layout>
+        <UserProfileSetup open={!!user && needsProfileSetup} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -92,7 +88,7 @@ function AppContent() {
           <Route path="/teacher" element={<TeacherDashboard />} />
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher/class/:classId" element={<ClassDetailPage />} />
-          <Route path="/teacher/classroom/:classId" element={<LiveClassroomMonitor classId={1} userId={1} />} />
+          <Route path="/teacher/classroom/:classId" element={<LiveClassroomPage />} />
           <Route path="/tutorial/user" element={<UserTutorial />} />
           <Route path="/tutorial/teacher" element={<TeacherTutorial />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -118,6 +114,23 @@ function AppContent() {
 function ClassDetailPage() {
   const { classId } = useParams<{ classId: string }>();
   return <ClassDetailView classId={classId!} />;
+}
+
+function LiveClassroomPage() {
+  const { classId } = useParams<{ classId: string }>();
+  const { userProfile } = useAuth();
+  const parsedClassId = Number(classId);
+
+  if (!classId || Number.isNaN(parsedClassId)) {
+    return <NotFound />;
+  }
+
+  return (
+    <LiveClassroomMonitor
+      classId={parsedClassId}
+      userId={userProfile?.id ?? 0}
+    />
+  );
 }
 
 function App() {

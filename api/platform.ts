@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient, type Scenario } from '../lib/supabase-server.js';
+import { getScenarios } from '../lib/scenarios-data.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { type } = req.query;
@@ -46,14 +47,8 @@ async function handleScenarios(req: VercelRequest, res: VercelResponse) {
   console.log('Processing GET request for scenarios...');
   
   try {
-    // Import scenarios from JSON file instead of database
-    const fs = await import('fs');
-    const path = await import('path');
-    
-    // Read scenarios from shared/scenarios.json
-    const scenariosPath = path.join(process.cwd(), 'shared', 'scenarios.json');
-    const scenariosData = fs.readFileSync(scenariosPath, 'utf8');
-    const scenarios = JSON.parse(scenariosData);
+    // Bundle scenarios into the serverless function (fs paths break on Vercel)
+    const scenarios = getScenarios();
     
     console.log(`Found ${scenarios?.length || 0} scenarios in JSON file`);
     

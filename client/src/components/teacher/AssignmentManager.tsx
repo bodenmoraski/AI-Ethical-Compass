@@ -20,6 +20,12 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import scenariosData from '../../../../shared/scenarios.json';
+
+const SCENARIO_OPTIONS = (scenariosData as Array<{ id: number; title: string }>).map((s) => ({
+  id: s.id,
+  title: s.title,
+}));
 
 interface Assignment {
   id: number;
@@ -27,6 +33,7 @@ interface Assignment {
   description?: string;
   instructions?: string;
   assignment_type: 'scenario' | 'custom' | 'discussion';
+  scenario_ids?: number[] | null;
   due_date?: string;
   points_possible: number;
   is_published: boolean;
@@ -55,6 +62,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
     description: '',
     instructions: '',
     assignment_type: 'scenario' as 'scenario' | 'custom' | 'discussion',
+    scenario_ids: [1] as number[],
     due_date: '',
     points_possible: 100,
     is_published: false
@@ -108,7 +116,8 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
       const assignmentData = {
         ...formData,
         class_id: classId,
-        due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null
+        due_date: formData.due_date ? new Date(formData.due_date).toISOString() : null,
+        scenario_ids: formData.assignment_type === 'scenario' ? formData.scenario_ids : undefined,
       };
 
       const response = await fetch('/api/teacher?action=assignments', {
@@ -135,6 +144,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
         description: '',
         instructions: '',
         assignment_type: 'scenario',
+        scenario_ids: [1],
         due_date: '',
         points_possible: 100,
         is_published: false
@@ -265,6 +275,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
       description: assignment.description || '',
       instructions: assignment.instructions || '',
       assignment_type: assignment.assignment_type,
+      scenario_ids: assignment.scenario_ids?.length ? assignment.scenario_ids : [1],
       due_date: formattedDueDate,
       points_possible: assignment.points_possible,
       is_published: assignment.is_published
@@ -460,6 +471,27 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                 />
               </div>
             </div>
+
+            {formData.assignment_type === 'scenario' && (
+              <div className="grid gap-2">
+                <Label htmlFor="scenario_id">Scenario</Label>
+                <Select
+                  value={String(formData.scenario_ids[0] || 1)}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, scenario_ids: [parseInt(value, 10)] }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a scenario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SCENARIO_OPTIONS.map((scenario) => (
+                      <SelectItem key={scenario.id} value={String(scenario.id)}>
+                        {scenario.id}. {scenario.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             <div className="grid gap-2">
               <Label htmlFor="due_date">Due Date (Optional)</Label>
@@ -584,6 +616,27 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                 />
               </div>
             </div>
+
+            {formData.assignment_type === 'scenario' && (
+              <div className="grid gap-2">
+                <Label htmlFor="edit-scenario_id">Scenario</Label>
+                <Select
+                  value={String(formData.scenario_ids[0] || 1)}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, scenario_ids: [parseInt(value, 10)] }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a scenario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SCENARIO_OPTIONS.map((scenario) => (
+                      <SelectItem key={scenario.id} value={String(scenario.id)}>
+                        {scenario.id}. {scenario.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             <div className="grid gap-2">
               <Label htmlFor="edit-due_date">Due Date (Optional)</Label>

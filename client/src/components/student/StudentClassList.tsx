@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
 import { Plus, Users, BookOpen, Calendar, ChevronRight } from 'lucide-react';
 import JoinClassModal from './JoinClassModal';
@@ -26,14 +27,11 @@ export default function StudentClassList() {
       setLoading(true);
       const token = session?.access_token;
       
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/student?action=classes`,
-        {
+      const response = await fetch('/api/student?action=classes', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
-        }
-      );
+        });
 
       if (!response.ok) {
         throw new Error('Failed to fetch classes');
@@ -136,6 +134,8 @@ export default function StudentClassList() {
 }
 
 function ClassCard({ classItem }: { classItem: EnrolledClass }) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
       {/* Class Header */}
@@ -182,9 +182,13 @@ function ClassCard({ classItem }: { classItem: EnrolledClass }) {
           </div>
         </div>
 
-        {/* View Class Button */}
-        <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-          View Class
+        {/* View Class Button → student assignments for this enrollment */}
+        <button
+          type="button"
+          onClick={() => navigate('/assignments')}
+          className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          View Assignments
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

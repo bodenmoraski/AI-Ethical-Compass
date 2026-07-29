@@ -39,7 +39,7 @@ const INSTITUTION_TYPES = [
 ];
 
 export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessModalProps) {
-  const { user, userProfile, refreshUserProfile } = useAuth();
+  const { user, userProfile, session, refreshUserProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,16 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
       return;
     }
 
+    if (!session?.access_token) {
+      setError('You must be signed in to request teacher access');
+      return;
+    }
+
+    if (!formData.institutionName.trim()) {
+      setError('Institution name is required');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -68,11 +78,11 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.email}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           userEmail: user.email,
-          institution_name: formData.institutionName || null,
+          institution_name: formData.institutionName.trim(),
           institution_type: formData.institutionType || null,
           department: formData.department || null,
           request_reason: formData.requestReason,

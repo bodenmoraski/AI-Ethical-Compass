@@ -99,13 +99,14 @@ export function useRealtimeClassroom(classId: number) {
   const createActivity = useCallback(async (activity: Omit<ActivityFeed, 'id' | 'timestamp'>) => {
     try {
       const headers = await getAuthHeaders();
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch('/api/realtime-classroom?action=activities', {
         method: 'POST',
         headers,
         body: JSON.stringify({
           ...activity,
           class_id: classId,
-          user_id: 'current-user', // This should come from auth context
+          user_id: session?.user?.id,
         }),
       });
 

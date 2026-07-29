@@ -58,11 +58,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.method === 'POST') {
-      // Recalculate leaderboard (admin function)
+      // Recalculate leaderboard — teachers/admins only
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const token = authHeader.substring(7);
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (authError || !user?.email) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
+
+      const { data: profile } = await supabase
+        .from('users')
+        .select('role')
+        .eq('email', user.email)
+        .single();
+
+      if (!profile || (profile.role !== 'teacher' && profile.role !== 'admin')) {
+        return res.status(403).json({ error: 'Only teachers can recalculate the leaderboard' });
+      }
+
       console.log('Recalculating leaderboard...');
-      
       await recalculateLeaderboard();
-      
       return res.status(200).json({ success: true, message: 'Leaderboard recalculated' });
     }
 
