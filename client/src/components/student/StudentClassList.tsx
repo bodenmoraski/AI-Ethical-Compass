@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
-import { Plus, Users, BookOpen, Calendar, ChevronRight } from 'lucide-react';
+import { Plus, Users, BookOpen, Calendar, ChevronRight, LogOut, Loader2 } from 'lucide-react';
+import { useToast } from '../../hooks/use-toast';
 import JoinClassModal from './JoinClassModal';
 
 interface EnrolledClass {
@@ -21,6 +22,8 @@ export default function StudentClassList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showJoinModal, setShowJoinModal] = useState(false);
+  const [leavingClassId, setLeavingClassId] = useState<number | null>(null);
+  const { toast } = useToast();
 
   const fetchClasses = async () => {
     try {
@@ -57,6 +60,44 @@ export default function StudentClassList() {
     // Refresh the class list
     fetchClasses();
     setShowJoinModal(false);
+  };
+
+  const handleLeaveClass = async (classItem: EnrolledClass) => {
+    const confirmed = window.confirm(
+      `Leave "${classItem.name}"? You will lose access to its assignments until you rejoin with the class code.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setLeavingClassId(classItem.id);
+      const response = await fetch('/api/student?action=leave-class', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ class_id: classItem.id }),
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) {
+        throw new Error(result.error || 'Failed to leave class');
+      }
+
+      toast({
+        title: 'Left class',
+        description: result.message || `You have left ${classItem.name}.`,
+      });
+      await fetchClasses();
+    } catch (err) {
+      toast({
+        title: 'Could not leave class',
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setLeavingClassId(null);
+    }
   };
 
   if (loading) {
@@ -117,7 +158,12 @@ export default function StudentClassList() {
       {classes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {classes.map((classItem) => (
-            <ClassCard key={classItem.id} classItem={classItem} />
+            <ClassCard
+              key={classItem.id}
+              classItem={classItem}
+              onLeave={handleLeaveClass}
+              leaving={leavingClassId === classItem.id}
+            />
           ))}
         </div>
       )}
@@ -133,7 +179,15 @@ export default function StudentClassList() {
   );
 }
 
-function ClassCard({ classItem }: { classItem: EnrolledClass }) {
+function ClassCard({
+  classItem,
+  onLeave,
+  leaving,
+}: {
+  classItem: EnrolledClass;
+  onLeave: (classItem: EnrolledClass) => void;
+  leaving: boolean;
+}) {
   const navigate = useNavigate();
 
   return (
@@ -190,6 +244,20 @@ function ClassCard({ classItem }: { classItem: EnrolledClass }) {
         >
           View Assignments
           <ChevronRight className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onLeave(classItem)}
+          disabled={leaving}
+          className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-60"
+        >
+          {leaving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <LogOut className="w-4 h-4" />
+          )}
+          {leaving ? 'Leaving…' : 'Leave Class'}
         </button>
       </div>
     </div>

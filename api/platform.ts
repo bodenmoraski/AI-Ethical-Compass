@@ -100,23 +100,14 @@ async function handlePlatformStats(req: VercelRequest, res: VercelResponse) {
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
-  // Get unique countries (this is a bit tricky, we'll estimate based on user diversity)
-  const { data: userEmails, error: emailsError } = await supabase
-    .from('users')
-    .select('email');
-
-  if (usersError || perspectivesError || builtInError || userScenariosError || emailsError) {
-    console.error('Database errors:', { usersError, perspectivesError, builtInError, userScenariosError, emailsError });
+  if (usersError || perspectivesError || builtInError || userScenariosError) {
+    console.error('Database errors:', { usersError, perspectivesError, builtInError, userScenariosError });
     throw new Error('Failed to fetch statistics');
   }
 
-  // Estimate countries based on email domains and user diversity
-  const uniqueDomains = new Set(
-    userEmails?.map((u: any) => u.email?.split('@')[1]?.toLowerCase()).filter(Boolean) || []
-  );
-  
-  // Conservative estimate: assume 1 country per 3-4 unique domains, minimum 1
-  const estimatedCountries = Math.max(1, Math.floor(uniqueDomains.size / 3));
+  // Never pull the users.email column for a homepage counter — that was both a
+  // privacy leak and an O(users) read. Approximate from headcount instead.
+  const estimatedCountries = Math.max(1, Math.min(80, Math.floor((usersCount || 0) / 25) || 1));
 
   const stats = {
     users: usersCount || 0,

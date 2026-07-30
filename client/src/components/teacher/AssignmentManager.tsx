@@ -17,9 +17,12 @@ import {
   Calendar, 
   Users, 
   Loader2,
-  CheckCircle
+  CheckCircle,
+  BarChart3
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AssignmentAnalytics from './AssignmentAnalytics';
+import RubricEditor, { Rubric } from './RubricEditor';
 import scenariosData from '../../../../shared/scenarios.json';
 
 const SCENARIO_OPTIONS = (scenariosData as Array<{ id: number; title: string }>).map((s) => ({
@@ -32,7 +35,7 @@ interface Assignment {
   title: string;
   description?: string;
   instructions?: string;
-  assignment_type: 'scenario' | 'custom' | 'discussion';
+  assignment_type: 'scenario' | 'custom';
   scenario_ids?: number[] | null;
   due_date?: string;
   points_possible: number;
@@ -40,11 +43,66 @@ interface Assignment {
   submission_count: number;
   class_id: number;
   created_at: string;
+  rubric?: Rubric | null;
+  allow_late_submissions?: boolean;
+  late_penalty_per_day?: number;
 }
 
 interface AssignmentManagerProps {
   classId: number;
   onRefresh?: () => void;
+}
+
+interface LatePolicyFieldsProps {
+  formData: { allow_late_submissions: boolean; late_penalty_per_day: number };
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  idPrefix: string;
+}
+
+/** Late settings were already stored on the assignment but had no way to be set. */
+function LatePolicyFields({ formData, setFormData, idPrefix }: LatePolicyFieldsProps) {
+  return (
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id={`${idPrefix}-allow_late_submissions`}
+          checked={formData.allow_late_submissions}
+          onChange={(e) =>
+            setFormData((prev: any) => ({ ...prev, allow_late_submissions: e.target.checked }))
+          }
+          className="rounded"
+        />
+        <Label htmlFor={`${idPrefix}-allow_late_submissions`}>Accept late submissions</Label>
+      </div>
+
+      {formData.allow_late_submissions ? (
+        <div className="grid gap-2">
+          <Label htmlFor={`${idPrefix}-late_penalty_per_day`}>Late penalty (% per day)</Label>
+          <Input
+            id={`${idPrefix}-late_penalty_per_day`}
+            type="number"
+            min={0}
+            max={100}
+            value={formData.late_penalty_per_day}
+            onChange={(e) =>
+              setFormData((prev: any) => ({
+                ...prev,
+                late_penalty_per_day: Math.max(0, Math.min(100, parseInt(e.target.value) || 0)),
+              }))
+            }
+          />
+          <p className="text-xs text-muted-foreground">
+            Applied automatically when you grade a late submission. 0 means no penalty.
+          </p>
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Students cannot submit after the due date.
+        </p>
+      )}
+    </div>
+  );
 }
 
 export default function AssignmentManager({ classId, onRefresh }: AssignmentManagerProps) {
@@ -53,6 +111,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [analyticsAssignment, setAnalyticsAssignment] = useState<Assignment | null>(null);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -61,11 +120,14 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
     title: '',
     description: '',
     instructions: '',
-    assignment_type: 'scenario' as 'scenario' | 'custom' | 'discussion',
+    assignment_type: 'scenario' as 'scenario' | 'custom',
     scenario_ids: [1] as number[],
     due_date: '',
     points_possible: 100,
-    is_published: false
+    is_published: false,
+    allow_late_submissions: true,
+    late_penalty_per_day: 0,
+    rubric: null as Rubric | null
   });
 
   const { toast } = useToast();
@@ -147,7 +209,10 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
         scenario_ids: [1],
         due_date: '',
         points_possible: 100,
-        is_published: false
+        is_published: false,
+        allow_late_submissions: true,
+        late_penalty_per_day: 0,
+        rubric: null
       });
       setCreateModalOpen(false);
       await fetchAssignments();
@@ -278,7 +343,10 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
       scenario_ids: assignment.scenario_ids?.length ? assignment.scenario_ids : [1],
       due_date: formattedDueDate,
       points_possible: assignment.points_possible,
-      is_published: assignment.is_published
+      is_published: assignment.is_published,
+      allow_late_submissions: assignment.allow_late_submissions ?? true,
+      late_penalty_per_day: assignment.late_penalty_per_day ?? 0,
+      rubric: assignment.rubric ?? null
     });
     setEditModalOpen(true);
   };
@@ -390,6 +458,14 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                     >
                       Grade Submissions
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAnalyticsAssignment(assignment)}
+                    >
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Analytics
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -397,6 +473,24 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
           ))}
         </div>
       )}
+
+      {/* Assignment Analytics Modal */}
+      <Dialog
+        open={analyticsAssignment !== null}
+        onOpenChange={(open) => !open && setAnalyticsAssignment(null)}
+      >
+        <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Analytics — {analyticsAssignment?.title}</DialogTitle>
+            <DialogDescription>
+              Completion, scores, and per-student progress for this assignment.
+            </DialogDescription>
+          </DialogHeader>
+          {analyticsAssignment && (
+            <AssignmentAnalytics assignmentId={String(analyticsAssignment.id)} />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Create Assignment Modal */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
@@ -415,7 +509,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="e.g., AI Ethics Analysis, Discussion Post"
+                placeholder="e.g., AI Ethics Analysis, Written Reflection"
               />
             </div>
             
@@ -453,8 +547,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="scenario">Scenario Analysis</SelectItem>
-                    <SelectItem value="discussion">Discussion</SelectItem>
-                    <SelectItem value="custom">Custom Assignment</SelectItem>
+                    <SelectItem value="custom">Written Response</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -513,6 +606,14 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
               />
               <Label htmlFor="is_published">Publish immediately</Label>
             </div>
+
+            <LatePolicyFields formData={formData} setFormData={setFormData} idPrefix="create" />
+
+            <RubricEditor
+              rubric={formData.rubric}
+              onChange={(rubric) => setFormData(prev => ({ ...prev, rubric }))}
+              pointsPossible={formData.points_possible}
+            />
           </div>
           
           <div className="flex justify-end gap-3">
@@ -560,7 +661,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                 id="edit-title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="e.g., AI Ethics Analysis, Discussion Post"
+                placeholder="e.g., AI Ethics Analysis, Written Reflection"
               />
             </div>
             
@@ -598,8 +699,7 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="scenario">Scenario Analysis</SelectItem>
-                    <SelectItem value="discussion">Discussion</SelectItem>
-                    <SelectItem value="custom">Custom Assignment</SelectItem>
+                    <SelectItem value="custom">Written Response</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -658,6 +758,14 @@ export default function AssignmentManager({ classId, onRefresh }: AssignmentMana
               />
               <Label htmlFor="edit-is_published">Published</Label>
             </div>
+
+            <LatePolicyFields formData={formData} setFormData={setFormData} idPrefix="edit" />
+
+            <RubricEditor
+              rubric={formData.rubric}
+              onChange={(rubric) => setFormData(prev => ({ ...prev, rubric }))}
+              pointsPossible={formData.points_possible}
+            />
           </div>
           
           <div className="flex justify-end gap-3">

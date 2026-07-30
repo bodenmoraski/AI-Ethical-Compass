@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
+import NotificationBell from "./NotificationBell";
 
 export const Navbar = () => {
   const location = useLocation();
@@ -84,7 +85,10 @@ export const Navbar = () => {
             {loading ? (
               <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full"></div>
             ) : user ? (
-              <UserMenu />
+              <>
+                <NotificationBell />
+                <UserMenu />
+              </>
             ) : (
               <Button
                 onClick={() => setAuthModalOpen(true)}

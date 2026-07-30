@@ -186,7 +186,7 @@ const ScenarioView = () => {
       } else {
         // Record scenario completion for signed-in users
         if (user && !submitAnonymously && userProfile?.id) {
-          await updateProgress(scenarioId!, true, userProfile.id);
+          await updateProgress(scenarioId!, true);
         }
 
         setPerspective('');

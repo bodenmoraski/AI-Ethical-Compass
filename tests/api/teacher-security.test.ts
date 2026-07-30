@@ -257,9 +257,7 @@ describe('🔥 REGRESSION TEST: Verify Old Vulnerability is Fixed', () => {
     // Read the actual teacher.ts file
     const fs = await import('fs');
     const path = await import('path');
-    const { fileURLToPath } = await import('url');
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const teacherApiPath = path.join(__dirname, 'teacher.ts');
+    const teacherApiPath = path.join(process.cwd(), 'api', 'teacher.ts');
     
     if (fs.existsSync(teacherApiPath)) {
       const content = fs.readFileSync(teacherApiPath, 'utf8');

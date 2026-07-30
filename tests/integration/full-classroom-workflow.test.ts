@@ -474,7 +474,7 @@ describe('Full Classroom Workflow Integration Test', () => {
   });
 
   describe('Phase 7: Summary and Verification', () => {
-    it('should provide a complete test summary', () => {
+    it('ends with every actor and artifact the workflow was supposed to create', () => {
       console.log('\n📊 TEST SUMMARY\n');
       console.log('═══════════════════════════════════════════════════');
       console.log(`Teacher: ${teacher.email}`);
@@ -483,8 +483,14 @@ describe('Full Classroom Workflow Integration Test', () => {
       console.log(`Assignment: ${assignment.title}`);
       console.log(`Submissions: ${STUDENT_COUNT}/${STUDENT_COUNT} (100%)`);
       console.log('═══════════════════════════════════════════════════\n');
-      
-      expect(true).toBe(true); // Always pass
+
+      expect(teacher.token).toBeTruthy();
+      expect(students).toHaveLength(STUDENT_COUNT);
+      expect(students.every((s: any) => s.token && s.email)).toBe(true);
+      expect(classData.id).toBeTruthy();
+      expect(classData.class_code).toMatch(/^[A-Z0-9]+$/);
+      expect(assignment.id).toBeTruthy();
+      expect(assignment.class_id).toBe(classData.id);
     });
   });
 });

@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { useAuth } from '../lib/auth';
-import { useTranslation } from 'react-i18next';
 import { 
   FileText, 
   BookOpen, 
@@ -18,13 +17,14 @@ import {
 } from 'lucide-react';
 import StudentAssignmentList from '../components/student/StudentAssignmentList';
 import StudentAssignmentView from '../components/student/StudentAssignmentView';
+import { useToast } from '../hooks/use-toast';
 
 interface Assignment {
   id: number;
   title: string;
   description?: string;
   instructions?: string;
-  assignment_type: 'scenario' | 'custom' | 'discussion';
+  assignment_type: 'scenario' | 'custom';
   scenario_ids?: number[] | null;
   due_date?: string;
   points_possible: number;
@@ -47,17 +47,23 @@ interface Assignment {
 
 export default function StudentAssignments() {
   const { user } = useAuth();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { toast } = useToast();
 
   const handleAssignmentSelect = (assignment: Assignment) => {
     // Scenario assignments are completed inside ScenarioView with ?assignment=
     if (assignment.assignment_type === 'scenario') {
       const scenarioId = assignment.scenario_ids?.[0];
       if (!scenarioId) {
-        console.error('Scenario assignment missing scenario_ids', assignment.id);
+        // Silently doing nothing here looked like a broken button.
+        toast({
+          title: 'Assignment is incomplete',
+          description:
+            'Your teacher has not attached a scenario to this assignment yet. Please let them know.',
+          variant: 'destructive',
+        });
         return;
       }
       navigate(`/scenarios/${scenarioId}?assignment=${assignment.id}`);

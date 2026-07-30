@@ -4,10 +4,13 @@ import SubmissionGradingForm from './SubmissionGradingForm';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { ArrowLeft } from 'lucide-react';
+import type { Rubric } from './RubricEditor';
 
 interface AssignmentGradingViewProps {
   assignmentId: number;
   pointsPossible: number;
+  rubric?: Rubric | null;
+  latePenaltyPerDay?: number;
 }
 
 /** ScenarioView stores `perspective`; free-response assignments store `perspectives[0]`. */
@@ -22,7 +25,7 @@ function getSubmissionPerspective(data: any): string {
   return '';
 }
 
-export default function AssignmentGradingView({ assignmentId, pointsPossible }: AssignmentGradingViewProps) {
+export default function AssignmentGradingView({ assignmentId, pointsPossible, rubric, latePenaltyPerDay }: AssignmentGradingViewProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -77,6 +80,8 @@ export default function AssignmentGradingView({ assignmentId, pointsPossible }: 
         <SubmissionGradingForm
           submission={selectedSubmission}
           pointsPossible={pointsPossible}
+          rubric={rubric}
+          latePenaltyPerDay={latePenaltyPerDay}
           onGraded={handleGraded}
         />
       </div>

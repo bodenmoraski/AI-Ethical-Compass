@@ -2,6 +2,9 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient, type Perspective } from '../lib/supabase-server.js';
 import { analyzePerspective, moderatePerspective } from '../lib/ai-analysis.js';
 import { getScenarioById } from '../lib/scenarios-data.js';
+import { enqueueForModeration } from '../lib/moderation-queue.js';
+import { checkAndAwardAchievements } from '../lib/achievements.js';
+import { resolveAppUser } from '../lib/api-auth.js';
 
 // ============================================
 // RANKING HELPER FUNCTIONS (merged from perspective-rankings.ts)
@@ -17,9 +20,13 @@ interface UserReputation {
   scenarios_created: number;
 }
 
-async function calculateUserReputations(supabase: any): Promise<UserReputation[]> {
+async function calculateUserReputations(
+  supabase: any,
+  /** When set, only score authors who appear in this scenario — never the whole table. */
+  scenarioId?: number | string
+): Promise<UserReputation[]> {
   try {
-    const { data: userStats, error } = await supabase
+    let query = supabase
       .from('perspectives')
       .select(`
         user_id,
@@ -27,6 +34,15 @@ async function calculateUserReputations(supabase: any): Promise<UserReputation[]
         likes
       `)
       .not('user_id', 'is', null);
+
+    if (scenarioId != null) {
+      query = query.eq('scenario_id', scenarioId);
+    } else {
+      // Unscoped calls must still be bounded; unbounded reputation scans are a DoS vector.
+      query = query.limit(2000);
+    }
+
+    const { data: userStats, error } = await query;
 
     if (error) {
       console.error('Error fetching user stats:', error);
@@ -116,11 +132,8 @@ function getRankingDescription(rankBy: string): string {
 // ============================================
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== PERSPECTIVES DB API CALLED ===');
-  console.log('Method:', req.method);
-  console.log('Body:', req.body);
-  console.log('Query:', req.query);
-  console.log('URL:', req.url);
+  // Never log req.body — it carries student writing and identity fields.
+  console.log('=== PERSPECTIVES DB API CALLED ===', req.method, req.url);
   
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -148,14 +161,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         includeAnalysis = 'true'
       } = req.query;
 
-      if (!scenarioId) {
+      if (!scenarioId || Array.isArray(scenarioId)) {
         return res.status(400).json({ 
           message: 'scenarioId is required' 
         });
       }
 
-      // Get user reputation scores
-      const userReputations = await calculateUserReputations(supabase);
+      // Get user reputation scores — scoped to this scenario so we never scan the
+      // entire perspectives table just to rank one discussion.
+      const userReputations = await calculateUserReputations(supabase, scenarioId);
       const reputationMap = new Map(userReputations.map(u => [u.user_email, u.reputation_score]));
 
       // Build the base query
@@ -176,11 +190,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
          )
       `;
 
+      // Hard ceiling: ranking still sorts in memory for smart_ranking, but a single
+      // scenario will not pull unbounded history into the function.
+      const RANKINGS_FETCH_CAP = 500;
       const { data: perspectives, error } = await supabase
         .from('perspectives')
         .select(selectFields)
         .eq('scenario_id', scenarioId)
-        .eq('moderation_status', 'approved');
+        .eq('moderation_status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(RANKINGS_FETCH_CAP);
 
       if (error) {
         console.error('Error fetching perspectives:', error);
@@ -308,16 +327,97 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     pathParts = [String(req.query.id), String(action)];
   }
   
+  // Rate a perspective's quality/thoughtfulness: ?action=rate&id=
+  if (action === 'rate' && req.method === 'POST') {
+    const perspectiveId = Number(req.query.id ?? req.body?.perspectiveId);
+    const { qualityRating, thoughtfulnessRating } = req.body || {};
+
+    const rater = await resolveAppUser(req);
+    if (!rater) {
+      return res.status(401).json({ message: 'Sign in to rate perspectives' });
+    }
+
+    if (!Number.isInteger(perspectiveId) || perspectiveId <= 0) {
+      return res.status(400).json({ message: 'A numeric perspective id is required' });
+    }
+
+    const inRange = (value: unknown) =>
+      Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 5;
+
+    if (!inRange(qualityRating) || !inRange(thoughtfulnessRating)) {
+      return res.status(400).json({
+        message: 'qualityRating and thoughtfulnessRating must be integers from 1 to 5',
+      });
+    }
+
+    try {
+      const supabase = getSupabaseClient();
+
+      const { data: target } = await supabase
+        .from('perspectives')
+        .select('id, user_id')
+        .eq('id', perspectiveId)
+        .single();
+
+      if (!target) {
+        return res.status(404).json({ message: 'Perspective not found' });
+      }
+      if (target.user_id && target.user_id === rater.email) {
+        return res.status(400).json({ message: 'You cannot rate your own perspective' });
+      }
+
+      // One rating per person per perspective; re-rating updates the existing row.
+      const { data: rating, error } = await supabase
+        .from('perspective_ratings')
+        .upsert(
+          {
+            perspective_id: perspectiveId,
+            rater_email: rater.email,
+            quality_rating: Number(qualityRating),
+            thoughtfulness_rating: Number(thoughtfulnessRating),
+          },
+          { onConflict: 'perspective_id,rater_email' }
+        )
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to save perspective rating:', error);
+        return res.status(500).json({ message: 'Failed to save rating' });
+      }
+
+      await checkAndAwardAchievements(rater.email);
+
+      return res.status(200).json({
+        success: true,
+        rating: {
+          perspectiveId,
+          qualityRating: rating.quality_rating,
+          thoughtfulnessRating: rating.thoughtfulness_rating,
+        },
+      });
+    } catch (error) {
+      console.error('Rating error:', error);
+      return res.status(500).json({ message: 'Failed to save rating' });
+    }
+  }
+
   // Handle like functionality: /api/perspectives/[id]/like or ?action=like&id=
   if (pathParts.length === 2 && pathParts[1] === 'like' && req.method === 'POST') {
     const perspectiveId = pathParts[0];
-    const { userId, userEmail } = req.body;
-    
+
+    // Likes feed reputation and the "community favorite" achievement, so an
+    // anonymous or spoofed liker would make both meaningless.
+    const liker = await resolveAppUser(req);
+    if (!liker) {
+      return res.status(401).json({ message: 'Sign in to like perspectives' });
+    }
+
     if (!perspectiveId) {
       return res.status(400).json({ message: 'Perspective ID is required' });
     }
 
-    const effectiveUserId = userId || userEmail || 'anonymous_user';
+    const effectiveUserId = liker.email;
     
     try {
       const supabase = getSupabaseClient();
@@ -358,7 +458,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Get current perspective and increment likes
       const { data: currentPerspective, error: fetchError } = await supabase
         .from('perspectives')
-        .select('likes')
+        .select('likes, user_id')
         .eq('id', perspectiveId)
         .single();
       
@@ -384,6 +484,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         });
       }
       
+      // A like can push the author over a "community favorite" threshold.
+      if (currentPerspective.user_id) {
+        await checkAndAwardAchievements(currentPerspective.user_id);
+      }
+
       return res.status(200).json({
         id: perspective.id,
         likes: perspective.likes,
@@ -438,11 +543,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).json(formattedReplies);
         
       } else if (req.method === 'POST') {
-        // Create reply
-        const { content, authorName } = req.body;
-        
-        if (!content || !authorName) {
-          return res.status(400).json({ message: 'content and authorName are required' });
+        // Replies are attributed in public, so the author must be a real signed-in
+        // account rather than whatever name the client typed into the body.
+        const replier = await resolveAppUser(req);
+        if (!replier) {
+          return res.status(401).json({ message: 'Sign in to reply' });
+        }
+
+        const { content } = req.body;
+
+        if (!content) {
+          return res.status(400).json({ message: 'content is required' });
         }
         
         if (content.trim().length < 5) {
@@ -469,7 +580,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .from('replies')
           .insert({
             perspective_id: perspectiveId,
-            author_name: authorName.trim(),
+            author_name: replier.username,
             content: content.trim(),
             moderation_status: 'approved'
           })
@@ -646,7 +757,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
       
       // Basic validation
-      const { scenarioId, content, authorName, userId, userEmail } = req.body;
+      const { scenarioId, content, authorName } = req.body;
+
+      // Identity is taken from the token, never the body: `user_id` drives reputation,
+      // achievements and dashboard stats, so a spoofable value would corrupt all three.
+      const authorUser = await resolveAppUser(req);
+      const userId = authorUser?.email || null;
       
       if (!scenarioId || !content) {
         return res.status(400).json({ 
@@ -712,7 +828,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let moderationStatus = 'approved';
       let moderation;
       
-      if (content.includes('{DEVYES}')) {
+      // Dev-only moderation bypass. Must never work in production — otherwise any
+      // student can skip AI moderation by embedding a magic token in their text.
+      if (content.includes('{DEVYES}') && process.env.NODE_ENV !== 'production' && process.env.VERCEL_ENV !== 'production') {
         console.log('Development bypass detected - auto-approving');
         moderationStatus = 'approved';
         moderation = {
@@ -803,7 +921,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       console.log(`Perspective created successfully with ID: ${perspective.id} for scenario ${perspective.scenario_id}`);
-      
+
+      // Flagged content goes to the human review queue so the teacher/admin
+      // moderation view has something real to show.
+      if (moderationStatus === 'flagged') {
+        await enqueueForModeration({
+          contentType: 'perspective',
+          contentId: perspective.id,
+          flaggedReason: (moderation?.issues || []).join('; ') || 'Flagged by automated moderation',
+          contentText: perspective.content,
+          aiAnalysis: moderation,
+        });
+      }
+
+      // Awards are checked server-side so they land even if the client never asks.
+      if (userId) {
+        const awarded = await checkAndAwardAchievements(userId);
+        if (awarded.length > 0) {
+          console.log(`Awarded ${awarded.length} achievement level(s) to ${userId}`);
+        }
+      }
+
       // Perform AI analysis in the background (don't block the response)
       analyzePerspective(content.trim())
         .then(async (analysis) => {

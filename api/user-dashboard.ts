@@ -1,10 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient } from '../lib/supabase-server.js';
+import { computeSdgImpact } from '../lib/sdg-impact.js';
+import { recordActivity } from '../lib/activity-feed.js';
+import { getBearerToken } from '../lib/api-auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('=== USER DASHBOARD API CALLED ===');
-  console.log('Method:', req.method);
-  console.log('Query:', req.query);
+  console.log('=== USER DASHBOARD API CALLED ===', req.method);
   
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,10 +41,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       let resolvedUserId = typeof userId === 'string' ? userId : undefined;
 
       // Always resolve identity from JWT when present; reject cross-user query params
-      const authHeader = req.headers.authorization;
+      const token = getBearerToken(req);
       let authEmail: string | undefined;
-      if (authHeader?.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
+      if (token) {
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
         if (!authError && user?.email) {
           authEmail = user.email;
@@ -125,6 +125,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             submitted_at,
             final_score,
             feedback,
+            is_late,
+            rubric_scores,
             submission_data
           `)
           .eq('student_id', userId)
@@ -275,11 +277,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         scenarios_completed: scenarioProgress?.length || 0
       };
       
-      // Calculate SDG impact (simplified for now)
-      const sdgImpact = {
-        primary_sdgs: [4, 16, 17], // Education, Peace & Justice, Partnerships
-        impact_score: Math.min(stats.total_perspectives * 10 + stats.total_likes_received * 2, 100)
-      };
+      // Derive SDGs from the scenarios this learner actually engaged with
+      const engagedScenarioIds = [
+        ...(userPerspectives || []).map((p: any) => p.scenario_id),
+        ...scenarioProgress.map((p: any) => p.scenario_id),
+      ];
+
+      let sdgImpact;
+      try {
+        const { getScenarios } = await import('../lib/scenarios-data.js');
+        sdgImpact = computeSdgImpact(engagedScenarioIds, getScenarios() as any, stats);
+      } catch (sdgError) {
+        console.error('Failed to compute SDG impact from scenarios:', sdgError);
+        sdgImpact = computeSdgImpact([], [], stats);
+      }
       
       console.log(`Dashboard data compiled for ${effectiveUserId}:`, {
         perspectives: stats.total_perspectives,
@@ -316,13 +327,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        // Bound payload size so a single student cannot dump megabytes into JSONB.
+        const serialized = JSON.stringify(submissionData);
+        if (serialized.length > 50_000) {
+          return res.status(400).json({ error: 'Submission is too large (max 50KB)' });
+        }
+        const perspectives = Array.isArray(submissionData.perspectives)
+          ? submissionData.perspectives
+          : [];
+        const primary = typeof perspectives[0] === 'string' ? perspectives[0].trim() : '';
+        if (primary.length < 5) {
+          return res.status(400).json({ error: 'Written response is too short' });
+        }
+        if (primary.length > 20000) {
+          return res.status(400).json({ error: 'Written response exceeds 20000 characters' });
+        }
+
         // Get user ID from authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        const token = getBearerToken(req);
+        if (!token) {
           return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        const token = authHeader.split(' ')[1];
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
         
         if (authError || !user) {
@@ -365,6 +391,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(403).json({ error: 'Not enrolled in this class' });
         }
 
+        const isLate = assignment.due_date
+          ? new Date() > new Date(assignment.due_date)
+          : false;
+
+        // A closed assignment must actually reject work, otherwise the teacher's
+        // "accept late submissions" switch is decorative.
+        if (isLate && assignment.allow_late_submissions === false) {
+          return res.status(403).json({
+            error: 'This assignment is past its due date and no longer accepts submissions',
+            due_date: assignment.due_date,
+          });
+        }
+
         // Check if already submitted
         const { data: existingSubmission, error: existingError } = await supabase
           .from('assignment_submissions')
@@ -385,7 +424,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             student_id: dbUser.id,
             submission_data: submissionData,
             submitted_at: new Date().toISOString(),
-            is_late: assignment.due_date ? new Date() > new Date(assignment.due_date) : false,
+            is_late: isLate,
             status: 'submitted'
           })
           .select()
@@ -395,6 +434,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           console.error('Error creating submission:', submissionError);
           return res.status(500).json({ error: 'Failed to submit assignment' });
         }
+
+        await recordActivity({
+          type: 'submission',
+          classId: assignment.class_id,
+          userId: dbUser.id,
+          title: 'Assignment submitted',
+          description: `${user.email} submitted "${assignment.title}"${submission.is_late ? ' (late)' : ''}`,
+          priority: submission.is_late ? 'high' : 'medium',
+          data: {
+            assignment_id: assignment.id,
+            submission_id: submission.id,
+            is_late: submission.is_late,
+          },
+        });
 
         return res.status(201).json({ 
           success: true, 

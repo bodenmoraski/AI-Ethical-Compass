@@ -22,7 +22,7 @@ interface Assignment {
   title: string;
   description?: string;
   instructions?: string;
-  assignment_type: 'scenario' | 'custom' | 'discussion';
+  assignment_type: 'scenario' | 'custom';
   due_date?: string;
   points_possible: number;
   is_published: boolean;

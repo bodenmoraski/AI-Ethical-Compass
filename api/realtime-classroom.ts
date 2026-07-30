@@ -1,22 +1,20 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import {
+  AppUser,
+  AuthError,
+  authErrorStatus,
+  getServiceClient,
+  requireAppUser,
+  setCors,
+} from '../lib/api-auth.js';
 
-// Environment variables
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing required Supabase environment variables');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = getServiceClient();
 
 // Validation schemas
 const ActivitySchema = z.object({
   type: z.enum(['discussion', 'submission', 'engagement', 'notification']),
   class_id: z.number(),
-  user_id: z.string(),
   title: z.string(),
   description: z.string(),
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
@@ -25,7 +23,7 @@ const ActivitySchema = z.object({
 
 const EngagementSchema = z.object({
   class_id: z.number(),
-  student_id: z.number(),
+  student_id: z.number().optional(),
   scenario_id: z.number().optional(),
   session_start: z.string().datetime().optional(),
   session_end: z.string().datetime().optional(),
@@ -36,44 +34,66 @@ const EngagementSchema = z.object({
   engagement_score: z.number().min(0).max(1).optional()
 });
 
-// Helper function to authenticate user
-const authenticateUser = async (req: VercelRequest) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    throw new Error('No authorization token provided');
+type ClassAccess = 'teacher' | 'student';
+
+/**
+ * Classroom telemetry exposes every student's activity, so access is scoped to the
+ * class: its teacher (or an admin) may read everything, an enrolled student may only
+ * write their own engagement.
+ */
+async function classAccess(user: AppUser, classId: number): Promise<ClassAccess> {
+  if (!Number.isInteger(classId) || classId <= 0) {
+    throw new AuthError('A numeric class id is required', 400);
   }
-  
-  const token = authHeader.substring(7);
-  
-  try {
-    // Verify the JWT token and extract user ID
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    
-    if (error || !user) {
-      throw new Error('Invalid or expired token');
-    }
-    
-    return user.id; // Return the actual user ID, not the JWT token
-  } catch (error) {
-    console.error('Authentication error:', error);
-    throw new Error('Authentication failed');
+
+  const { data: classRow } = await supabase
+    .from('classes')
+    .select('id, teacher_id')
+    .eq('id', classId)
+    .single();
+
+  if (!classRow) {
+    throw new AuthError('Class not found', 404);
   }
-};
+
+  if (user.role === 'admin' || classRow.teacher_id === user.id) {
+    return 'teacher';
+  }
+
+  const { data: enrollment } = await supabase
+    .from('class_enrollments')
+    .select('id')
+    .eq('class_id', classId)
+    .eq('student_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  if (enrollment) return 'student';
+
+  throw new AuthError('Not a member of this class', 403);
+}
+
+async function requireTeacherAccess(user: AppUser, classId: number): Promise<void> {
+  const access = await classAccess(user, classId);
+  if (access !== 'teacher') {
+    throw new AuthError('Teacher access required for this class', 403);
+  }
+}
 
 // Real-time activity handlers
-const handleRealTimeActivity = async (req: VercelRequest, res: VercelResponse) => {
-  const userId = await authenticateUser(req);
-
+const handleRealTimeActivity = async (req: VercelRequest, res: VercelResponse, user: AppUser) => {
   switch (req.method) {
     case 'POST': {
-      // Create a new real-time activity
       const validatedData = ActivitySchema.parse(req.body);
-      
+      await classAccess(user, validatedData.class_id);
+
       const { data: activity, error } = await supabase
         .from('realtime_activities')
         .insert({
           ...validatedData,
-          created_by: userId,
+          // The author is always the caller; a client cannot attribute activity to someone else.
+          user_id: String(user.id),
+          created_by: String(user.id),
           timestamp: new Date().toISOString()
         })
         .select()
@@ -85,17 +105,16 @@ const handleRealTimeActivity = async (req: VercelRequest, res: VercelResponse) =
     }
 
     case 'GET': {
-      // Get recent activities for a class
-      const { classId, limit = 50 } = req.query;
-      
-      if (!classId) throw new Error('Class ID required');
+      const { limit = 50 } = req.query;
+      const classId = Number(req.query.classId);
+      await requireTeacherAccess(user, classId);
 
       const { data: activities, error } = await supabase
         .from('realtime_activities')
         .select('*')
         .eq('class_id', classId)
         .order('timestamp', { ascending: false })
-        .limit(Number(limit));
+        .limit(Math.min(Number(limit) || 50, 200));
 
       if (error) throw error;
 
@@ -103,23 +122,26 @@ const handleRealTimeActivity = async (req: VercelRequest, res: VercelResponse) =
     }
 
     default:
-      throw new Error(`Method ${req.method} not allowed`);
+      throw new AuthError(`Method ${req.method} not allowed`, 405);
   }
 };
 
 // Student engagement tracking
-const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) => {
-  const userId = await authenticateUser(req);
-
+const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse, user: AppUser) => {
   switch (req.method) {
     case 'POST': {
-      // Update student engagement
       const validatedData = EngagementSchema.parse(req.body);
-      
+      const access = await classAccess(user, validatedData.class_id);
+
+      // Students may only report their own engagement.
+      const studentId =
+        access === 'teacher' ? validatedData.student_id ?? user.id : user.id;
+
       const { data: engagement, error } = await supabase
         .from('student_engagement')
         .upsert({
           ...validatedData,
+          student_id: studentId,
           updated_at: new Date().toISOString()
         })
         .select()
@@ -127,19 +149,18 @@ const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) 
 
       if (error) throw error;
 
-      // Also create a real-time activity for engagement updates
-      if (validatedData.engagement_score && validatedData.engagement_score < 30) {
+      if (validatedData.engagement_score !== undefined && validatedData.engagement_score < 0.3) {
         await supabase
           .from('realtime_activities')
           .insert({
             type: 'engagement',
             class_id: validatedData.class_id,
-            user_id: userId,
+            user_id: String(studentId),
             title: 'Low Engagement Alert',
-            description: `Student showing decreased activity (${validatedData.engagement_score}% engagement)`,
+            description: `Student showing decreased activity (${Math.round(validatedData.engagement_score * 100)}% engagement)`,
             priority: 'high',
             timestamp: new Date().toISOString(),
-            created_by: userId,
+            created_by: String(user.id),
             data: { engagement_score: validatedData.engagement_score }
           });
       }
@@ -148,10 +169,8 @@ const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) 
     }
 
     case 'GET': {
-      // Get engagement data for a class
-      const { classId } = req.query;
-      
-      if (!classId) throw new Error('Class ID required');
+      const classId = Number(req.query.classId);
+      await requireTeacherAccess(user, classId);
 
       const { data: engagements, error } = await supabase
         .from('student_engagement')
@@ -168,24 +187,22 @@ const handleStudentEngagement = async (req: VercelRequest, res: VercelResponse) 
     }
 
     default:
-      throw new Error(`Method ${req.method} not allowed`);
+      throw new AuthError(`Method ${req.method} not allowed`, 405);
   }
 };
 
 // Live statistics
-const handleLiveStats = async (req: VercelRequest, res: VercelResponse) => {
-  await authenticateUser(req);
-
+const handleLiveStats = async (req: VercelRequest, res: VercelResponse, user: AppUser) => {
   if (req.method !== 'GET') {
-    throw new Error(`Method ${req.method} not allowed`);
+    throw new AuthError(`Method ${req.method} not allowed`, 405);
   }
 
-  const { classId } = req.query;
-  if (!classId) throw new Error('Class ID required');
+  const classId = Number(req.query.classId);
+  await requireTeacherAccess(user, classId);
 
   // Get active students (engaged in last 10 minutes)
   const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-  
+
   const { data: activeStudents, error: activeError } = await supabase
     .from('student_engagement')
     .select('student_id')
@@ -196,7 +213,7 @@ const handleLiveStats = async (req: VercelRequest, res: VercelResponse) => {
 
   // Get recent activities count
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  
+
   const { data: recentActivities, error: activitiesError } = await supabase
     .from('realtime_activities')
     .select('type')
@@ -205,9 +222,8 @@ const handleLiveStats = async (req: VercelRequest, res: VercelResponse) => {
 
   if (activitiesError) throw activitiesError;
 
-  // Count by type
   const stats = {
-    activeStudents: activeStudents?.length || 0,
+    activeStudents: new Set((activeStudents || []).map((row) => row.student_id)).size,
     newPosts: recentActivities?.filter(a => a.type === 'discussion').length || 0,
     newSubmissions: recentActivities?.filter(a => a.type === 'submission').length || 0,
     pendingNotifications: recentActivities?.filter(a => a.type === 'notification').length || 0
@@ -218,66 +234,63 @@ const handleLiveStats = async (req: VercelRequest, res: VercelResponse) => {
 
 // Connection monitoring
 const handleConnectionStatus = async (req: VercelRequest, res: VercelResponse) => {
-  await authenticateUser(req);
-
   if (req.method !== 'GET') {
-    throw new Error(`Method ${req.method} not allowed`);
+    throw new AuthError(`Method ${req.method} not allowed`, 405);
   }
 
-  // Simple health check for real-time connection
-  try {
-    const { data, error } = await supabase
-      .from('realtime_activities')
-      .select('id')
-      .limit(1);
+  const { error } = await supabase
+    .from('realtime_activities')
+    .select('id')
+    .limit(1);
 
-    if (error) throw error;
-
-    return res.json({ 
-      success: true, 
-      status: 'connected',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
+  if (error) {
+    return res.status(503).json({
+      success: false,
       status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error.message
     });
   }
+
+  return res.json({
+    success: true,
+    status: 'connected',
+    timestamp: new Date().toISOString()
+  });
 };
 
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCors(res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
+    const user = await requireAppUser(req);
     const { action } = req.query;
 
     switch (action) {
       case 'activities':
-        return await handleRealTimeActivity(req, res);
+        return await handleRealTimeActivity(req, res, user);
       case 'engagement':
-        return await handleStudentEngagement(req, res);
+        return await handleStudentEngagement(req, res, user);
       case 'stats':
-        return await handleLiveStats(req, res);
+        return await handleLiveStats(req, res, user);
       case 'connection':
         return await handleConnectionStatus(req, res);
       default:
-        throw new Error('Invalid action parameter');
+        return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     }
   } catch (error) {
-    console.error('Real-time classroom API error:', error);
-    return res.status(500).json({
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ success: false, error: 'Invalid request body', details: error.errors });
+    }
+    const status = authErrorStatus(error);
+    if (status === 500) console.error('Real-time classroom API error:', error);
+    return res.status(status).json({
       success: false,
       error: error instanceof Error ? error.message : 'Internal server error'
     });
   }
-} 
+}

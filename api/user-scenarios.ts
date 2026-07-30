@@ -1,17 +1,16 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
 import { moderateScenario } from '../lib/ai-analysis.js';
+import {
+  authErrorStatus,
+  getServiceClient,
+  requireAppUser,
+  setCors,
+} from '../lib/api-auth.js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+const supabase = getServiceClient();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCors(res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -19,20 +18,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (req.method === 'GET') {
-      // Get user scenarios (approved ones for public, all for admin)
       const { status = 'approved', author_email } = req.query;
-      
+
+      // Anything other than the approved list is private: it can expose pending or
+      // rejected submissions, so it is limited to the author and to admins.
+      const wantsPrivate = status !== 'approved';
+      let scopedEmail = typeof author_email === 'string' ? author_email : undefined;
+
+      if (wantsPrivate) {
+        const viewer = await requireAppUser(req, supabase);
+        if (viewer.role !== 'admin') {
+          if (scopedEmail && scopedEmail !== viewer.email) {
+            return res.status(403).json({ error: 'You can only list your own submissions' });
+          }
+          scopedEmail = viewer.email;
+        }
+      }
+
       let query = supabase
         .from('user_scenarios')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (status === 'approved') {
+      if (!wantsPrivate) {
         query = query.eq('status', 'approved');
       }
 
-      if (author_email) {
-        query = query.eq('author_email', author_email);
+      if (scopedEmail) {
+        query = query.eq('author_email', scopedEmail);
       }
 
       const { data, error } = await query;
@@ -46,30 +59,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.method === 'POST') {
-      // Submit new user scenario
-      const { title, description, category, author_name, author_email } = req.body;
+      const author = await requireAppUser(req, supabase);
+      const { title, description, category } = req.body || {};
 
-      if (!title || !description || !author_name || !author_email) {
-        return res.status(400).json({ error: 'Missing required fields' });
+      if (!title || !description) {
+        return res.status(400).json({ error: 'Title and description are required' });
       }
 
-      // AI moderation
-      console.log('Moderating scenario:', title);
-      const moderationResult = await moderateScenario(title, description);
+      const cleanTitle = String(title).trim();
+      const cleanDescription = String(description).trim();
+      if (cleanTitle.length < 5 || cleanTitle.length > 200) {
+        return res.status(400).json({ error: 'Title must be 5–200 characters' });
+      }
+      if (cleanDescription.length < 40 || cleanDescription.length > 10000) {
+        return res.status(400).json({ error: 'Description must be 40–10000 characters' });
+      }
 
-      // Save to database
+      const moderationResult = await moderateScenario(cleanTitle, cleanDescription);
+
       const { data, error } = await supabase
         .from('user_scenarios')
         .insert({
-          title,
-          description,
-          category: category || moderationResult.category_suggestion,
+          title: cleanTitle,
+          description: cleanDescription,
+          category: typeof category === 'string' ? category.slice(0, 100) : moderationResult.category_suggestion,
           difficulty_level: moderationResult.difficulty_suggestion,
-          author_name,
-          author_email,
+          author_name: author.username,
+          author_email: author.email,
           status: moderationResult.is_appropriate ? 'approved' : 'pending',
-          moderation_notes: moderationResult.issues.length > 0 
-            ? moderationResult.issues.join('; ') 
+          moderation_notes: moderationResult.issues.length > 0
+            ? moderationResult.issues.join('; ')
             : null,
           ai_analysis: {
             quality_score: moderationResult.quality_score,
@@ -92,23 +111,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.method === 'PUT') {
-      // Vote on a scenario
-      const { scenario_id, user_email, vote_type } = req.body;
+      const voter = await requireAppUser(req, supabase);
+      const { scenario_id, vote_type } = req.body || {};
 
-      if (!scenario_id || !user_email || !['up', 'down'].includes(vote_type)) {
+      if (!scenario_id || !['up', 'down'].includes(vote_type)) {
         return res.status(400).json({ error: 'Invalid vote data' });
       }
 
-      // Check if user already voted
       const { data: existingVote } = await supabase
         .from('scenario_votes')
-        .select('*')
+        .select('id')
         .eq('scenario_id', scenario_id)
-        .eq('user_email', user_email)
-        .single();
+        .eq('user_email', voter.email)
+        .maybeSingle();
 
       if (existingVote) {
-        // Update existing vote
         const { error } = await supabase
           .from('scenario_votes')
           .update({ vote_type })
@@ -119,12 +136,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(500).json({ error: 'Failed to update vote' });
         }
       } else {
-        // Create new vote
         const { error } = await supabase
           .from('scenario_votes')
           .insert({
             scenario_id,
-            user_email,
+            user_email: voter.email,
             vote_type
           });
 
@@ -134,7 +150,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       }
 
-      // Update scenario vote counts
       const { data: votes } = await supabase
         .from('scenario_votes')
         .select('vote_type')
@@ -157,7 +172,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
-    console.error('API Error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    const status = authErrorStatus(error);
+    if (status === 500) console.error('API Error:', error);
+    return res.status(status).json({
+      error: error instanceof Error ? error.message : 'Internal server error',
+    });
   }
-} 
+}

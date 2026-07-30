@@ -30,6 +30,7 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import StudentAssignments from "@/pages/StudentAssignments";
 import AssignmentGrading from "@/pages/AssignmentGrading";
 import JoinClass from "@/pages/JoinClass";
+import AdminConsole from "@/pages/AdminConsole";
 import UserProfileSetup from "@/components/UserProfileSetup";
 
 const queryClient = new QueryClient({
@@ -85,6 +86,7 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/assignments" element={<StudentAssignments />} />
           <Route path="/join-class" element={<JoinClass />} />
+          <Route path="/admin" element={<AdminConsole />} />
           <Route path="/teacher" element={<TeacherDashboard />} />
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher/class/:classId" element={<ClassDetailPage />} />

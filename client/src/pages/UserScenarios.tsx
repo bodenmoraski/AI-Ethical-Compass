@@ -7,6 +7,8 @@ import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useAuth } from '../lib/auth';
+import { apiRequest } from '../lib/queryClient';
+import { supabase } from '../../../lib/supabase-client';
 import { ThumbsUp, ThumbsDown, Clock, CheckCircle, XCircle, Sparkles, Brain, AlertTriangle } from 'lucide-react';
 
 interface UserScenario {
@@ -77,9 +79,16 @@ export default function UserScenarios() {
 
   const fetchMyScenarios = async () => {
     if (!user) return;
-    
+
     try {
-      const response = await fetch(`/api/user-scenarios?author_email=${encodeURIComponent(user.email)}&status=all`);
+      // Pending and rejected submissions are private, so this call must be authenticated.
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+
+      const response = await fetch('/api/user-scenarios?status=all', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.ok) {
         const data = await response.json();
         setMyScenarios(data);
@@ -97,37 +106,22 @@ export default function UserScenarios() {
     setModerationFeedback(null);
 
     try {
-      const response = await fetch('/api/user-scenarios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          author_name: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
-          author_email: user.email,
-        }),
-      });
+      // Attribution is taken from the token server-side.
+      const response = await apiRequest('POST', '/api/user-scenarios', formData);
 
-      if (response.ok) {
-        const result = await response.json();
-        setModerationFeedback(result.moderation);
-        setFormData({ title: '', description: '', category: '' });
-        
-        // Refresh scenarios
-        fetchScenarios();
-        fetchMyScenarios();
-        
-        if (result.moderation.is_appropriate) {
-          setShowForm(false);
-        }
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
+      const result = await response.json();
+      setModerationFeedback(result.moderation);
+      setFormData({ title: '', description: '', category: '' });
+
+      fetchScenarios();
+      fetchMyScenarios();
+
+      if (result.moderation.is_appropriate) {
+        setShowForm(false);
       }
     } catch (error) {
       console.error('Error submitting scenario:', error);
-      alert('Failed to submit scenario');
+      alert(error instanceof Error ? error.message : 'Failed to submit scenario');
     } finally {
       setSubmitting(false);
     }
@@ -137,21 +131,11 @@ export default function UserScenarios() {
     if (!user) return;
 
     try {
-      const response = await fetch('/api/user-scenarios', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          scenario_id: scenarioId,
-          user_email: user.email,
-          vote_type: voteType,
-        }),
+      await apiRequest('PUT', '/api/user-scenarios', {
+        scenario_id: scenarioId,
+        vote_type: voteType,
       });
-
-      if (response.ok) {
-        fetchScenarios();
-      }
+      fetchScenarios();
     } catch (error) {
       console.error('Error voting:', error);
     }

@@ -5,6 +5,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
@@ -40,7 +42,12 @@ export function LanguageSelector() {
           <Globe className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel className="font-normal text-xs text-slate-500">
+          Navigation and the home and about pages are translated. Scenarios,
+          discussions, and classroom tools are English only for now.
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}

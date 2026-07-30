@@ -32,8 +32,9 @@ export async function createNotification(data: NotificationData): Promise<boolea
         recipient_id: data.recipient_id,
         sender_id: data.sender_id || null,
         type: data.type,
-        title: data.title,
-        message: data.message,
+        // Defensive caps so a long class/assignment title cannot bloat rows.
+        title: String(data.title || '').slice(0, 200),
+        message: String(data.message || '').slice(0, 2000),
         data: data.data || {},
         priority: data.priority || 'medium',
         is_read: false,

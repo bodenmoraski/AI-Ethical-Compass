@@ -33,6 +33,17 @@ export default {
     '**/__tests__/**/*.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)'
   ],
+  // These suites talk to a running API server and a live Supabase project, so they
+  // cannot pass in a plain `npm test` run. Execute them with `npm run test:integration`
+  // once the stack is up and credentials are exported.
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/tests/integration/',
+    '<rootDir>/tests/api/student.test.ts',
+    '<rootDir>/tests/api/student-enrollment-api.test.ts',
+    '<rootDir>/tests/api/teacher-security.test.ts',
+    '<rootDir>/tests/lib/notifications.test.ts'
+  ],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   collectCoverageFrom: [
     'api/**/*.{ts,tsx}',

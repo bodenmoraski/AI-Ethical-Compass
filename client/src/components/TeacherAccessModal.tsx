@@ -111,14 +111,13 @@ export default function TeacherAccessModal({ isOpen, onClose }: TeacherAccessMod
 
       toast({
         title: "Request Submitted! 📝",
-        description: result.message || "Your teacher access request has been submitted for review. You'll receive an email notification within 24-48 hours.",
+        description: result.message || "Your teacher access request is pending administrator review. Teacher tools unlock on this account once it is approved.",
       });
 
       // Close the modal
       onClose();
 
       // Do NOT refresh profile or navigate - user doesn't have teacher access yet
-      // They will be notified via email when approved
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

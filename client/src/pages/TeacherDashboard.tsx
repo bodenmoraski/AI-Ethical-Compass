@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../lib/auth';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -18,6 +17,7 @@ import TeacherAccessModal from '../components/TeacherAccessModal';
 import LiveClassroomMonitor from '../components/teacher/LiveClassroomMonitor';
 import AssignmentManager from '../components/teacher/AssignmentManager';
 import StudentManager from '../components/teacher/StudentManager';
+import ModerationPanel from '../components/teacher/ModerationPanel';
 import { 
   Users, 
   BookOpen, 
@@ -79,7 +79,6 @@ interface TeacherDashboardData {
 
 export default function TeacherDashboard() {
   const { user, userProfile } = useAuth();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [dashboardData, setDashboardData] = useState<TeacherDashboardData | null>(null);
@@ -88,6 +87,7 @@ export default function TeacherDashboard() {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [teacherAccessModalOpen, setTeacherAccessModalOpen] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
 
   // Debounced loading state to prevent flickering
   const [debouncedLoading, setDebouncedLoading] = useState(true);
@@ -99,6 +99,18 @@ export default function TeacherDashboard() {
     
     return () => clearTimeout(timer);
   }, [loading]);
+
+  // Keep the active class valid as the class list loads or changes
+  useEffect(() => {
+    const list = dashboardData?.classes || [];
+    if (list.length === 0) {
+      setSelectedClassId(null);
+      return;
+    }
+    setSelectedClassId((current) =>
+      current !== null && list.some((cls) => cls.id === current) ? current : list[0].id
+    );
+  }, [dashboardData]);
 
   // Class creation state
   const [createClassModalOpen, setCreateClassModalOpen] = useState(false);
@@ -466,6 +478,30 @@ export default function TeacherDashboard() {
   }
 
   const { classes, overallStats, recentActivity, upcomingDeadlines } = dashboardData;
+  const activeClass = classes.find((cls) => cls.id === selectedClassId) ?? classes[0] ?? null;
+
+  const classSelector = classes.length > 1 && activeClass ? (
+    <div className="flex items-center gap-2">
+      <Label htmlFor="active-class" className="text-sm text-muted-foreground">
+        Class
+      </Label>
+      <Select
+        value={String(activeClass.id)}
+        onValueChange={(value) => setSelectedClassId(Number(value))}
+      >
+        <SelectTrigger id="active-class" className="w-[240px]">
+          <SelectValue placeholder="Select a class" />
+        </SelectTrigger>
+        <SelectContent>
+          {classes.map((cls) => (
+            <SelectItem key={cls.id} value={String(cls.id)}>
+              {cls.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  ) : null;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -552,7 +588,11 @@ export default function TeacherDashboard() {
                     <p className="text-sm font-medium text-orange-800">
                       {overallStats.pendingGrades} assignments need grading
                     </p>
-                    <Button variant="link" className="p-0 h-auto text-orange-700">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-orange-700"
+                      onClick={() => setSelectedTab('assignments')}
+                    >
                       Review pending grades →
                     </Button>
                   </div>
@@ -570,7 +610,11 @@ export default function TeacherDashboard() {
                     <p className="text-sm font-medium text-red-800">
                       {overallStats.flaggedContent} discussions flagged for review
                     </p>
-                    <Button variant="link" className="p-0 h-auto text-red-700">
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto text-red-700"
+                      onClick={() => setSelectedTab('moderation')}
+                    >
                       Review flagged content →
                     </Button>
                   </div>
@@ -793,12 +837,13 @@ export default function TeacherDashboard() {
                 <h3 className="text-lg font-semibold">Student Analytics & Live Monitoring</h3>
                 <p className="text-gray-600">Track student engagement and monitor classroom activity in real-time</p>
               </div>
+              {classSelector}
             </div>
 
             {/* Real-time Classroom Monitor */}
-            {classes.length > 0 ? (
+            {activeClass ? (
               <LiveClassroomMonitor 
-                classId={classes[0].id} 
+                classId={activeClass.id} 
                 userId={Number(user?.id) || 0}
               />
             ) : (
@@ -822,32 +867,19 @@ export default function TeacherDashboard() {
         </TabsContent>
 
         <TabsContent value="assignments" className="mt-6">
-          {classes.length > 0 ? (
+          {activeClass ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold">Assignment Management</h3>
                   <p className="text-sm text-muted-foreground">
-                    Managing assignments for: <span className="font-medium">{classes[0].name}</span>
-                    {classes.length > 1 && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        +{classes.length - 1} more class{classes.length > 2 ? 'es' : ''}
-                      </span>
-                    )}
+                    Managing assignments for: <span className="font-medium">{activeClass.name}</span>
                   </p>
                 </div>
-                {classes.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedTab('classes')}
-                  >
-                    Switch Class
-                  </Button>
-                )}
+                {classSelector}
               </div>
               <AssignmentManager 
-                classId={classes[0].id} 
+                classId={activeClass.id} 
                 onRefresh={fetchDashboardData}
               />
             </div>
@@ -871,11 +903,7 @@ export default function TeacherDashboard() {
         </TabsContent>
 
         <TabsContent value="moderation" className="mt-6">
-          <div className="text-center py-8">
-            <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium">Content Moderation</h3>
-            <p className="text-gray-600">Discussion moderation tools coming soon</p>
-          </div>
+          <ModerationPanel />
         </TabsContent>
       </Tabs>
       

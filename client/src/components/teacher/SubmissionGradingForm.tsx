@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Input } from '../ui/input';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '../../../../lib/supabase-client';
+import { isRubric, scoreRubric } from '../../../../lib/rubric-scoring';
+import type { Rubric } from './RubricEditor';
 
 interface Submission {
   id: number;
@@ -12,7 +14,9 @@ interface Submission {
   submitted_at: string;
   final_score?: number;
   feedback?: string;
+  is_late?: boolean;
   submission_data: any;
+  rubric_scores?: Array<{ id: string; awarded: number }> | null;
   users: {
     id: number;
     email: string;
@@ -25,15 +29,39 @@ interface Submission {
 interface SubmissionGradingFormProps {
   submission: Submission;
   pointsPossible: number;
+  rubric?: Rubric | null;
+  /** Percent of the assignment total deducted per day late, from the assignment. */
+  latePenaltyPerDay?: number;
   onGraded: (updated: Submission) => void;
 }
 
-export default function SubmissionGradingForm({ submission, pointsPossible, onGraded }: SubmissionGradingFormProps) {
-  const [score, setScore] = useState(submission.final_score ?? '');
+export default function SubmissionGradingForm({
+  submission,
+  pointsPossible,
+  rubric,
+  latePenaltyPerDay = 0,
+  onGraded,
+}: SubmissionGradingFormProps) {
+  const usingRubric = isRubric(rubric);
+
+  const [score, setScore] = useState<number | string>(submission.final_score ?? '');
+  const [criterionScores, setCriterionScores] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    (submission.rubric_scores || []).forEach((entry) => {
+      initial[entry.id] = entry.awarded;
+    });
+    return initial;
+  });
   const [feedback, setFeedback] = useState(submission.feedback ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Mirrors the server's calculation so the teacher sees the score they will store.
+  const rubricResult = useMemo(() => {
+    if (!usingRubric || !rubric) return null;
+    return scoreRubric(rubric, criterionScores, pointsPossible);
+  }, [usingRubric, rubric, criterionScores, pointsPossible]);
 
   const handleGrade = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,11 +69,14 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
     setError(null);
     setSuccess(false);
     try {
-      // Get the proper access token from Supabase
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('No authentication token available');
       }
+
+      const body = usingRubric
+        ? { submissionId: submission.id, rubricScores: criterionScores, feedback }
+        : { submissionId: submission.id, score: Number(score), feedback };
 
       const response = await fetch('/api/teacher?action=grade-submission', {
         method: 'POST',
@@ -53,13 +84,12 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`
         },
-        body: JSON.stringify({
-          submissionId: submission.id,
-          score: Number(score),
-          feedback
-        })
+        body: JSON.stringify(body)
       });
-      if (!response.ok) throw new Error('Failed to grade submission');
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || 'Failed to grade submission');
+      }
       const data = await response.json();
       setSuccess(true);
       onGraded(data.submission);
@@ -70,6 +100,10 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
     }
   };
 
+  const canSubmit = usingRubric
+    ? true
+    : score !== '' && Number(score) >= 0 && Number(score) <= pointsPossible;
+
   return (
     <Card>
       <CardHeader>
@@ -77,18 +111,64 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
       </CardHeader>
       <CardContent>
         <form onSubmit={handleGrade} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Score (out of {pointsPossible})</label>
-            <Input
-              type="number"
-              min={0}
-              max={pointsPossible}
-              value={score}
-              onChange={e => setScore(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
+          {submission.is_late && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              Submitted late.
+              {latePenaltyPerDay > 0
+                ? ` A ${latePenaltyPerDay}% per-day penalty is applied automatically when you save this grade.`
+                : ' No late penalty is configured for this assignment.'}
+            </div>
+          )}
+          {usingRubric && rubric ? (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Rubric</p>
+              {rubric.criteria.map((criterion) => (
+                <div key={criterion.id} className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm">{criterion.name || 'Untitled criterion'}</p>
+                    {criterion.description && (
+                      <p className="text-xs text-muted-foreground">{criterion.description}</p>
+                    )}
+                  </div>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={criterion.maxPoints}
+                    aria-label={`Points for ${criterion.name || 'criterion'}`}
+                    value={criterionScores[criterion.id] ?? ''}
+                    onChange={(e) =>
+                      setCriterionScores((prev) => ({
+                        ...prev,
+                        [criterion.id]: Number(e.target.value) || 0,
+                      }))
+                    }
+                    disabled={loading}
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground w-16">
+                    / {criterion.maxPoints}
+                  </span>
+                </div>
+              ))}
+              <div className="text-sm font-medium">
+                Total: {rubricResult?.earned ?? 0}/{rubricResult?.possible ?? 0} →{' '}
+                {rubricResult?.points ?? 0}/{pointsPossible} points
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium mb-1">Score (out of {pointsPossible})</label>
+              <Input
+                type="number"
+                min={0}
+                max={pointsPossible}
+                value={score}
+                onChange={e => setScore(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium mb-1">Feedback</label>
             <Textarea
@@ -100,7 +180,7 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button type="submit" disabled={loading || score === '' || Number(score) < 0 || Number(score) > pointsPossible}>
+            <Button type="submit" disabled={loading || !canSubmit}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
               Grade
             </Button>
@@ -111,4 +191,4 @@ export default function SubmissionGradingForm({ submission, pointsPossible, onGr
       </CardContent>
     </Card>
   );
-} 
+}

@@ -6,7 +6,6 @@ import { Progress } from '../components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../lib/auth';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase-client';
 import { 
@@ -77,7 +76,6 @@ interface DashboardData {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'perspectives';

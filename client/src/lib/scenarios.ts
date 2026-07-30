@@ -19,43 +19,19 @@ export async function submitPerspective(scenarioId: number, content: string, aut
   return await response.json();
 }
 
-export async function updateProgress(scenarioId: number, completed: boolean = true, userId?: number | string): Promise<void> {
+/**
+ * Records scenario completion. The server resolves the user from the session token,
+ * so an anonymous visitor simply has no progress to record.
+ */
+export async function updateProgress(scenarioId: number, completed: boolean = true): Promise<void> {
   try {
-    let resolvedUserId = userId;
-
-    if (resolvedUserId == null) {
-      const { data: { session } } = await supabase.auth.getSession();
-      const email = session?.user?.email;
-      if (!email) {
-        console.warn('Skipping progress update: no signed-in user');
-        return;
-      }
-
-      // Resolve integer users.id expected by user_progress
-      const profileRes = await fetch(`/api/user-profile?email=${encodeURIComponent(email)}`);
-      if (!profileRes.ok) {
-        console.warn('Skipping progress update: user profile not found');
-        return;
-      }
-      const profile = await profileRes.json();
-      resolvedUserId = profile.id;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      console.warn('Skipping progress update: no signed-in user');
+      return;
     }
 
-    const response = await fetch('/api/user-progress', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId: resolvedUserId,
-        scenarioId,
-        completed,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to update progress:', response.statusText);
-    }
+    await apiRequest('POST', '/api/user-progress', { scenarioId, completed });
   } catch (error) {
     console.error('Error updating progress:', error);
   }

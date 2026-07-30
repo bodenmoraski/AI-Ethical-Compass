@@ -28,10 +28,12 @@ interface Assignment {
   title: string;
   description?: string;
   instructions?: string;
-  assignment_type: 'scenario' | 'custom' | 'discussion';
+  assignment_type: 'scenario' | 'custom';
   due_date?: string;
   points_possible: number;
   is_published: boolean;
+  allow_late_submissions?: boolean;
+  late_penalty_per_day?: number;
   class_id: number;
   created_at: string;
   classes: {
@@ -181,6 +183,8 @@ export default function StudentAssignmentView({
   const isOverdue = assignment.due_date && new Date(assignment.due_date) < new Date();
   const isSubmitted = assignment.submission?.status === 'submitted' || assignment.submission?.status === 'graded';
   const isGraded = assignment.submission?.status === 'graded';
+  const lateSubmissionsClosed = Boolean(isOverdue) && assignment.allow_late_submissions === false;
+  const latePenaltyPerDay = assignment.late_penalty_per_day ?? 0;
 
   return (
     <div className="space-y-6">
@@ -271,7 +275,22 @@ export default function StudentAssignmentView({
           </Card>
 
           {/* Submission Form */}
-          {!isSubmitted && (
+          {!isSubmitted && lateSubmissionsClosed && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  Submissions are closed
+                </CardTitle>
+                <CardDescription>
+                  This assignment passed its due date and your teacher is not accepting late work.
+                  Contact them if you need an extension.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
+
+          {!isSubmitted && !lateSubmissionsClosed && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -281,6 +300,13 @@ export default function StudentAssignmentView({
                 <CardDescription>
                   Provide your analysis and perspective for this assignment
                 </CardDescription>
+                {isOverdue && (
+                  <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                    {latePenaltyPerDay > 0
+                      ? `This assignment is past due. Late work loses ${latePenaltyPerDay}% of the total per day.`
+                      : 'This assignment is past due, but your teacher still accepts late work.'}
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>

@@ -1,7 +1,16 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { notifyStudentOfManualEnrollment, notifyStudentOfRemoval } from '../lib/notifications.js';
+import {
+  notifyStudentOfManualEnrollment,
+  notifyStudentOfRemoval,
+  notifyStudentOfGrade,
+  notifyStudentOfNewAssignment,
+} from '../lib/notifications.js';
+import { recordActivity } from '../lib/activity-feed.js';
+import { isRubric, scoreRubric } from '../lib/rubric-scoring.js';
+import { requireRole, getBearerToken } from '../lib/api-auth.js';
+import { applyLatePenalty } from '../lib/late-policy.js';
 
 // Environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
@@ -18,16 +27,16 @@ const ClassSchema = z.object({
   name: z.string().min(1).max(100),
   subject: z.string().min(1).max(50),
   grade_level: z.string().min(1).max(20),
-  description: z.string().optional(),
-  school_year: z.string().optional(),
-  semester: z.string().optional()
+  description: z.string().max(5000).optional(),
+  school_year: z.string().max(20).optional(),
+  semester: z.string().max(20).optional()
 });
 
 const AssignmentSchema = z.object({
   class_id: z.number().int(),
   title: z.string().min(1).max(200),
-  description: z.string().optional(),
-  instructions: z.string().optional(),
+  description: z.string().max(5000).optional(),
+  instructions: z.string().max(20000).optional(),
   assignment_type: z.enum(['scenario', 'custom', 'discussion']).default('scenario'),
   scenario_ids: z.array(z.number()).optional(),
   due_date: z.string().nullable().optional().refine((val) => {
@@ -40,7 +49,7 @@ const AssignmentSchema = z.object({
     }
   }, { message: "Invalid date format" }),
   points_possible: z.number().int().min(0).max(1000).default(100),
-  rubric: z.record(z.any()).optional(),
+  rubric: z.record(z.any()).nullable().optional(),
   allow_late_submissions: z.boolean().default(true),
   late_penalty_per_day: z.number().int().min(0).max(100).default(0),
   is_published: z.boolean().optional()
@@ -55,15 +64,9 @@ const TeacherAccessSchema = z.object({
 
 // Auth helper - proper JWT verification
 const authenticateUser = async (req: VercelRequest) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
+  const token = getBearerToken(req);
+  if (!token) {
     throw new Error('No authorization token provided');
-  }
-  
-  const token = authHeader.substring(7);
-  
-  if (!token || token === 'null' || token === 'undefined') {
-    throw new Error('Invalid authorization token');
   }
   
   try {
@@ -117,6 +120,53 @@ const generateClassCode = () => {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return code;
+};
+
+/**
+ * Tells enrolled students an assignment went live and drops a matching event on
+ * the class activity feed. Best-effort: publishing must not fail on notification errors.
+ */
+const announcePublishedAssignment = async (
+  assignment: { id: number; class_id: number; title: string; due_date?: string | null },
+  teacherId: number
+) => {
+  try {
+    const { data: classRow } = await supabase
+      .from('classes')
+      .select('name')
+      .eq('id', assignment.class_id)
+      .single();
+
+    const { data: enrollments } = await supabase
+      .from('class_enrollments')
+      .select('student_id')
+      .eq('class_id', assignment.class_id)
+      .eq('status', 'active');
+
+    await Promise.all(
+      (enrollments || []).map((enrollment) =>
+        notifyStudentOfNewAssignment(
+          enrollment.student_id,
+          assignment.title,
+          classRow?.name || 'your class',
+          assignment.due_date || null,
+          assignment.id
+        )
+      )
+    );
+
+    await recordActivity({
+      type: 'notification',
+      classId: assignment.class_id,
+      userId: teacherId,
+      title: 'Assignment published',
+      description: `"${assignment.title}" is now available to students`,
+      priority: 'medium',
+      data: { assignment_id: assignment.id },
+    });
+  } catch (error) {
+    console.error('Failed to announce published assignment:', error);
+  }
 };
 
 // Route handlers
@@ -342,6 +392,10 @@ const handleAssignments = async (req: VercelRequest, res: VercelResponse) => {
 
       if (error) throw error;
 
+      if (assignment.is_published) {
+        await announcePublishedAssignment(assignment, userId);
+      }
+
       return res.status(201).json({ success: true, assignment });
     }
 
@@ -374,6 +428,11 @@ const handleAssignments = async (req: VercelRequest, res: VercelResponse) => {
         .single();
 
       if (error) throw error;
+
+      // Only announce on the draft -> published transition, never on every edit.
+      if (!assignment.is_published && updatedAssignment.is_published) {
+        await announcePublishedAssignment(updatedAssignment, userId);
+      }
 
       return res.json({ success: true, assignment: updatedAssignment });
     }
@@ -602,15 +661,14 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
     case 'POST': {
       try {
         // Require a real JWT so callers cannot submit requests for arbitrary emails
-        const authHeader = req.headers.authorization;
-        if (!authHeader?.startsWith('Bearer ')) {
+        const token = getBearerToken(req);
+        if (!token) {
           return res.status(401).json({
             success: false,
             error: 'Unauthorized'
           });
         }
 
-        const token = authHeader.substring(7);
         const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(token);
 
         if (authError || !authUser?.email) {
@@ -671,23 +729,11 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
           });
         }
 
-        // FUTURE ENHANCEMENT: Send email notification to admins
-        // This requires setting up an email service (SendGrid, Resend, etc.)
-        // Implementation would look like:
-        // await sendAdminNotification({
-        //   userName: `${user.first_name} ${user.last_name}`,
-        //   userEmail: user.email,
-        //   institution: validatedData.institution_name,
-        //   reason: validatedData.request_reason,
-        //   requestId: request.id
-        // });
-        // See: https://supabase.com/docs/guides/functions/examples/send-emails
-
         console.log(`Teacher access request created (pending): user_id=${user.id}, request_id=${request.id}`);
 
         return res.status(201).json({ 
           success: true, 
-          message: 'Teacher access request submitted successfully. You will receive an email notification when your request has been reviewed. This typically takes 24-48 hours.',
+          message: 'Teacher access request submitted. An administrator reviews requests in the admin console; teacher tools unlock on this account as soon as it is approved.',
           status: 'pending',
           request_id: request.id
         });
@@ -703,7 +749,10 @@ const handleTeacherAccess = async (req: VercelRequest, res: VercelResponse) => {
     }
 
     case 'GET': {
-      // Get all teacher access requests (admin only)
+      // These rows carry names, emails and institutions, so the list is admin-only.
+      const admin = await requireRole(req, ['admin']);
+      console.log(`Admin ${admin.id} listed teacher access requests`);
+
       const { data: requests, error } = await supabase
         .from('teacher_access_requests')
         .select(`
@@ -788,8 +837,11 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
     case 'POST': {
       // Grade a submission
       if (req.query.action === 'grade-submission') {
-        const { submissionId, score, feedback } = req.body;
-        if (!submissionId || typeof score !== 'number') throw new Error('Submission ID and score required');
+        const { submissionId, score, feedback, rubricScores } = req.body;
+        if (!submissionId) throw new Error('Submission ID required');
+        if (typeof feedback === 'string' && feedback.length > 10000) {
+          throw new Error('Feedback exceeds maximum length of 10000 characters');
+        }
         // Get submission and verify teacher owns it
         const { data: submission, error } = await supabase
           .from('assignment_submissions')
@@ -799,24 +851,43 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
         if (error || !submission) throw new Error('Submission not found');
         const { data: assignment, error: assignmentError } = await supabase
           .from('assignments')
-          .select('id, class_id, points_possible')
+          .select('id, class_id, points_possible, title, rubric, due_date, late_penalty_per_day')
           .eq('id', submission.assignment_id)
           .single();
         if (assignmentError || !assignment) throw new Error('Assignment not found');
         const { data: classData, error: classError } = await supabase
           .from('classes')
-          .select('teacher_id')
+          .select('teacher_id, name')
           .eq('id', assignment.class_id)
           .single();
         if (classError || !classData || classData.teacher_id !== userId) throw new Error('Access denied');
-        if (score < 0 || score > assignment.points_possible) throw new Error('Score out of range');
+
+        // A rubric grade derives the score from per-criterion awards so the
+        // stored score always matches the criteria the teacher actually filled in.
+        let finalScore: number;
+        let rubricResult: ReturnType<typeof scoreRubric> | null = null;
+
+        if (rubricScores && isRubric(assignment.rubric)) {
+          rubricResult = scoreRubric(assignment.rubric, rubricScores, assignment.points_possible);
+          finalScore = rubricResult.points;
+        } else {
+          if (typeof score !== 'number') throw new Error('Submission ID and score required');
+          finalScore = score;
+        }
+
+        if (finalScore < 0 || finalScore > assignment.points_possible) throw new Error('Score out of range');
+
+        const latePenalty = applyLatePenalty(submission, assignment, finalScore);
+        const scoreAfterPenalty = latePenalty.score;
+
         // Update submission
         const { data: updated, error: updateError } = await supabase
           .from('assignment_submissions')
           .update({
-            manual_score: score,
-            final_score: score,
+            manual_score: finalScore,
+            final_score: scoreAfterPenalty,
             feedback: feedback || null,
+            rubric_scores: rubricResult ? rubricResult.perCriterion : null,
             status: 'graded',
             graded_at: new Date().toISOString(),
             graded_by: userId
@@ -825,7 +896,31 @@ const handleGrading = async (req: VercelRequest, res: VercelResponse) => {
           .select()
           .single();
         if (updateError) throw updateError;
-        return res.json({ success: true, submission: updated });
+
+        await notifyStudentOfGrade(
+          submission.student_id,
+          assignment.title,
+          scoreAfterPenalty,
+          assignment.points_possible,
+          Number(submissionId)
+        );
+
+        await recordActivity({
+          type: 'notification',
+          classId: assignment.class_id,
+          userId,
+          title: 'Submission graded',
+          description: `"${assignment.title}" graded ${scoreAfterPenalty}/${assignment.points_possible}`,
+          priority: 'low',
+          data: { assignment_id: assignment.id, submission_id: Number(submissionId) },
+        });
+
+        return res.json({
+          success: true,
+          submission: updated,
+          rubric: rubricResult,
+          latePenalty: latePenalty.applied ? latePenalty : null,
+        });
       }
       throw new Error('Invalid grading POST action');
     }
@@ -1173,6 +1268,103 @@ const handleStats = async (req: VercelRequest, res: VercelResponse) => {
   }
 };
 
+// Per-class analytics: real completion per assignment plus a submission trend.
+const handleClassAnalytics = async (req: VercelRequest, res: VercelResponse) => {
+  const userId = await authenticateUser(req);
+  const classId = Number(req.query.classId);
+
+  if (!Number.isInteger(classId) || classId <= 0) {
+    return res.status(400).json({ success: false, error: 'A numeric classId is required' });
+  }
+
+  const { data: classRow, error: classError } = await supabase
+    .from('classes')
+    .select('id, teacher_id')
+    .eq('id', classId)
+    .single();
+
+  if (classError || !classRow || classRow.teacher_id !== userId) {
+    return res.status(403).json({ success: false, error: 'Access denied' });
+  }
+
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('student_id')
+    .eq('class_id', classId)
+    .eq('status', 'active');
+
+  const totalStudents = enrollments?.length || 0;
+
+  const { data: assignments } = await supabase
+    .from('assignments')
+    .select('id, title, due_date')
+    .eq('class_id', classId)
+    .order('created_at', { ascending: true });
+
+  const assignmentIds = (assignments || []).map((a) => a.id);
+
+  let submissions: Array<{ assignment_id: number; submitted_at: string | null; status: string }> = [];
+  if (assignmentIds.length > 0) {
+    const { data } = await supabase
+      .from('assignment_submissions')
+      .select('assignment_id, submitted_at, status')
+      .in('assignment_id', assignmentIds)
+      .in('status', ['submitted', 'graded', 'completed']);
+    submissions = data || [];
+  }
+
+  const submittedByAssignment = new Map<number, number>();
+  for (const s of submissions) {
+    submittedByAssignment.set(
+      s.assignment_id,
+      (submittedByAssignment.get(s.assignment_id) || 0) + 1
+    );
+  }
+
+  const byAssignment = (assignments || []).map((assignment) => {
+    const submitted = submittedByAssignment.get(assignment.id) || 0;
+    return {
+      assignment_id: assignment.id,
+      title: assignment.title,
+      submitted,
+      total_students: totalStudents,
+      completion_rate: totalStudents > 0 ? Math.round((submitted / totalStudents) * 100) : 0,
+    };
+  });
+
+  const totalExpected = assignmentIds.length * totalStudents;
+  const overallCompletion =
+    totalExpected > 0 ? Math.round((submissions.length / totalExpected) * 100) : 0;
+
+  // Submissions per day for the last 30 days — O(submissions), not O(days × submissions).
+  const countsByDay = new Map<string, number>();
+  for (const s of submissions) {
+    if (!s.submitted_at) continue;
+    const key = s.submitted_at.slice(0, 10);
+    countsByDay.set(key, (countsByDay.get(key) || 0) + 1);
+  }
+
+  const trend: Array<{ date: string; submissions: number }> = [];
+  for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+    const date = new Date();
+    date.setDate(date.getDate() - dayOffset);
+    const key = date.toISOString().split('T')[0];
+    trend.push({ date: key, submissions: countsByDay.get(key) || 0 });
+  }
+
+  return res.json({
+    success: true,
+    analytics: {
+      total_students: totalStudents,
+      completion_rates: {
+        total: overallCompletion,
+        by_assignment: byAssignment,
+      },
+      engagement_trends: trend,
+    },
+  });
+};
+
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -1200,6 +1392,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await handleStats(req, res);
       case 'assignment-analytics':
         return await handleAssignmentAnalytics(req, res);
+      case 'class-analytics':
+        return await handleClassAnalytics(req, res);
       case 'assignment-submissions':
       case 'submission-detail':
       case 'grade-submission':

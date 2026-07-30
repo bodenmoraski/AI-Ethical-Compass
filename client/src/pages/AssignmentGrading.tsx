@@ -59,7 +59,12 @@ export default function AssignmentGrading() {
           <div className="text-gray-600">Points Possible: <span className="font-bold">{assignment.points_possible}</span></div>
         </CardContent>
       </Card>
-      <AssignmentGradingView assignmentId={assignment.id} pointsPossible={assignment.points_possible} />
+      <AssignmentGradingView
+        assignmentId={assignment.id}
+        pointsPossible={assignment.points_possible}
+        rubric={assignment.rubric ?? null}
+        latePenaltyPerDay={assignment.late_penalty_per_day ?? 0}
+      />
     </div>
   );
 } 

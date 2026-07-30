@@ -14,6 +14,33 @@ interface PerspectiveCardProps {
   scenarioId: number;
 }
 
+interface StarRatingProps {
+  label: string;
+  value: number;
+  disabled: boolean;
+  onSelect: (value: number) => void;
+}
+
+const StarRating = ({ label, value, disabled, onSelect }: StarRatingProps) => (
+  <div className="flex items-center gap-1">
+    <span className="text-xs text-neutral-500 mr-1">{label}</span>
+    {[1, 2, 3, 4, 5].map((star) => (
+      <button
+        key={star}
+        type="button"
+        disabled={disabled}
+        onClick={() => onSelect(star)}
+        aria-label={`Rate ${label.toLowerCase()} ${star} out of 5`}
+        className={`material-icons text-base leading-none disabled:opacity-50 ${
+          star <= value ? 'text-amber-500' : 'text-neutral-300 hover:text-amber-400'
+        }`}
+      >
+        {star <= value ? 'star' : 'star_border'}
+      </button>
+    ))}
+  </div>
+);
+
 const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
@@ -28,6 +55,8 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
   // Local state for optimistic like updates
   const [isLiked, setIsLiked] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState(perspective.likes || 0);
+  const [rating, setRating] = useState<{ quality: number; thoughtfulness: number } | null>(null);
+  const [ratingSaving, setRatingSaving] = useState(false);
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -50,15 +79,10 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     setLoading((prev) => ({ ...prev, like: true }));
     
     try {
-      // user_likes.user_id is TEXT — prefer email for dashboard join consistency
-      const likeUserKey = userProfile?.email || user?.email || String(userProfile?.id);
+      // The server derives the liker from the bearer token that apiRequest attaches.
       await apiRequest(
         "POST",
-        `/api/perspectives?action=like&id=${perspective.id}`,
-        {
-          userId: likeUserKey,
-          userEmail: userProfile?.email || user?.email
-        }
+        `/api/perspectives?action=like&id=${perspective.id}`
       );
       
       // Update cache to reflect the new like count
@@ -85,6 +109,39 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
     }
   };
 
+  const submitRating = async (quality: number, thoughtfulness: number) => {
+    if (!userProfile?.email && !user?.email) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to rate perspectives.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const previous = rating;
+    setRating({ quality, thoughtfulness });
+    setRatingSaving(true);
+
+    try {
+      await apiRequest('POST', `/api/perspectives?action=rate&id=${perspective.id}`, {
+        qualityRating: quality,
+        thoughtfulnessRating: thoughtfulness,
+      });
+      toast({ title: 'Rating saved', description: 'Thanks for helping surface strong reasoning.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/perspectives', 'rankings', scenarioId] });
+    } catch (error) {
+      setRating(previous);
+      toast({
+        title: 'Could not save rating',
+        description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setRatingSaving(false);
+    }
+  };
+
   const handleReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading.reply || !replyContent.trim()) return;
@@ -94,10 +151,7 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
       const response = await apiRequest(
         "POST",
         `/api/perspectives?action=replies&id=${perspective.id}`,
-        {
-          content: replyContent,
-          authorName: userProfile?.username || "Anonymous"
-        }
+        { content: replyContent }
       );
       
       const newReply = await response.json();
@@ -204,6 +258,23 @@ const PerspectiveCard = ({ perspective, scenarioId }: PerspectiveCardProps) => {
             </div>
           </div>
           
+          {/* Community rating — feeds perspective ranking and reviewer achievements */}
+          <div className="mt-3 pt-3 border-t border-neutral-100 flex flex-wrap items-center gap-x-6 gap-y-2">
+            <StarRating
+              label="Quality"
+              value={rating?.quality ?? 0}
+              disabled={ratingSaving}
+              onSelect={(value) => submitRating(value, rating?.thoughtfulness ?? value)}
+            />
+            <StarRating
+              label="Thoughtfulness"
+              value={rating?.thoughtfulness ?? 0}
+              disabled={ratingSaving}
+              onSelect={(value) => submitRating(rating?.quality ?? value, value)}
+            />
+            {rating && <span className="text-xs text-neutral-500">Rating saved</span>}
+          </div>
+
           {/* Reply actions */}
           <div className="flex items-center gap-3 pt-2">
             <Button 

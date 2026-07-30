@@ -1,103 +1,75 @@
 /**
  * Database Indexes Test
- * 
- * Verifies that all performance-critical indexes exist
- * Tests should FAIL initially, then PASS after creating indexes
+ *
+ * Verifies that performance-critical indexes are declared in migration SQL.
+ * These assertions are environment-free on purpose: the previous version of this
+ * suite needed live Supabase credentials and asserted `expect(true).toBe(true)`,
+ * so it could never fail for a missing index.
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+function migrationSql(): string {
+  const roots = [
+    path.join(process.cwd(), 'server/migrations'),
+    path.join(process.cwd(), 'scripts/sql'),
+  ];
+
+  return roots
+    .filter((dir) => fs.existsSync(dir))
+    .flatMap((dir) =>
+      fs
+        .readdirSync(dir)
+        .filter((file) => file.endsWith('.sql'))
+        .map((file) => fs.readFileSync(path.join(dir, file), 'utf-8'))
+    )
+    .join('\n')
+    .toLowerCase();
+}
+
+const sql = migrationSql();
+
+/** Matches `CREATE INDEX ... ON table(col` and `ON table (col` plus composite indexes. */
+function hasIndexOn(table: string, column: string): boolean {
+  const pattern = new RegExp(
+    `create\\s+index[^;]*?on\\s+(?:public\\.)?${table}\\s*\\(([^)]*)\\)`,
+    'gi'
+  );
+
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(sql)) !== null) {
+    const columns = match[1].split(',').map((c) => c.trim().split(/\s+/)[0]);
+    if (columns.includes(column)) return true;
+  }
+  return false;
+}
 
 describe('Database Indexes Verification', () => {
-  describe('Performance-Critical Indexes', () => {
-    it('should have index on assignments.is_published', async () => {
-      // Query pg_indexes to check if index exists
-      const { data, error } = await supabase
-        .rpc('check_index_exists', {
-          table_name: 'assignments',
-          column_name: 'is_published'
-        })
-        .single();
+  describe('Performance-critical indexes are declared in migrations', () => {
+    const required: Array<[string, string]> = [
+      ['assignments', 'is_published'],
+      ['assignment_submissions', 'status'],
+      ['class_enrollments', 'status'],
+      ['notifications', 'is_read'],
+      ['notifications', 'recipient_id'],
+    ];
 
-      // For now, we'll skip this test since we can't easily query pg_indexes
-      // In production, you'd use a direct PostgreSQL connection
-      console.log('Index check: assignments.is_published');
-      expect(true).toBe(true); // Placeholder - would check actual index
-    });
-
-    it('should have index on assignment_submissions.status', async () => {
-      console.log('Index check: assignment_submissions.status');
-      expect(true).toBe(true); // Placeholder
-    });
-
-    it('should have index on class_enrollments.status', async () => {
-      console.log('Index check: class_enrollments.status');
-      expect(true).toBe(true); // Placeholder
-    });
-
-    it('should have index on notifications.is_read', async () => {
-      console.log('Index check: notifications.is_read');
-      expect(true).toBe(true); // Placeholder
-    });
-
-    it('should have index on notifications.recipient_id', async () => {
-      console.log('Index check: notifications.recipient_id');
-      expect(true).toBe(true); // Placeholder
+    it.each(required)('has an index on %s.%s', (table, column) => {
+      expect(hasIndexOn(table, column)).toBe(true);
     });
   });
 
-  describe('Query Performance Tests', () => {
-    it('should efficiently query published assignments', async () => {
-      const startTime = Date.now();
-      
-      const { data, error } = await supabase
-        .from('assignments')
-        .select('id, title')
-        .eq('is_published', true)
-        .limit(100);
-
-      const queryTime = Date.now() - startTime;
-
-      expect(error).toBeNull();
-      expect(queryTime).toBeLessThan(1000); // Should be fast
-      console.log(`✅ Query time for published assignments: ${queryTime}ms`);
+  describe('Index helper correctness', () => {
+    it('finds migration SQL to inspect', () => {
+      expect(sql.length).toBeGreaterThan(0);
+      expect(sql).toContain('create index');
     });
 
-    it('should efficiently query active enrollments', async () => {
-      const startTime = Date.now();
-      
-      const { data, error } = await supabase
-        .from('class_enrollments')
-        .select('id, class_id, student_id')
-        .eq('status', 'active')
-        .limit(100);
-
-      const queryTime = Date.now() - startTime;
-
-      expect(error).toBeNull();
-      expect(queryTime).toBeLessThan(1000);
-      console.log(`✅ Query time for active enrollments: ${queryTime}ms`);
-    });
-
-    it('should efficiently query unread notifications', async () => {
-      const startTime = Date.now();
-      
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('id, title')
-        .eq('is_read', false)
-        .limit(100);
-
-      const queryTime = Date.now() - startTime;
-
-      expect(error).toBeNull();
-      expect(queryTime).toBeLessThan(1000);
-      console.log(`✅ Query time for unread notifications: ${queryTime}ms`);
+    it('does not report an index that was never declared', () => {
+      expect(hasIndexOn('assignments', 'definitely_not_a_column')).toBe(false);
+      expect(hasIndexOn('not_a_table', 'status')).toBe(false);
     });
   });
 });
-

@@ -62,9 +62,9 @@ const AuthCallback = () => {
               // Skip create if profile already exists
               let profileExists = false;
               try {
-                const existing = await fetch(
-                  `/api/user-profile?email=${encodeURIComponent(email)}`,
-                  { credentials: 'include' }
+                const existing = await apiRequest(
+                  'GET',
+                  `/api/user-profile?email=${encodeURIComponent(email)}`
                 );
                 profileExists = existing.ok;
               } catch {

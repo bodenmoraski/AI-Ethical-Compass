@@ -1,13 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient } from '../lib/supabase-server.js';
+import { getBearerToken } from '../lib/api-auth.js';
 
 async function requireAuthEmail(
   req: VercelRequest,
   supabase: ReturnType<typeof getSupabaseClient>
 ): Promise<string | null> {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  const token = authHeader.substring(7);
+  const token = getBearerToken(req);
+  if (!token) return null;
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user?.email) return null;
   return user.email;
@@ -109,22 +109,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   else if (req.method === 'GET') {
     try {
-      const { email } = req.query;
-
-      if (!email || typeof email !== 'string') {
-        return res.status(400).json({ message: 'Email is required' });
+      // A profile exposes role and institution, so reads are owner-only. Without
+      // this the endpoint is an email-to-account lookup for anyone.
+      const authEmail = await requireAuthEmail(req, supabase);
+      if (!authEmail) {
+        return res.status(401).json({ message: 'Authentication required' });
       }
 
-      // Prefer JWT when present: only allow reading your own profile
-      const authEmail = await requireAuthEmail(req, supabase);
-      if (authEmail && email.toLowerCase() !== authEmail.toLowerCase()) {
+      const { email } = req.query;
+      if (email && typeof email === 'string' && email.toLowerCase() !== authEmail.toLowerCase()) {
         return res.status(403).json({ message: "Cannot access another user's profile" });
       }
 
       const { data: user, error } = await supabase
         .from('users')
         .select('id, email, username, institution_name, institution_type, role, created_at')
-        .eq('email', email)
+        .eq('email', authEmail)
         .single();
 
       if (error || !user) {

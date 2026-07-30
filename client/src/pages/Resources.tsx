@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useTranslation } from 'react-i18next';
 import { Search, Filter, ExternalLink, BookOpen, School, Microscope, Code, Lightbulb, Shield, Globe, Users, TrendingUp, Mail, Plus, ChevronLeft, ChevronRight, X, Clock, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ResourceRecommender from '@/components/ResourceRecommender';
@@ -27,7 +26,6 @@ interface Resource extends ResourceData {
 }
 
 const Resources = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -1453,15 +1451,35 @@ const Resources = () => {
   // Highlight search terms in text
   const highlightText = useCallback((text: string, query: string) => {
     if (!query.trim()) return text;
-    
-    const queryWords = query.toLowerCase().split(' ').filter(word => word.length > 0);
-    let highlightedText = text;
-    
-    queryWords.forEach(word => {
+
+    // Escape HTML first so resource titles/descriptions cannot inject markup
+    // through dangerouslySetInnerHTML, then wrap matches in <mark>.
+    const escapeHtml = (value: string) =>
+      value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const queryWords = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((word) => word.length > 0)
+      .map(escapeRegExp);
+
+    let highlightedText = escapeHtml(text);
+
+    queryWords.forEach((word) => {
       const regex = new RegExp(`(${word})`, 'gi');
-      highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200 rounded">$1</mark>');
+      highlightedText = highlightedText.replace(
+        regex,
+        '<mark class="bg-yellow-200 rounded">$1</mark>'
+      );
     });
-    
+
     return highlightedText;
   }, []);
 

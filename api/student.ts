@@ -6,6 +6,8 @@ import {
   notifyStudentOfEnrollment,
   notifyTeacherOfUnenrollment
 } from '../lib/notifications.js';
+import { recordActivity } from '../lib/activity-feed.js';
+import { getBearerToken } from '../lib/api-auth.js';
 
 // Environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
@@ -47,16 +49,10 @@ interface ClassData {
 
 // Auth helper - validates student authentication
 const authenticateStudent = async (req: VercelRequest): Promise<StudentAuthResult> => {
-  const authHeader = req.headers.authorization;
+  const token = getBearerToken(req);
   
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!token) {
     throw new Error('No authorization token provided');
-  }
-  
-  const token = authHeader.substring(7);
-  
-  if (!token || token === 'null' || token === 'undefined') {
-    throw new Error('Invalid authorization token');
   }
   
   try {
@@ -202,6 +198,16 @@ const handleJoinClass = async (req: VercelRequest, res: VercelResponse) => {
       console.error('Failed to send enrollment notifications:', notifError);
       // Continue anyway - enrollment was successful
     }
+
+    await recordActivity({
+      type: 'engagement',
+      classId: classData.id,
+      userId,
+      title: 'Student joined the class',
+      description: `${studentName} joined ${classData.name}`,
+      priority: 'low',
+      data: { event: 'enrollment', student_id: userId },
+    });
     
     console.log(`Student ${userId} successfully enrolled in class ${classData.id}`);
     

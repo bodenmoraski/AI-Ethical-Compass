@@ -14,7 +14,7 @@ import { useAuth } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 
 const UserMenu = () => {
-  const { user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -83,6 +83,15 @@ const UserMenu = () => {
           <span className="material-icons mr-2 text-sm">dashboard</span>
           Dashboard
         </DropdownMenuItem>
+        {userProfile?.role === 'admin' && (
+          <DropdownMenuItem
+            onClick={() => navigate('/admin')}
+            className="cursor-pointer"
+          >
+            <span className="material-icons mr-2 text-sm">admin_panel_settings</span>
+            Admin Console
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}

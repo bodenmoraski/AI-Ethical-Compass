@@ -41,7 +41,9 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
     refreshData,
   } = useRealtimeClassroom(classId);
 
-  // Demo function to create test activity
+  // Only available in local development so production teachers can't inject fake events
+  const showDevTools = typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV);
+
   const createTestActivity = useCallback(() => {
     createActivity({
       type: 'discussion',
@@ -144,9 +146,11 @@ const LiveClassroomMonitor: React.FC<LiveClassroomMonitorProps> = ({
               <Button variant="outline" size="sm" onClick={refreshData}>
                 Refresh
               </Button>
-              <Button variant="outline" size="sm" onClick={createTestActivity}>
-                Test Activity
-              </Button>
+              {showDevTools && (
+                <Button variant="outline" size="sm" onClick={createTestActivity}>
+                  Test Activity
+                </Button>
+              )}
               {connectionStatus === 'error' && (
                 <Button variant="outline" size="sm" onClick={reconnect}>
                   Reconnect

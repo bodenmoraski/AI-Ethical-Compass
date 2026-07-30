@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '../ui/alert';
 import { Skeleton } from '../ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
 import AssignmentManager from './AssignmentManager';
+import SubmissionTrendChart from './SubmissionTrendChart';
 import { 
   Users, 
   BookOpen, 
@@ -75,12 +76,15 @@ interface Assignment {
 interface AnalyticsData {
   engagement_trends: Array<{
     date: string;
-    engagement_score: number;
+    submissions: number;
   }>;
   completion_rates: {
     total: number;
     by_assignment: Array<{
       assignment_id: number;
+      title?: string;
+      submitted?: number;
+      total_students?: number;
       completion_rate: number;
     }>;
   };
@@ -268,8 +272,7 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
       }
       
       try {
-        // Use class detail payload (includes completion_rate) — dedicated analytics endpoint does not exist
-        const response = await fetch(`/api/teacher?action=classes&classId=${classId}`, {
+        const response = await fetch(`/api/teacher?action=class-analytics&classId=${classId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
@@ -281,13 +284,13 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
         }
         
         const result = await response.json();
-        const classInfo = result.data || result.class || {};
+        const analytics = result.analytics || {};
         return {
           data: {
-            engagement_trends: [],
+            engagement_trends: analytics.engagement_trends || [],
             completion_rates: {
-              total: classInfo.completion_rate ?? 0,
-              by_assignment: [],
+              total: analytics.completion_rates?.total ?? 0,
+              by_assignment: analytics.completion_rates?.by_assignment || [],
             },
           },
         };
@@ -669,22 +672,14 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Engagement Trends</CardTitle>
-                <CardDescription>Student engagement over time</CardDescription>
+                <CardTitle>Submission Activity</CardTitle>
+                <CardDescription>Submissions per day over the past 30 days</CardDescription>
               </CardHeader>
               <CardContent>
                 {analyticsLoading ? (
                   <Skeleton className="h-64" />
                 ) : (
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      Showing engagement data for the past 30 days
-                    </p>
-                    {/* Chart would go here - using placeholder for now */}
-                    <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground">Engagement Chart Placeholder</p>
-                    </div>
-                  </div>
+                  <SubmissionTrendChart trend={analyticsData?.data?.engagement_trends || []} />
                 )}
               </CardContent>
             </Card>
@@ -704,12 +699,22 @@ const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => {
                     </div>
                     <p className="text-sm text-muted-foreground">Overall completion rate</p>
                     <div className="space-y-2">
-                      {(analyticsData?.data?.completion_rates?.by_assignment || []).map((item, index) => (
-                        <div key={index} className="flex justify-between">
-                          <span className="text-sm">Assignment {item.assignment_id}</span>
-                          <span className="text-sm font-medium">{item.completion_rate}%</span>
-                        </div>
-                      ))}
+                      {(analyticsData?.data?.completion_rates?.by_assignment || []).length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                          No assignments yet — create one to see completion per assignment.
+                        </p>
+                      ) : (
+                        (analyticsData?.data?.completion_rates?.by_assignment || []).map((item: any) => (
+                          <div key={item.assignment_id} className="flex justify-between gap-4">
+                            <span className="text-sm truncate">
+                              {item.title || `Assignment ${item.assignment_id}`}
+                            </span>
+                            <span className="text-sm font-medium whitespace-nowrap">
+                              {item.submitted ?? 0}/{item.total_students ?? 0} · {item.completion_rate}%
+                            </span>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}

@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import { calculateUserScore } from '../lib/ai-analysis.js';
+import { getBearerToken } from '../lib/api-auth.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -20,6 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method === 'GET') {
       const { category = 'overall', period = 'all_time', limit = 50 } = req.query;
+      const cappedLimit = Math.min(Math.max(parseInt(String(limit), 10) || 50, 1), 100);
 
       // Get existing leaderboard entries
       let query = supabase
@@ -27,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select('*')
         .eq('category', category)
         .order('rank_position', { ascending: true })
-        .limit(parseInt(limit as string));
+        .limit(cappedLimit);
 
       if (period !== 'all_time') {
         const now = new Date();
@@ -59,12 +61,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'POST') {
       // Recalculate leaderboard — teachers/admins only
-      const authHeader = req.headers.authorization;
-      if (!authHeader?.startsWith('Bearer ')) {
+      const token = getBearerToken(req);
+      if (!token) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const token = authHeader.substring(7);
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       if (authError || !user?.email) {
         return res.status(401).json({ error: 'Invalid or expired token' });
@@ -95,7 +96,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 async function recalculateLeaderboard() {
   try {
-    // Get all users with their contributions
+    // Bound the scan: a full-table read on every recalculate is a DoS vector even
+    // for authenticated teachers. Recent activity is enough for a rolling board.
+    const RECALC_FETCH_CAP = 2000;
+
     const { data: perspectives } = await supabase
       .from('perspectives')
       .select(`
@@ -106,12 +110,15 @@ async function recalculateLeaderboard() {
           quality_score,
           bias_score
         )
-      `);
+      `)
+      .order('created_at', { ascending: false })
+      .limit(RECALC_FETCH_CAP);
 
     const { data: userScenarios } = await supabase
       .from('user_scenarios')
       .select('author_name, author_email, status, votes_up, votes_down')
-      .eq('status', 'approved');
+      .eq('status', 'approved')
+      .limit(RECALC_FETCH_CAP);
 
          const { data: perspectiveRatings } = await supabase
        .from('perspective_ratings')
@@ -119,7 +126,8 @@ async function recalculateLeaderboard() {
          perspectives (author_name),
          quality_rating,
          thoughtfulness_rating
-       `);
+       `)
+       .limit(RECALC_FETCH_CAP);
 
      // Aggregate user metrics
      const userMetrics = new Map<string, any>();

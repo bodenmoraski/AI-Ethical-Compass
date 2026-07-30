@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { isRubric, scoreRubric } from '../../lib/rubric-scoring';
 
 // Define types for the mock API
 interface TemplateData {
@@ -280,75 +281,70 @@ describe('Assignment Templates and Rubrics', () => {
   });
 
   describe('Auto-scoring Functionality', () => {
+    const rubric = {
+      criteria: [
+        { id: '1', name: 'Ethical Framework', maxPoints: 25 },
+        { id: '2', name: 'Analysis Depth', maxPoints: 30 },
+        { id: '3', name: 'Critical Thinking', maxPoints: 25 },
+        { id: '4', name: 'Communication', maxPoints: 20 }
+      ]
+    };
+
     it('should apply rubric scoring to submission', () => {
-      const rubric = {
-        criteria: [
-          { id: '1', name: 'Ethical Framework', maxPoints: 25, weight: 25 },
-          { id: '2', name: 'Analysis Depth', maxPoints: 30, weight: 30 },
-          { id: '3', name: 'Critical Thinking', maxPoints: 25, weight: 25 },
-          { id: '4', name: 'Communication', maxPoints: 20, weight: 20 }
-        ],
-        levels: [
-          { id: '1', name: 'Excellent', points: 100 },
-          { id: '2', name: 'Good', points: 85 },
-          { id: '3', name: 'Satisfactory', points: 70 },
-          { id: '4', name: 'Needs Improvement', points: 55 },
-          { id: '5', name: 'Unsatisfactory', points: 40 }
-        ]
-      };
+      // 20 + 30 + 18 + 17 = 85 of 100 possible points
+      const result = scoreRubric(rubric, { '1': 20, '2': 30, '3': 18, '4': 17 }, 100);
 
-      const submissionScores = {
-        '1': 85, // Good
-        '2': 100, // Excellent
-        '3': 70, // Satisfactory
-        '4': 85 // Good
-      };
-
-      const calculateScore = (scores: Record<string, number>) => {
-        let totalScore = 0;
-        let totalWeight = 0;
-
-        rubric.criteria.forEach(criterion => {
-          const score = scores[criterion.id] || 0;
-          const weightedScore = (score / 100) * criterion.maxPoints;
-          totalScore += weightedScore;
-          totalWeight += criterion.weight;
-        });
-
-        return Math.round((totalScore / 100) * 100);
-      };
-
-      const finalScore = calculateScore(submissionScores);
-      expect(finalScore).toBe(85); // Expected weighted average
+      expect(result.earned).toBe(85);
+      expect(result.possible).toBe(100);
+      expect(result.percentage).toBe(85);
+      expect(result.points).toBe(85);
     });
 
     it('should handle missing criteria scores', () => {
-      const rubric = {
+      const partialRubric = {
         criteria: [
-          { id: '1', name: 'Ethical Framework', maxPoints: 25, weight: 25 },
-          { id: '2', name: 'Analysis Depth', maxPoints: 30, weight: 30 }
+          { id: '1', name: 'Ethical Framework', maxPoints: 25 },
+          { id: '2', name: 'Analysis Depth', maxPoints: 30 }
         ]
       };
 
-      const submissionScores = {
-        '1': 85 // Only one criteria scored
-      };
+      // Only the first criterion was scored: 20 of 55 possible.
+      const result = scoreRubric(partialRubric, { '1': 20 }, 100);
 
-      const calculateScore = (scores: Record<string, number>) => {
-        let totalScore = 0;
-        let totalMaxPoints = 0;
+      expect(result.earned).toBe(20);
+      expect(result.possible).toBe(55);
+      expect(result.points).toBe(36); // round(20/55 * 100)
+    });
 
-        rubric.criteria.forEach(criterion => {
-          const score = scores[criterion.id] || 0;
-          totalScore += score;
-          totalMaxPoints += criterion.maxPoints;
-        });
+    it('should clamp an award above a criterion maximum', () => {
+      const result = scoreRubric(rubric, { '1': 999, '2': 0, '3': 0, '4': 0 }, 100);
+      expect(result.earned).toBe(25);
+      expect(result.perCriterion[0].awarded).toBe(25);
+    });
 
-        return Math.round((totalScore / totalMaxPoints) * 100);
-      };
+    it('should treat negative and non-numeric awards as zero', () => {
+      const result = scoreRubric(rubric, { '1': -10, '2': 'abc', '3': null, '4': undefined }, 100);
+      expect(result.earned).toBe(0);
+      expect(result.points).toBe(0);
+    });
 
-      const finalScore = calculateScore(submissionScores);
-      expect(finalScore).toBe(31); // 85/275 * 100
+    it('should scale to the assignment points possible', () => {
+      const result = scoreRubric(rubric, { '1': 25, '2': 30, '3': 25, '4': 20 }, 50);
+      expect(result.percentage).toBe(100);
+      expect(result.points).toBe(50);
+    });
+
+    it('should not divide by zero for an empty rubric', () => {
+      const result = scoreRubric({ criteria: [] }, {}, 100);
+      expect(result.percentage).toBe(0);
+      expect(result.points).toBe(0);
+    });
+
+    it('should recognise valid and invalid rubric shapes', () => {
+      expect(isRubric(rubric)).toBe(true);
+      expect(isRubric({ criteria: [] })).toBe(false);
+      expect(isRubric({})).toBe(false);
+      expect(isRubric(null)).toBe(false);
     });
   });
 

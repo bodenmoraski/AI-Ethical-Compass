@@ -1,5 +1,39 @@
 # 🏆 AI Ethical Compass - Comprehensive Feature Summary for Awards & Grants
 
+## Feature Status
+
+This table is the source of truth for what is actually shipped. Anything described later in this
+document should be read against this table — narrative sections describe design intent, this table
+describes runtime reality.
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Scenario library & perspectives | Shipped | Public browse, submit, rank, reply, like |
+| AI moderation of perspectives | Shipped | Appropriateness, topical relevance, quality scoring |
+| Moderation review queue | Shipped | Flagged perspectives enqueue; teacher/admin review UI |
+| Auth (email + Google OAuth) | Shipped | Supabase Auth, profile bootstrap |
+| Classes, enrollment, join codes | Shipped | Create, join, leave, roster management |
+| Assignments (create/publish/submit) | Shipped | Scenario and free-response types |
+| Grading + feedback | Shipped | Score, feedback, rubric-aware grading |
+| Grading rubrics | Shipped | Authored on the assignment, applied during grading |
+| Per-assignment analytics | Shipped | Completion, scores, submission trend, CSV export |
+| Class analytics | Shipped | Real per-assignment breakdown; no synthetic charts |
+| Live classroom monitor | Shipped (polling) | HTTP polling every 5s — not WebSocket delivery |
+| Notifications | Shipped (in-app) | In-app centre only; no email, push, or digests |
+| Achievements & leaderboard | Shipped | Server-side award checks on qualifying actions |
+| Perspective ratings | Shipped | Quality/thoughtfulness ratings feed reputation |
+| Teacher access approval | Shipped (in-app) | Admin console approves; no email notification |
+| SDG impact | Shipped | Derived from scenarios the learner engaged with |
+| Internationalisation | Partial | English complete; other locales fall back per key |
+| Gradebook export | Planned | `gradebook_entries` table exists; no product surface |
+| Parent/guardian portal | Planned | Schema only |
+| Class groups | Planned | Schema only |
+| Bulk CSV roster import | Planned | Not implemented |
+| Assignment template library | Planned | Not implemented |
+| LMS passback (Canvas/Classroom) | Planned | Not implemented |
+| Email / push notifications | Planned | No provider wired |
+| WebSocket realtime transport | Planned | Monitor uses polling today |
+
 ## Executive Summary
 
 **AI Ethical Compass** is a production-ready, full-stack educational platform designed for the ISTE+ASCD AI Innovator Challenge 2025. This platform represents a sophisticated, enterprise-grade solution for teaching ethical AI use to high school students, combining cutting-edge technology with pedagogically sound design principles. Built with over **50,000+ lines of code**, the platform demonstrates technical excellence, educational innovation, and unwavering commitment to accessibility and inclusion.
@@ -106,117 +140,81 @@ A **groundbreaking live monitoring system** (`api/realtime-classroom.ts`) that p
 - Connection status indicators
 - Error handling with user-friendly messages
 
-### 3. **Comprehensive Teacher Dashboard Suite**
+### 3. **Teacher Dashboard Suite**
 
-An **enterprise-grade classroom management system** rivaling commercial LMS platforms:
-
-#### Class Management (`classes` table)
-- Create unlimited classes with unique generated codes
+#### Class Management (`classes` table) — Shipped
+- Create classes with unique generated codes
 - Configure subject, grade level, school year, semester
-- Rich descriptions and class metadata
-- Student enrollment via class codes or manual addition
-- Bulk CSV import capabilities
+- Descriptions and class metadata
+- Student enrollment via class codes
 - Status tracking (active/inactive)
 - Automatic enrollment date tracking
+- Multi-class switching from a single dashboard
 
-#### Assignment System (`assignments` table)
+#### Assignment System (`assignments` table) — Shipped
 **Assignment Creation**:
-- Multiple assignment types: scenario-based, custom, discussion
+- Two assignment types: scenario-based and written response
 - Support for multiple scenarios per assignment
-- Rich text instructions with formatting
-- Flexible due dates with timezone handling
+- Plain-text instructions
+- Due dates
 - Customizable point values
-- **Advanced Rubric System** (JSONB-stored):
-  - Multi-criteria rubrics (Analysis, Reasoning, Writing, etc.)
-  - Point allocations per category
-  - Descriptive level definitions
-  - Reusable templates
-- Late submission policies:
-  - Allow/disallow late work
-  - Percentage penalty per day
-  - Automatic late detection
-- Draft/published visibility controls
+- **Rubric authoring** (JSONB-stored): named criteria with max points, scored by
+  `lib/rubric-scoring.ts` and shown to the teacher during grading
+- Late submission policy: allow/disallow late work and a percentage penalty per
+  day, enforced on submit and applied at grading time
+- Draft/published visibility controls, with a notification to students on publish
 
 **Assignment Tracking**:
-- Submission lists with status indicators (submitted, graded, late, missing)
-- Real-time completion statistics
-- Filter and sort capabilities
-- Preview submissions without opening full view
-- Export functionality for record-keeping
+- Submission lists with status indicators (submitted, graded, late)
+- Completion statistics per assignment
+- CSV export of submissions
 
-#### Grading Workflow (`assignment_submissions` table)
-**Sophisticated Grading System**:
+#### Grading Workflow (`assignment_submissions` table) — Shipped
 - Split-screen interface (submission + grading form)
-- Three-tier scoring:
-  - **Auto-score**: Automatically calculated based on criteria
-  - **Manual score**: Teacher-assigned score
-  - **Final score**: Score after adjustments (late penalties, etc.)
-- Rich text feedback editor
-- Saved feedback snippets for efficiency
-- Previous feedback reference
-- Quick actions for common scenarios
-- Grading progress tracking
-- Status management (submitted → graded → returned)
+- Per-criterion rubric entry when the assignment has a rubric, single score otherwise
+- Scoring fields: `manual_score` (teacher entry) and `final_score` (after late penalty)
+- Plain-text feedback
+- Status management (submitted → graded)
+- In-app notification to the student when a grade is posted
 
-**Grading Analytics**:
-- Average scores by assignment
-- Grade distribution visualizations
-- Common strengths and weaknesses identification
-- Individual vs. class performance comparisons
-- Time-to-grade metrics
+**Grading Analytics** — Shipped:
+- Average score and completion rate per assignment
+- Score distribution
+- Submission trend over time
 
-#### Student Management
-- Comprehensive student roster views
-- Individual student profiles
+#### Student Management — Shipped
+- Class roster views
 - Progress tracking per student
-- Engagement score monitoring
-- Participation analytics
-- Communication logs
-- Parent/guardian relationship tracking
+- Engagement metrics from recorded classroom activity
 
-#### Advanced Features
-- **Group Management** (`class_groups` table):
-  - Create collaborative groups within classes
-  - Set maximum members per group
-  - Track group memberships
-  - Assign group-based activities
+#### Planned / not implemented
 
-- **Discussion Forums** (`discussion_threads`, `discussion_posts` tables):
-  - Create threaded discussions
-  - Pin important threads
-  - Lock threads when complete
-  - Moderation status tracking
-  - Sentiment analysis on posts
-  - Teacher vs. student post identification
+These tables exist in the schema but have **no product surface**. They are listed
+here so nobody mistakes schema for a feature.
 
-- **Gradebook System** (`gradebook_entries` table):
-  - Flexible grading categories (assignment, participation, quiz, project)
-  - Letter grade calculation
-  - Excuse assignments
-  - Grade notes and annotations
-  - Export to CSV/Excel
+- **Group Management** (`class_groups`, `group_memberships`) — Planned. Schema only.
+- **Discussion Forums** (`discussion_threads`, `discussion_posts`) — Planned. Schema
+  only; there is no threaded discussion UI, which is why "discussion" is not a
+  selectable assignment type.
+- **Gradebook export** (`gradebook_entries`) — Planned. Schema only; no letter grades,
+  categories, or export.
+- **Assignment Templates** (`assignment_templates`) — Planned. Schema and an API
+  module exist; there is no library UI for saving or reusing templates.
+- **Parent/guardian portal** (`parent_relationships`) — Planned. Schema only.
+- **Bulk CSV roster import** — Planned. Not implemented.
+- **LMS passback (Canvas / Google Classroom)** — Planned. Not implemented.
+- **Email and push notifications** — Planned. No delivery provider is wired; all
+  notifications are in-app only.
 
-- **Notification System** (`notifications` table):
-  - Assignment due reminders
-  - Grade posted notifications
-  - Discussion reply alerts
-  - Custom teacher announcements
-  - Read/unread status tracking
-  - Notification preferences per user
+#### Shipped platform services
 
-- **Content Moderation Queue** (`moderation_queue` table):
-  - AI-flagged content review
-  - Manual flagging by users
-  - Moderation workflow (pending → reviewed → action taken)
-  - Audit log for accountability
-  - Bulk moderation actions
-  - Appeal process support
+- **Notification System** (`notifications` table): in-app notifications with a bell
+  and unread badge in the navbar, produced on enrollment, assignment publish, and
+  grade posting. Read/unread tracking. No email or push delivery.
 
-- **Assignment Templates** (`assignment_templates` table):
-  - Save assignments as reusable templates
-  - Category-based organization
-  - Public/private template sharing
-  - Template marketplace (future)
+- **Content Moderation Queue** (`moderation_queue` table): AI-flagged content review
+  with a teacher/admin panel, approve / reject / dismiss actions, and class-scoped
+  authorization. Bulk actions and an appeal process are not implemented.
 
 ### 4. **Gamification & Achievement System**
 
@@ -994,7 +992,7 @@ Verified across:
 
 2. **Real-Time Classroom Intelligence**: Revolutionary live monitoring system providing unprecedented visibility
 
-3. **Comprehensive Teacher Tools**: Enterprise-grade classroom management rivaling commercial LMS platforms
+3. **Teacher Tools**: Classes, assignments, rubric grading, moderation, and analytics (see the Feature Status table for what is shipped vs. planned)
 
 4. **Sophisticated Gamification**: Multi-tiered achievement system that drives engagement without trivializing ethics
 
